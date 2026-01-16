@@ -44,9 +44,8 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: height * 0.65, // Increased height for better coverage
+    height: height * 0.65,
     overflow: 'hidden',
-    zIndex: -1,
   },
   glowGradient: {
     flex: 1,
