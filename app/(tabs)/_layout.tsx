@@ -2,21 +2,23 @@ import { Tabs } from "expo-router";
 import { Home, TrendingUp, Target, PieChart, Sparkles, Calendar, CheckSquare, MessageCircle, User } from "lucide-react-native";
 import React from "react";
 import { View, StyleSheet } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppMode } from "@/contexts/AppModeContext";
 
 export default function TabLayout() {
   const { isFinancialMode } = useAppMode();
+  const { colors, isDark } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#FFFFFF',
-        tabBarInactiveTintColor: '#52525B',
+        tabBarActiveTintColor: isDark ? '#FFFFFF' : '#0F172A',
+        tabBarInactiveTintColor: isDark ? '#52525B' : '#94A3B8',
         tabBarShowLabel: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { backgroundColor: colors.tabBar }],
         tabBarBackground: () => (
-          <View style={styles.tabBackground} />
+          <View style={[styles.tabBackground, { backgroundColor: colors.tabBar, borderTopColor: colors.tabBarBorder }]} />
         ),
       }}
     >
@@ -147,9 +149,7 @@ const styles = StyleSheet.create({
   },
   tabBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
     borderTopWidth: 1,
-    borderTopColor: '#18181B',
   },
   iconContainer: {
     alignItems: 'center',

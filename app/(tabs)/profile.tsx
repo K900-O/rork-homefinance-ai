@@ -36,9 +36,12 @@ import {
   FileText,
   Sparkles,
   Calendar,
+  Sun,
+  Moon,
 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { router } from 'expo-router';
@@ -57,6 +60,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, updateUser, logout, financialSummary, transactions, totalRewardPoints } = useFinance();
   const { toggleMode, isFinancialMode } = useAppMode();
+  const { colors, isDark, toggleTheme } = useTheme();
   
   const [showEditModal, setShowEditModal] = useState(false);
   const [editField, setEditField] = useState<string>('');
@@ -162,8 +166,8 @@ export default function ProfileScreen() {
   
 
   return (
-    <View style={styles.container}>
-      <BlueGlow />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {isDark && <BlueGlow />}
       <Animated.View style={[
         styles.contentContainer, 
         { 
@@ -173,9 +177,9 @@ export default function ProfileScreen() {
         }
       ]}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity style={styles.settingsButton}>
-            <Settings color="#A1A1AA" size={22} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Profile</Text>
+          <TouchableOpacity style={[styles.settingsButton, { backgroundColor: colors.surface }]}>
+            <Settings color={colors.textSecondary} size={22} />
           </TouchableOpacity>
         </View>
 
@@ -185,8 +189,8 @@ export default function ProfileScreen() {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <LinearGradient
-            colors={['#18181B', '#09090B']}
-            style={styles.profileCard}
+            colors={isDark ? ['#18181B', '#09090B'] : [colors.card, colors.backgroundSecondary]}
+            style={[styles.profileCard, { borderColor: colors.border }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
@@ -201,8 +205,8 @@ export default function ProfileScreen() {
             </View>
             
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{user?.name || 'User'}</Text>
-              <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
+              <Text style={[styles.profileName, { color: colors.text }]}>{user?.name || 'User'}</Text>
+              <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>{user?.email || 'email@example.com'}</Text>
               <View style={styles.memberBadge}>
                 <Calendar size={12} color="#10B981" />
                 <Text style={styles.memberText}>Member since {memberSince}</Text>
@@ -211,36 +215,36 @@ export default function ProfileScreen() {
           </LinearGradient>
 
           <View style={styles.statsSection}>
-            <View style={styles.statCard}>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
                 <Wallet size={20} color="#10B981" />
               </View>
-              <Text style={styles.statValue}>{financialSummary.balance.toLocaleString()}</Text>
-              <Text style={styles.statLabel}>Balance</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{financialSummary.balance.toLocaleString()}</Text>
+              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Balance</Text>
             </View>
             
-            <View style={styles.statCard}>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
                 <TrendingUp size={20} color="#3B82F6" />
               </View>
-              <Text style={styles.statValue}>{totalTransactions}</Text>
-              <Text style={styles.statLabel}>Transactions</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{totalTransactions}</Text>
+              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Transactions</Text>
             </View>
             
-            <View style={styles.statCard}>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={[styles.statIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
                 <Award size={20} color="#F59E0B" />
               </View>
-              <Text style={styles.statValue}>{totalRewardPoints}</Text>
-              <Text style={styles.statLabel}>Points</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{totalRewardPoints}</Text>
+              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Points</Text>
             </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account Details</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Account Details</Text>
             
             <TouchableOpacity 
-              style={styles.menuItem}
+              style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onPress={() => openEditModal('name', user?.name || '')}
             >
               <View style={styles.menuItemLeft}>
@@ -248,15 +252,15 @@ export default function ProfileScreen() {
                   <User size={18} color="#6366F1" />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>Name</Text>
-                  <Text style={styles.menuValue}>{user?.name || 'Not set'}</Text>
+                  <Text style={[styles.menuLabel, { color: colors.text }]}>Name</Text>
+                  <Text style={[styles.menuValue, { color: colors.textTertiary }]}>{user?.name || 'Not set'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.menuItem}
+              style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onPress={() => openEditModal('email', user?.email || '')}
             >
               <View style={styles.menuItemLeft}>
@@ -264,11 +268,11 @@ export default function ProfileScreen() {
                   <Mail size={18} color="#EC4899" />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>Email</Text>
-                  <Text style={styles.menuValue}>{user?.email || 'Not set'}</Text>
+                  <Text style={[styles.menuLabel, { color: colors.text }]}>Email</Text>
+                  <Text style={[styles.menuValue, { color: colors.textTertiary }]}>{user?.email || 'Not set'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -307,10 +311,30 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Preferences</Text>
 
             <TouchableOpacity 
-              style={styles.menuItem}
+              style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={toggleTheme}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: isDark ? 'rgba(251, 191, 36, 0.15)' : 'rgba(99, 102, 241, 0.15)' }]}>
+                  {isDark ? <Moon size={18} color="#FBBF24" /> : <Sun size={18} color="#6366F1" />}
+                </View>
+                <View>
+                  <Text style={[styles.menuLabel, { color: colors.text }]}>Theme</Text>
+                  <Text style={[styles.menuValue, { color: colors.textTertiary }]}>{isDark ? 'Dark Mode' : 'Light Mode'}</Text>
+                </View>
+              </View>
+              <View style={[styles.themeBadge, { backgroundColor: isDark ? 'rgba(251, 191, 36, 0.15)' : 'rgba(99, 102, 241, 0.15)' }]}>
+                <Text style={[styles.themeBadgeText, { color: isDark ? '#FBBF24' : '#6366F1' }]}>
+                  {isDark ? 'Dark' : 'Light'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onPress={() => openEditModal('currency', user?.currency || 'USD')}
             >
               <View style={styles.menuItemLeft}>
@@ -318,15 +342,15 @@ export default function ProfileScreen() {
                   <Globe size={18} color="#F59E0B" />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>Currency</Text>
-                  <Text style={styles.menuValue}>{user?.currency || 'USD'}</Text>
+                  <Text style={[styles.menuLabel, { color: colors.text }]}>Currency</Text>
+                  <Text style={[styles.menuValue, { color: colors.textTertiary }]}>{user?.currency || 'USD'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.menuItem}
+              style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onPress={() => openEditModal('riskTolerance', user?.riskTolerance || 'moderate')}
             >
               <View style={styles.menuItemLeft}>
@@ -334,13 +358,13 @@ export default function ProfileScreen() {
                   <Shield size={18} color="#EF4444" />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>Risk Tolerance</Text>
-                  <Text style={styles.menuValue}>
+                  <Text style={[styles.menuLabel, { color: colors.text }]}>Risk Tolerance</Text>
+                  <Text style={[styles.menuValue, { color: colors.textTertiary }]}>
                     {user?.riskTolerance ? user.riskTolerance.charAt(0).toUpperCase() + user.riskTolerance.slice(1) : 'Moderate'}
                   </Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={toggleMode}>
@@ -693,6 +717,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
+  },
+  themeBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  themeBadgeText: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 12,
+    fontWeight: '600' as const,
   },
   financialBadge: {
     backgroundColor: 'rgba(16, 185, 129, 0.15)',

@@ -30,6 +30,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { usePersonal } from '@/contexts/PersonalContext';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { ACTIVITY_COLORS } from '@/constants/personalTypes';
 import type { Activity, Habit } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
@@ -109,6 +110,7 @@ export default function PersonalHomeScreen() {
   const router = useRouter();
   const { user } = useFinance();
   const { toggleMode } = useAppMode();
+  const { colors, isDark } = useTheme();
   const { 
     dailySummary, 
     getTodayActivities, 
@@ -185,8 +187,8 @@ export default function PersonalHomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <BlueGlow />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {isDark && <BlueGlow />}
       
       <Animated.View style={[
         styles.animatedContainer, 
