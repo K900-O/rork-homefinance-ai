@@ -69,6 +69,10 @@ export default function OnboardingScreen() {
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('moderate');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Refs for input focus
+  const incomeInputRef = useRef<TextInput>(null);
+  const householdInputRef = useRef<TextInput>(null);
 
   // Step Animations
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -102,6 +106,11 @@ export default function OnboardingScreen() {
       duration: 300,
       useNativeDriver: false,
     }).start();
+
+    // Focus input when step changes
+    if (currentStep === 0) {
+      setTimeout(() => incomeInputRef.current?.focus(), 300);
+    }
   }, [currentStep, progressAnim]);
 
   const animateSlide = (direction: 'forward' | 'backward') => {
@@ -237,14 +246,17 @@ export default function OnboardingScreen() {
             <View style={styles.inputContainer}>
               <Text style={styles.currencyPrefix}>JD</Text>
               <TextInput
+                ref={incomeInputRef}
                 style={styles.mainInput}
                 value={monthlyIncome}
                 onChangeText={setMonthlyIncome}
                 keyboardType="decimal-pad"
                 placeholder="0"
                 placeholderTextColor={AppColors.textSecondary}
-                autoFocus
+                returnKeyType="next"
+                onSubmitEditing={handleNext}
                 selectionColor={AppColors.primary}
+                blurOnSubmit={false}
               />
             </View>
           </View>
@@ -289,13 +301,17 @@ export default function OnboardingScreen() {
             <View style={styles.otherInputContainer}>
               <Text style={styles.otherLabel}>Other amount</Text>
               <TextInput
+                ref={householdInputRef}
                 style={styles.otherInput}
                 value={householdSize}
                 onChangeText={setHouseholdSize}
                 keyboardType="number-pad"
                 placeholder="#"
                 placeholderTextColor={AppColors.textSecondary}
-                textAlign="center"
+                returnKeyType="next"
+                onSubmitEditing={handleNext}
+                selectionColor={AppColors.primary}
+                blurOnSubmit={false}
               />
             </View>
           </View>
@@ -583,6 +599,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     height: 60,
     fontWeight: '700' as const,
+    padding: 0,
   },
 
   // Household Step
@@ -638,6 +655,7 @@ const styles = StyleSheet.create({
     minWidth: 60,
     textAlign: 'right' as const,
     fontWeight: '600' as const,
+    padding: 0,
   },
 
   // Goals Step
