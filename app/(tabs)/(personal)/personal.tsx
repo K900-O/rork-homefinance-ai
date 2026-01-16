@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,30 +6,102 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Image,
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { 
   Plus, 
-  Bell, 
   CheckCircle2, 
-  Circle, 
   Clock, 
   Flame,
-  ArrowRight,
   Zap,
   Shield,
+  Activity as ActivityIcon,
+  ChevronDown,
+  Cloud,
+  Target,
+  Layout,
+  ListTodo
 } from 'lucide-react-native';
+import Svg, { Circle } from 'react-native-svg';
 import { usePersonal } from '@/contexts/PersonalContext';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { ACTIVITY_COLORS } from '@/constants/personalTypes';
-import type { Activity, Habit } from '@/constants/personalTypes';
+import type { Activity } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
+
+// Bevel-style Circular Progress
+const CircularProgress = ({ 
+  size = 80, 
+  strokeWidth = 8, 
+  progress = 0, 
+  color = '#3B82F6',
+  label = '',
+  value = ''
+}: { 
+  size?: number; 
+  strokeWidth?: number; 
+  progress?: number; 
+  color?: string;
+  label?: string;
+  value?: string;
+}) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <View style={{ width: size, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+        <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
+          {/* Background Circle */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            opacity={0.2}
+          />
+          {/* Progress Circle */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+          />
+        </Svg>
+        <View style={[StyleSheet.absoluteFillObject, { alignItems: 'center', justifyContent: 'center' }]} pointerEvents="none">
+          <Text style={{ 
+            color: '#FFF', 
+            fontFamily: sfProDisplayBold, 
+            fontSize: size * 0.22,
+            textAlign: 'center'
+          }}>
+            {value}
+          </Text>
+        </View>
+      </View>
+      <Text style={{ 
+        color: '#A1A1AA', 
+        fontFamily: sfProDisplayMedium, 
+        fontSize: 12, 
+        marginTop: 8 
+      }}>
+        {label}
+      </Text>
+    </View>
+  );
+};
 
 export default function PersonalHomeScreen() {
   const insets = useSafeAreaInsets();
@@ -39,13 +111,10 @@ export default function PersonalHomeScreen() {
     dailySummary, 
     getTodayActivities, 
     goodHabits,
-    badHabits,
     completeActivity,
-    completeHabitForToday,
-    logSuccessBadHabit,
     isHabitCompletedToday,
-    isBadHabitSuccessToday,
   } = usePersonal();
+  
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -74,12 +143,29 @@ export default function PersonalHomeScreen() {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
+  const formattedDate = useMemo(() => {
+    const date = new Date();
+    return date.toLocaleDateString('en-GB', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long' 
+    });
+  }, []);
+
+  const productivityColor = '#3B82F6'; // Blue
+  const habitsColor = '#60A5FA'; // Lighter Blue
+  const tasksColor = '#2563EB'; // Darker Blue
+
+  const habitsCompletion = useMemo(() => {
+    if (goodHabits.length === 0) return 0;
+    const completed = goodHabits.filter(h => isHabitCompletedToday(h.id)).length;
+    return Math.round((completed / goodHabits.length) * 100);
+  }, [goodHabits, isHabitCompletedToday]);
+
+  const tasksCompletion = useMemo(() => {
+    if (dailySummary.totalActivities === 0) return 0;
+    return Math.round((dailySummary.completedActivities / dailySummary.totalActivities) * 100);
+  }, [dailySummary]);
 
   return (
     <View style={styles.container}>
@@ -93,300 +179,199 @@ export default function PersonalHomeScreen() {
           paddingTop: insets.top 
         }
       ]}>
+        
+        {/* Header - Bevel Style */}
         <View style={styles.header}>
-          <View style={styles.userInfo}>
-            <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }} 
-              style={styles.avatar} 
-            />
-            <View>
-              <Text style={styles.greeting}>{getGreeting()},</Text>
-              <Text style={styles.userName}>{user?.name || 'User'}!</Text>
-            </View>
-          </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-              <Text style={styles.modeButtonText}>$</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Bell color="#FFF" size={20} />
+          <View>
+            <TouchableOpacity style={styles.dateSelector}>
+              <Text style={styles.dateText}>{formattedDate}</Text>
+              <ChevronDown size={16} color="#A1A1AA" />
             </TouchableOpacity>
           </View>
+          <TouchableOpacity onPress={toggleMode} style={styles.avatarContainer}>
+             <View style={styles.avatarFallback}>
+               <Text style={styles.avatarText}>{user?.name?.[0] || 'U'}</Text>
+             </View>
+          </TouchableOpacity>
         </View>
 
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3B82F6" />}
         >
-          <View style={styles.statsSection}>
-            <LinearGradient
-              colors={['#18181B', '#09090B']}
-              style={styles.statsCard}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.statsHeader}>
-                <View style={styles.statsIconContainer}>
-                  <Zap color="#F59E0B" size={24} fill="#F59E0B" />
-                </View>
-                <Text style={styles.statsTitle}>Todays Progress</Text>
-              </View>
-
-              <View style={styles.statsGrid}>
-                <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{dailySummary.completedActivities}</Text>
-                  <Text style={styles.statLabel}>Completed</Text>
-                </View>
-                <View style={styles.statDivider} />
-                <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{dailySummary.totalActivities}</Text>
-                  <Text style={styles.statLabel}>Total Tasks</Text>
-                </View>
-                <View style={styles.statDivider} />
-                <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{dailySummary.productivityScore}%</Text>
-                  <Text style={styles.statLabel}>Score</Text>
-                </View>
-              </View>
-
-              <View style={styles.progressBarContainer}>
-                <View style={styles.progressBarBg}>
-                  <View 
-                    style={[
-                      styles.progressBarFill, 
-                      { width: `${Math.min(dailySummary.productivityScore, 100)}%` }
-                    ]} 
-                  />
-                </View>
-              </View>
-            </LinearGradient>
+          
+          {/* Status Pills */}
+          <View style={styles.statusRow}>
+            <View style={styles.statusPill}>
+              <View style={[styles.statusDot, { backgroundColor: '#10B981' }]} />
+              <Text style={styles.statusText}>Focus Mode</Text>
+              <ChevronDown size={14} color="#71717A" style={{ marginLeft: 4 }} />
+            </View>
+            <View style={styles.statusPill}>
+              <Cloud size={14} color="#A1A1AA" />
+              <Text style={styles.statusText}>22°C Clear</Text>
+            </View>
           </View>
 
-          <View style={styles.habitsSection}>
+          {/* Main Metrics Card */}
+          <View style={styles.mainCard}>
+            <View style={styles.ringsRow}>
+              <CircularProgress 
+                progress={dailySummary.productivityScore} 
+                value={`${dailySummary.productivityScore}%`}
+                label="Productivity"
+                color={productivityColor}
+              />
+              <CircularProgress 
+                progress={habitsCompletion} 
+                value={`${habitsCompletion}%`}
+                label="Habits"
+                color={habitsColor}
+              />
+              <CircularProgress 
+                progress={tasksCompletion} 
+                value={`${tasksCompletion}%`}
+                label="Tasks"
+                color={tasksColor}
+              />
+            </View>
+            
+            <View style={styles.divider} />
+            
+            <View style={styles.insightContainer}>
+              <View style={styles.insightHeader}>
+                <ActivityIcon size={16} color={productivityColor} />
+                <Text style={styles.insightTitle}>Daily Progress</Text>
+              </View>
+              <Text style={styles.insightText}>
+                Great momentum! You&apos;ve completed {dailySummary.completedActivities} out of {dailySummary.totalActivities} tasks today. 
+                Keep pushing to reach your daily goals.
+              </Text>
+            </View>
+          </View>
+
+          {/* Secondary Section - "Stress & Energy" equivalent */}
+          <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Good Habits</Text>
-              <TouchableOpacity style={styles.seeAllButton}>
-                <Text style={styles.seeAllText}>See All</Text>
-                <ArrowRight size={14} color="#71717A" />
-              </TouchableOpacity>
+               <View style={styles.sectionTitleRow}>
+                  <View style={[styles.sectionIcon, { backgroundColor: '#3B82F620' }]}>
+                    <Target size={16} color="#3B82F6" />
+                  </View>
+                  <Text style={styles.sectionTitle}>Today&apos;s Focus</Text>
+               </View>
+               <View style={styles.scoreContainer}>
+                  <Text style={styles.scoreValue}>{dailySummary.productivityScore}</Text>
+                  <Text style={styles.scoreLabel}>Score</Text>
+               </View>
             </View>
 
-            {goodHabits.length > 0 ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.habitsScroll}>
-                {goodHabits.map((habit) => (
-                  <HabitCard 
-                    key={habit.id} 
-                    habit={habit} 
-                    isCompleted={isHabitCompletedToday(habit.id)}
-                    onComplete={() => completeHabitForToday(habit.id)}
-                  />
+            <View style={styles.gaugeContainer}>
+               <View style={styles.gaugeRow}>
+                 <Text style={styles.gaugeLabel}>Highest</Text>
+                 <Text style={styles.gaugeLabel}>Lowest</Text>
+                 <Text style={styles.gaugeLabel}>Average</Text>
+               </View>
+               <View style={styles.gaugeValues}>
+                 <Text style={[styles.gaugeValue, { color: '#EAB308' }]}>85</Text>
+                 <Text style={[styles.gaugeValue, { color: '#3B82F6' }]}>42</Text>
+                 <Text style={[styles.gaugeValue, { color: '#10B981' }]}>64</Text>
+               </View>
+               
+               {/* Mock Bar Chart */}
+               <View style={styles.barChart}>
+                  {[40, 60, 30, 80, 50, 70, 45, 90, 60, 40, 55, 75, 50, 65, 45, 80, 60, 40, 30, 50, 70, 60, 80, 40].map((h, i) => (
+                    <View 
+                      key={i} 
+                      style={[
+                        styles.bar, 
+                        { 
+                          height: `${h}%`, 
+                          backgroundColor: h > 70 ? '#3B82F6' : '#27272A' 
+                        }
+                      ]} 
+                    />
+                  ))}
+               </View>
+            </View>
+            
+            <View style={styles.energyBarContainer}>
+               <Zap size={16} color="#EAB308" fill="#EAB308" />
+               <View style={styles.energyBarBg}>
+                  <View style={[styles.energyBarFill, { width: `${dailySummary.productivityScore}%` }]} />
+               </View>
+               <Text style={styles.energyValue}>{dailySummary.productivityScore}%</Text>
+            </View>
+          </View>
+
+          {/* Activities / Habits List */}
+          <View style={styles.listSection}>
+             <Text style={styles.listHeader}>Priorities</Text>
+             
+             <View style={styles.menuGrid}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
+                   <Layout size={24} color="#FFF" />
+                   <Text style={styles.menuLabel}>Home</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
+                   <ListTodo size={24} color="#A1A1AA" />
+                   <Text style={styles.menuLabel}>Tasks</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItemActive} onPress={() => setShowAddModal(true)}>
+                   <Plus size={24} color="#000" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
+                   <Flame size={24} color="#A1A1AA" />
+                   <Text style={styles.menuLabel}>Habits</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
+                   <Shield size={24} color="#A1A1AA" />
+                   <Text style={styles.menuLabel}>Focus</Text>
+                </TouchableOpacity>
+             </View>
+
+             {/* Recent Items List */}
+             <View style={styles.activitiesList}>
+                {getTodayActivities.slice(0, 3).map((activity) => (
+                   <ActivityRow 
+                      key={activity.id} 
+                      activity={activity} 
+                      onComplete={() => completeActivity(activity.id)} 
+                    />
                 ))}
-              </ScrollView>
-            ) : (
-              <View style={styles.emptyHabits}>
-                <Text style={styles.emptyText}>No good habits yet</Text>
-                <Text style={styles.emptySubtext}>Go to Habits tab to add some</Text>
-              </View>
-            )}
+                {getTodayActivities.length === 0 && (
+                  <Text style={styles.emptyText}>No activities scheduled for today</Text>
+                )}
+             </View>
           </View>
 
-          <View style={styles.habitsSection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Breaking Habits</Text>
-              <TouchableOpacity style={styles.seeAllButton}>
-                <Text style={styles.seeAllText}>See All</Text>
-                <ArrowRight size={14} color="#71717A" />
-              </TouchableOpacity>
-            </View>
-
-            {badHabits.length > 0 ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.habitsScroll}>
-                {badHabits.map((habit) => (
-                  <BadHabitHomeCard 
-                    key={habit.id} 
-                    habit={habit} 
-                    isSuccessToday={isBadHabitSuccessToday(habit.id)}
-                    onLogSuccess={() => logSuccessBadHabit(habit.id)}
-                  />
-                ))}
-              </ScrollView>
-            ) : (
-              <View style={styles.emptyHabits}>
-                <Text style={styles.emptyText}>No habits to break</Text>
-                <Text style={styles.emptySubtext}>Go to Habits tab to add some</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.activitiesSection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Todays Activities</Text>
-              <TouchableOpacity style={styles.seeAllButton}>
-                <Text style={styles.seeAllText}>See All</Text>
-                <ArrowRight size={14} color="#71717A" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.activitiesList}>
-              {getTodayActivities.length > 0 ? (
-                getTodayActivities.slice(0, 5).map((activity) => (
-                  <ActivityItem 
-                    key={activity.id} 
-                    activity={activity}
-                    onComplete={() => completeActivity(activity.id)}
-                  />
-                ))
-              ) : (
-                <View style={styles.emptyState}>
-                  <Clock size={48} color="#333" />
-                  <Text style={styles.emptyStateText}>No activities for today</Text>
-                  <Text style={styles.emptyStateSubtext}>Tap + to add your first activity</Text>
-                </View>
-              )}
-            </View>
-          </View>
         </ScrollView>
       </Animated.View>
-
-      <TouchableOpacity 
-        style={styles.fab} 
-        onPress={() => setShowAddModal(true)}
-        activeOpacity={0.8}
-      >
-        <Plus color="#000" size={32} />
-      </TouchableOpacity>
 
       <AddActivityModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
     </View>
   );
 }
 
-function HabitCard({ 
-  habit, 
-  isCompleted, 
-  onComplete 
-}: { 
-  habit: Habit; 
-  isCompleted: boolean;
-  onComplete: () => void;
-}) {
-  return (
-    <TouchableOpacity 
-      style={[
-        styles.habitCard, 
-        { borderColor: isCompleted ? '#10B981' : habit.color }
-      ]}
-      onPress={onComplete}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.habitIconBg, { backgroundColor: habit.color + '20' }]}>
-        {isCompleted ? (
-          <CheckCircle2 size={24} color="#10B981" fill="#10B981" />
-        ) : (
-          <Circle size={24} color={habit.color} />
-        )}
-      </View>
-      <Text style={[styles.habitTitle, isCompleted && styles.habitTitleCompleted]}>
-        {habit.title}
-      </Text>
-      <View style={styles.streakContainer}>
-        <Flame size={14} color="#F59E0B" />
-        <Text style={styles.streakText}>{habit.currentStreak}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function BadHabitHomeCard({ 
-  habit, 
-  isSuccessToday, 
-  onLogSuccess 
-}: { 
-  habit: Habit & { daysClean: number }; 
-  isSuccessToday: boolean;
-  onLogSuccess: () => void;
-}) {
-  return (
-    <TouchableOpacity 
-      style={[
-        styles.badHabitCard, 
-        { borderColor: isSuccessToday ? '#10B981' : '#EF4444' }
-      ]}
-      onPress={onLogSuccess}
-      activeOpacity={0.8}
-      disabled={isSuccessToday}
-    >
-      <View style={[styles.habitIconBg, { backgroundColor: '#EF444420' }]}>
-        {isSuccessToday ? (
-          <CheckCircle2 size={24} color="#10B981" fill="#10B981" />
-        ) : (
-          <Shield size={24} color="#EF4444" />
-        )}
-      </View>
-      <Text style={[styles.habitTitle, isSuccessToday && styles.habitTitleCompleted]} numberOfLines={1}>
-        {habit.title}
-      </Text>
-      <View style={styles.daysCleanContainer}>
-        <Text style={styles.daysCleanText}>{habit.daysClean} days</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function ActivityItem({ 
-  activity, 
-  onComplete 
-}: { 
-  activity: Activity;
-  onComplete: () => void;
-}) {
+function ActivityRow({ activity, onComplete }: { activity: Activity; onComplete: () => void }) {
   const isCompleted = activity.status === 'completed';
-  const categoryColor = ACTIVITY_COLORS[activity.category] || '#A1A1AA';
-
   return (
-    <TouchableOpacity 
-      style={styles.activityItem}
-      onPress={onComplete}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.activityIndicator, { backgroundColor: categoryColor }]} />
-      <TouchableOpacity 
-        style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
-        onPress={onComplete}
-      >
-        {isCompleted && <CheckCircle2 size={20} color="#10B981" fill="#10B981" />}
-      </TouchableOpacity>
-      <View style={styles.activityInfo}>
-        <Text style={[styles.activityTitle, isCompleted && styles.activityTitleCompleted]}>
-          {activity.title}
-        </Text>
-        <View style={styles.activityMeta}>
-          <View style={[styles.categoryBadge, { backgroundColor: categoryColor + '20' }]}>
-            <Text style={[styles.categoryText, { color: categoryColor }]}>
-              {activity.category}
-            </Text>
-          </View>
-          {activity.startTime && (
-            <View style={styles.timeContainer}>
-              <Clock size={12} color="#71717A" />
-              <Text style={styles.timeText}>
-                {new Date(activity.startTime).toLocaleTimeString('en-US', { 
-                  hour: 'numeric', 
-                  minute: '2-digit',
-                  hour12: true 
-                })}
-              </Text>
-            </View>
-          )}
-        </View>
+    <TouchableOpacity style={styles.activityRow} onPress={onComplete} activeOpacity={0.7}>
+      <View style={[styles.activityIcon, { backgroundColor: ACTIVITY_COLORS[activity.category] + '20' }]}>
+        <Clock size={16} color={ACTIVITY_COLORS[activity.category]} />
       </View>
-      {activity.priority === 'high' && (
-        <View style={styles.priorityBadge}>
-          <Text style={styles.priorityText}>!</Text>
-        </View>
-      )}
+      <View style={styles.activityContent}>
+        <Text style={[styles.activityTitle, isCompleted && styles.completedText]}>{activity.title}</Text>
+        <Text style={styles.activityTime}>
+          {activity.startTime ? new Date(activity.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'All Day'}
+           {' • '}
+          <Text style={{color: ACTIVITY_COLORS[activity.category], textTransform: 'capitalize'}}>{activity.category}</Text>
+        </Text>
+      </View>
+      <View style={[styles.checkBox, isCompleted && styles.checkBoxChecked]}>
+        {isCompleted && <CheckCircle2 size={16} color="#FFF" />}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -404,366 +389,328 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 16,
+    marginTop: 8,
   },
-  userInfo: {
+  dateSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#333',
-  },
-  greeting: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 14,
-    color: '#A1A1AA',
-  },
-  userName: {
+  dateText: {
     fontFamily: sfProDisplayBold,
-    fontSize: 18,
-    fontWeight: '700' as const,
+    fontSize: 22,
     color: '#FFFFFF',
   },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  modeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#10B981',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  modeButtonText: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#000',
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#18181B',
+  avatarContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#1C1C1E',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#333',
+  },
+  avatarFallback: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  avatarText: {
+    fontFamily: sfProDisplayMedium,
+    color: '#FFF',
+    fontSize: 14,
   },
   content: {
     flex: 1,
   },
-  statsSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-  },
-  statsCard: {
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  statsHeader: {
+  statusRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    paddingHorizontal: 20,
     gap: 12,
     marginBottom: 20,
   },
-  statsIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F59E0B20',
+  statusPill: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#1C1C1E',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#27272A',
   },
-  statsTitle: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
-  statsGrid: {
+  statusText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#E4E4E7',
+  },
+  mainCard: {
+    marginHorizontal: 20,
+    backgroundColor: '#121212',
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#27272A',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+  ringsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 8,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#27272A',
     marginBottom: 16,
   },
-  statItem: {
-    flex: 1,
+  insightContainer: {
+    gap: 8,
+  },
+  insightHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#333',
-  },
-  statValue: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 28,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
+    gap: 8,
     marginBottom: 4,
   },
-  statLabel: {
+  insightTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  insightText: {
     fontFamily: sfProDisplayRegular,
-    fontSize: 12,
-    color: '#71717A',
+    fontSize: 15,
+    color: '#A1A1AA',
+    lineHeight: 22,
   },
-  progressBarContainer: {
-    marginTop: 8,
-  },
-  progressBarBg: {
-    height: 8,
-    backgroundColor: '#27272A',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#F59E0B',
-    borderRadius: 4,
-  },
-  habitsSection: {
+  sectionContainer: {
+    marginHorizontal: 20,
+    backgroundColor: '#121212',
+    borderRadius: 24,
+    padding: 20,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#27272A',
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    gap: 10,
+  },
+  sectionIcon: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#3B82F6',
   },
   sectionTitle: {
     fontFamily: sfProDisplayBold,
-    fontSize: 20,
-    fontWeight: '700' as const,
+    fontSize: 17,
     color: '#FFFFFF',
   },
-  seeAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  seeAllText: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 14,
-    color: '#71717A',
-  },
-  habitsScroll: {
-    paddingLeft: 20,
-  },
-  habitCard: {
-    width: 120,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: '#18181B',
-    marginRight: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  habitIconBg: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  scoreContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: '#27272A',
+    borderRightColor: '#EAB308',
+    borderTopColor: '#EAB308',
   },
-  habitTitle: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  habitTitleCompleted: {
-    color: '#71717A',
-    textDecorationLine: 'line-through',
-  },
-  streakContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  streakText: {
+  scoreValue: {
     fontFamily: sfProDisplayBold,
-    fontSize: 12,
-    fontWeight: '600' as const,
-    color: '#F59E0B',
-  },
-  emptyHabits: {
-    marginHorizontal: 20,
-    padding: 24,
-    backgroundColor: '#18181B',
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontFamily: sfProDisplayMedium,
     fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#71717A',
+    color: '#FFFFFF',
+  },
+  scoreLabel: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 9,
+    color: '#EAB308',
+  },
+  gaugeContainer: {
+    marginBottom: 20,
+  },
+  gaugeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
-  emptySubtext: {
+  gaugeLabel: {
     fontFamily: sfProDisplayRegular,
-    fontSize: 14,
-    color: '#52525B',
-  },
-  badHabitCard: {
-    width: 120,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: '#18181B',
-    marginRight: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  daysCleanContainer: {
-    backgroundColor: '#10B98120',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  daysCleanText: {
-    fontFamily: sfProDisplayBold,
     fontSize: 12,
-    fontWeight: '600' as const,
-    color: '#10B981',
+    color: '#71717A',
+    width: '30%',
   },
-  activitiesSection: {
-    paddingBottom: 120,
+  gaugeValues: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
-  activitiesList: {
-    paddingHorizontal: 20,
-    gap: 12,
+  gaugeValue: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 20,
+    width: '30%',
   },
-  activityItem: {
+  barChart: {
+    flexDirection: 'row',
+    height: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 2,
+  },
+  bar: {
+    flex: 1,
+    borderRadius: 2,
+  },
+  energyBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
     backgroundColor: '#18181B',
+    padding: 12,
     borderRadius: 16,
-    padding: 16,
+  },
+  energyBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#27272A',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  energyBarFill: {
+    height: '100%',
+    backgroundColor: '#10B981',
+    borderRadius: 3,
+  },
+  energyValue: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 14,
+    color: '#FFFFFF',
+    width: 40,
+    textAlign: 'right',
+  },
+  listSection: {
+    paddingHorizontal: 20,
+  },
+  listHeader: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginBottom: 16,
+  },
+  menuGrid: {
+    flexDirection: 'row',
+    backgroundColor: '#18181B',
+    borderRadius: 30,
+    padding: 6,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#27272A',
+  },
+  menuItem: {
+    alignItems: 'center',
+    padding: 10,
+    gap: 4,
+  },
+  menuItemActive: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -20,
+    shadowColor: '#FFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  menuLabel: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 10,
+    color: '#A1A1AA',
+  },
+  activitiesList: {
     gap: 12,
   },
-  activityIndicator: {
-    position: 'absolute',
-    left: 0,
-    top: 12,
-    bottom: 12,
-    width: 4,
-    borderTopRightRadius: 2,
-    borderBottomRightRadius: 2,
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#121212',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#27272A',
+    gap: 12,
   },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#52525B',
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkboxCompleted: {
-    borderColor: '#10B981',
-    backgroundColor: 'transparent',
-  },
-  activityInfo: {
+  activityContent: {
     flex: 1,
   },
   activityTitle: {
     fontFamily: sfProDisplayMedium,
     fontSize: 16,
-    fontWeight: '600' as const,
     color: '#FFFFFF',
-    marginBottom: 6,
+    marginBottom: 4,
   },
-  activityTitleCompleted: {
-    color: '#71717A',
+  completedText: {
     textDecorationLine: 'line-through',
+    color: '#71717A',
   },
-  activityMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  categoryBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  categoryText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 11,
-    fontWeight: '600' as const,
-    textTransform: 'capitalize',
-  },
-  timeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  timeText: {
+  activityTime: {
     fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
   },
-  priorityBadge: {
+  checkBox: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#EF4444',
+    borderWidth: 2,
+    borderColor: '#3F3F46',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  priorityText: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 14,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
+  checkBoxChecked: {
+    borderColor: '#3B82F6',
+    backgroundColor: '#3B82F6',
   },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 48,
-  },
-  emptyStateText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#71717A',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 14,
+  emptyText: {
     color: '#52525B',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#FFFFFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
-  },
+    textAlign: 'center',
+    marginTop: 20,
+    fontFamily: sfProDisplayRegular,
+  }
 });
