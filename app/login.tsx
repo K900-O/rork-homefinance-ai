@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,14 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Lock, Mail, ArrowRight } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -22,6 +24,26 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Animation Refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -50,71 +72,80 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <BlueGlow />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                 <Text style={styles.backButtonText}>← Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to continue to Hayati</Text>
-          </View>
-
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <View style={styles.inputIcon}>
-                <Mail color="#A1A1AA" size={20} />
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#52525B"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+          <Animated.View 
+            style={{ 
+              flex: 1, 
+              opacity: fadeAnim, 
+              transform: [{ translateY: slideAnim }] 
+            }}
+          >
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                   <Text style={styles.backButtonText}>← Back</Text>
+              </TouchableOpacity>
+              <Text style={styles.title}>Welcome Back</Text>
+              <Text style={styles.subtitle}>Sign in to continue to Hayati</Text>
             </View>
 
-            <View style={styles.inputContainer}>
-              <View style={styles.inputIcon}>
-                <Lock color="#A1A1AA" size={20} />
+            <View style={styles.form}>
+              <View style={styles.inputContainer}>
+                <View style={styles.inputIcon}>
+                  <Mail color="#A1A1AA" size={20} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="#52525B"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#52525B"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
+
+              <View style={styles.inputContainer}>
+                <View style={styles.inputIcon}>
+                  <Lock color="#A1A1AA" size={20} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#52525B"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.button, isLoading && styles.buttonDisabled]}
+                onPress={handleLogin}
+                disabled={isLoading}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.buttonText}>
+                  {isLoading ? 'Signing In...' : 'Sign In'}
+                </Text>
+                {!isLoading && <ArrowRight color="#FFFFFF" size={20} />}
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              style={[styles.button, isLoading && styles.buttonDisabled]}
-              onPress={handleLogin}
-              disabled={isLoading}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.buttonText}>
-                {isLoading ? 'Signing In...' : 'Sign In'}
-              </Text>
-              {!isLoading && <ArrowRight color="#000" size={20} />}
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don&apos;t have an account?</Text>
-            <TouchableOpacity onPress={() => router.push('/signup' as any)}>
-              <Text style={styles.footerLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Don&apos;t have an account?</Text>
+              <TouchableOpacity onPress={() => router.push('/signup' as any)}>
+                <Text style={styles.footerLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -167,7 +198,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#333',
@@ -189,11 +220,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#3B82F6',
     paddingVertical: 18,
     borderRadius: 30,
     marginTop: 16,
     gap: 8,
+    shadowColor: '#3B82F6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -201,7 +240,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 18,
-    color: '#000000',
+    color: '#FFFFFF',
     fontWeight: '600' as const,
   },
   footer: {
@@ -220,7 +259,7 @@ const styles = StyleSheet.create({
   footerLink: {
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#3B82F6',
     fontWeight: '600' as const,
   },
 });

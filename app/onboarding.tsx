@@ -28,15 +28,16 @@ import {
   GraduationCap,
   Plane,
   Umbrella,
-  Zap,
   Shield,
-  BarChart3
+  BarChart3,
+  Zap
 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { RiskTolerance } from '@/constants/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/colors';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
 
 const { width } = Dimensions.get('window');
 
@@ -69,10 +70,31 @@ export default function OnboardingScreen() {
   const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('moderate');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Animations
+  // Step Animations
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
+
+  // Initial Entrance Animation
+  const initialFade = useRef(new Animated.Value(0)).current;
+  const initialSlide = useRef(new Animated.Value(30)).current;
+
+  useEffect(() => {
+    // Initial entrance animation
+    Animated.parallel([
+      Animated.timing(initialFade, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(initialSlide, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [initialFade, initialSlide]);
 
   useEffect(() => {
     Animated.timing(progressAnim, {
@@ -398,65 +420,74 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
+      <BlueGlow />
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardAvoid}
           >
-            <View style={styles.progressBarContainer}>
-              <Animated.View 
-                style={[
-                  styles.progressBarFill, 
-                  { 
-                    width: progressAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['0%', '100%']
-                    }) 
-                  }
-                ]} 
-              />
-            </View>
-
-            <View style={styles.mainContent}>
-              <Animated.View 
-                style={[
-                  styles.animatedContainer, 
-                  { 
-                    opacity: fadeAnim,
-                    transform: [{ translateX: slideAnim }] 
-                  }
-                ]}
-              >
-                {renderStep()}
-              </Animated.View>
-            </View>
-
-            <View style={styles.footer}>
-              <View style={styles.footerButtons}>
-                {currentStep > 0 ? (
-                  <TouchableOpacity 
-                    style={styles.backButton} 
-                    onPress={handleBack}
-                    activeOpacity={0.7}
-                  >
-                    <ArrowLeft color={AppColors.textPrimary} size={24} />
-                  </TouchableOpacity>
-                ) : <View style={{ width: 48 }} />} {/* Spacer */}
-                
-                <TouchableOpacity
-                  style={[styles.nextButton, isLoading && styles.buttonDisabled]}
-                  onPress={currentStep === 3 ? handleComplete : handleNext}
-                  disabled={isLoading}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.nextButtonText}>
-                    {isLoading ? 'Processing...' : currentStep === 3 ? 'Get Started' : 'Continue'}
-                  </Text>
-                  {!isLoading && <ArrowRight color="#000" size={20} strokeWidth={2.5} />}
-                </TouchableOpacity>
+            <Animated.View 
+              style={{ 
+                flex: 1,
+                opacity: initialFade,
+                transform: [{ translateY: initialSlide }]
+              }}
+            >
+              <View style={styles.progressBarContainer}>
+                <Animated.View 
+                  style={[
+                    styles.progressBarFill, 
+                    { 
+                      width: progressAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0%', '100%']
+                      }) 
+                    }
+                  ]} 
+                />
               </View>
-            </View>
+
+              <View style={styles.mainContent}>
+                <Animated.View 
+                  style={[
+                    styles.animatedContainer, 
+                    { 
+                      opacity: fadeAnim,
+                      transform: [{ translateX: slideAnim }] 
+                    }
+                  ]}
+                >
+                  {renderStep()}
+                </Animated.View>
+              </View>
+
+              <View style={styles.footer}>
+                <View style={styles.footerButtons}>
+                  {currentStep > 0 ? (
+                    <TouchableOpacity 
+                      style={styles.backButton} 
+                      onPress={handleBack}
+                      activeOpacity={0.7}
+                    >
+                      <ArrowLeft color={AppColors.textPrimary} size={24} />
+                    </TouchableOpacity>
+                  ) : <View style={{ width: 48 }} />} {/* Spacer */}
+                  
+                  <TouchableOpacity
+                    style={[styles.nextButton, isLoading && styles.buttonDisabled]}
+                    onPress={currentStep === 3 ? handleComplete : handleNext}
+                    disabled={isLoading}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.nextButtonText}>
+                      {isLoading ? 'Processing...' : currentStep === 3 ? 'Get Started' : 'Continue'}
+                    </Text>
+                    {!isLoading && <ArrowRight color="#FFFFFF" size={20} strokeWidth={2.5} />}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Animated.View>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       </SafeAreaView>
@@ -485,7 +516,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#3B82F6',
     borderRadius: 2,
   },
   mainContent: {
@@ -506,12 +537,12 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
   },
   stepTitle: {
     fontFamily: sfProDisplayBold,
@@ -565,9 +596,9 @@ const styles = StyleSheet.create({
     width: (width - 48 - 24) / 3,
     aspectRatio: 1,
     borderRadius: 16,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -588,11 +619,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
   },
   otherLabel: {
     fontFamily: sfProDisplayMedium,
@@ -627,9 +658,9 @@ const styles = StyleSheet.create({
     width: (width - 48 - 12) / 2,
     padding: 16,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
     minHeight: 110,
     justifyContent: 'space-between',
   },
@@ -676,9 +707,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
   },
   riskCardSelected: {
     backgroundColor: '#FFFFFF',
@@ -733,22 +764,30 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.8)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
   },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#3B82F6',
     paddingVertical: 16,
     paddingHorizontal: 28,
     borderRadius: 100,
     gap: 8,
     minWidth: 140,
     justifyContent: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -756,7 +795,7 @@ const styles = StyleSheet.create({
   nextButtonText: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
-    color: '#000000',
+    color: '#FFFFFF',
     fontWeight: '700' as const,
   },
 });
