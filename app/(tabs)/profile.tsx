@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -39,7 +40,7 @@ import {
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { router } from 'expo-router';
 import type { RiskTolerance } from '@/constants/types';
 import { BlueGlow } from '@/components/BlueGlow';
@@ -60,6 +61,26 @@ export default function ProfileScreen() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editField, setEditField] = useState<string>('');
   const [editValue, setEditValue] = useState<string>('');
+
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   const handleLogout = useCallback(() => {
     Alert.alert(
@@ -143,7 +164,14 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <BlueGlow />
-      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+      <Animated.View style={[
+        styles.contentContainer, 
+        { 
+          paddingTop: insets.top,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }
+      ]}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Profile</Text>
           <TouchableOpacity style={styles.settingsButton}>
@@ -480,7 +508,7 @@ export default function ProfileScreen() {
             </View>
           </KeyboardAvoidingView>
         </Modal>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -501,7 +529,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700' as const,
     color: '#FFFFFF',
@@ -554,14 +582,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileName: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 24,
     fontWeight: '700' as const,
     color: '#FFFFFF',
     marginBottom: 4,
   },
   profileEmail: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#A1A1AA',
     marginBottom: 12,
@@ -576,7 +604,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   memberText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     color: '#10B981',
     fontWeight: '500' as const,
@@ -604,14 +632,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statValue: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '700' as const,
     color: '#FFFFFF',
     marginBottom: 2,
   },
   statLabel: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 11,
     color: '#71717A',
   },
@@ -619,7 +647,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#A1A1AA',
@@ -650,13 +678,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuLabel: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 15,
     fontWeight: '500' as const,
     color: '#FFFFFF',
   },
   menuValue: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 13,
     color: '#71717A',
     marginTop: 2,
@@ -673,7 +701,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(139, 92, 246, 0.15)',
   },
   modeBadgeText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '600' as const,
   },
@@ -703,7 +731,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   goalTagText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 13,
     color: '#10B981',
     fontWeight: '500' as const,
@@ -718,7 +746,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptyGoalsText: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#52525B',
   },
@@ -735,13 +763,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(239, 68, 68, 0.2)',
   },
   logoutText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#EF4444',
   },
   versionText: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#52525B',
     textAlign: 'center',
@@ -769,7 +797,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   modalTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700' as const,
     color: '#FFFFFF',
@@ -780,7 +808,7 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     color: '#FFFFFF',
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     marginBottom: 24,
     borderWidth: 1,
     borderColor: '#3F3F46',
@@ -804,7 +832,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
   },
   optionText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     color: '#A1A1AA',
   },
@@ -831,7 +859,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   riskOptionLabel: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     color: '#A1A1AA',
     marginBottom: 2,
@@ -841,7 +869,7 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
   },
   riskOptionDescription: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
   },
@@ -857,7 +885,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#A1A1AA',
@@ -870,7 +898,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#000000',

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Platform,
   UIManager,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -22,7 +23,7 @@ import { usePersonal } from '@/contexts/PersonalContext';
 import { ACTIVITY_COLORS } from '@/constants/personalTypes';
 import type { Activity } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 
 if (Platform.OS === 'android') {
@@ -40,6 +41,26 @@ export default function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -92,7 +113,14 @@ export default function ScheduleScreen() {
   return (
     <View style={styles.container}>
       <BlueGlow />
-      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+      <Animated.View style={[
+        styles.contentContainer, 
+        { 
+          paddingTop: insets.top,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }
+      ]}>
         <View style={styles.header}>
           <Text style={styles.title}>Schedule</Text>
           <TouchableOpacity 
@@ -182,7 +210,7 @@ export default function ScheduleScreen() {
           onClose={() => setShowAddModal(false)}
           initialDate={selectedDateStr}
         />
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -275,7 +303,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 32,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -304,7 +332,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   monthTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
@@ -331,7 +359,7 @@ const styles = StyleSheet.create({
     borderColor: '#F59E0B',
   },
   dayName: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 11,
     color: '#71717A',
     marginBottom: 4,
@@ -340,7 +368,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   dayNumber: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
@@ -366,14 +394,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   selectedDateText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   activityCount: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#71717A',
   },
@@ -390,13 +418,13 @@ const styles = StyleSheet.create({
     paddingRight: 12,
   },
   timeText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 13,
     fontWeight: '500',
     color: '#FFFFFF',
   },
   timeTextEnd: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 11,
     color: '#71717A',
     marginTop: 2,
@@ -431,7 +459,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   activityTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
@@ -443,7 +471,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   activityDescription: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#A1A1AA',
     marginBottom: 12,
@@ -459,13 +487,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'capitalize',
   },
   durationText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
   },
@@ -474,7 +502,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyStateText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
     color: '#71717A',
@@ -482,7 +510,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyStateSubtext: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#52525B',
   },

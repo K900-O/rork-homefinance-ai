@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Image,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,7 +28,8 @@ import { useAppMode } from '@/contexts/AppModeContext';
 import { ACTIVITY_COLORS } from '@/constants/personalTypes';
 import type { Activity, Habit } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
 
 export default function PersonalHomeScreen() {
   const insets = useSafeAreaInsets();
@@ -47,6 +49,26 @@ export default function PersonalHomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 1000);
@@ -60,161 +82,173 @@ export default function PersonalHomeScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Image 
-            source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }} 
-            style={styles.avatar} 
-          />
-          <View>
-            <Text style={styles.greeting}>{getGreeting()},</Text>
-            <Text style={styles.userName}>{user?.name || 'User'}!</Text>
+    <View style={styles.container}>
+      <BlueGlow />
+      
+      <Animated.View style={[
+        styles.animatedContainer, 
+        { 
+          opacity: fadeAnim, 
+          transform: [{ translateY: slideAnim }],
+          paddingTop: insets.top 
+        }
+      ]}>
+        <View style={styles.header}>
+          <View style={styles.userInfo}>
+            <Image 
+              source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }} 
+              style={styles.avatar} 
+            />
+            <View>
+              <Text style={styles.greeting}>{getGreeting()},</Text>
+              <Text style={styles.userName}>{user?.name || 'User'}!</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-            <Text style={styles.modeButtonText}>$</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Bell color="#FFF" size={20} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
-      >
-        <View style={styles.statsSection}>
-          <LinearGradient
-            colors={['#18181B', '#09090B']}
-            style={styles.statsCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.statsHeader}>
-              <View style={styles.statsIconContainer}>
-                <Zap color="#F59E0B" size={24} fill="#F59E0B" />
-              </View>
-              <Text style={styles.statsTitle}>Todays Progress</Text>
-            </View>
-
-            <View style={styles.statsGrid}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{dailySummary.completedActivities}</Text>
-                <Text style={styles.statLabel}>Completed</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{dailySummary.totalActivities}</Text>
-                <Text style={styles.statLabel}>Total Tasks</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{dailySummary.productivityScore}%</Text>
-                <Text style={styles.statLabel}>Score</Text>
-              </View>
-            </View>
-
-            <View style={styles.progressBarContainer}>
-              <View style={styles.progressBarBg}>
-                <View 
-                  style={[
-                    styles.progressBarFill, 
-                    { width: `${Math.min(dailySummary.productivityScore, 100)}%` }
-                  ]} 
-                />
-              </View>
-            </View>
-          </LinearGradient>
-        </View>
-
-        <View style={styles.habitsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Good Habits</Text>
-            <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>See All</Text>
-              <ArrowRight size={14} color="#71717A" />
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
+              <Text style={styles.modeButtonText}>$</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+              <Bell color="#FFF" size={20} />
             </TouchableOpacity>
           </View>
-
-          {goodHabits.length > 0 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.habitsScroll}>
-              {goodHabits.map((habit) => (
-                <HabitCard 
-                  key={habit.id} 
-                  habit={habit} 
-                  isCompleted={isHabitCompletedToday(habit.id)}
-                  onComplete={() => completeHabitForToday(habit.id)}
-                />
-              ))}
-            </ScrollView>
-          ) : (
-            <View style={styles.emptyHabits}>
-              <Text style={styles.emptyText}>No good habits yet</Text>
-              <Text style={styles.emptySubtext}>Go to Habits tab to add some</Text>
-            </View>
-          )}
         </View>
 
-        <View style={styles.habitsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Breaking Habits</Text>
-            <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>See All</Text>
-              <ArrowRight size={14} color="#71717A" />
-            </TouchableOpacity>
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
+        >
+          <View style={styles.statsSection}>
+            <LinearGradient
+              colors={['#18181B', '#09090B']}
+              style={styles.statsCard}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.statsHeader}>
+                <View style={styles.statsIconContainer}>
+                  <Zap color="#F59E0B" size={24} fill="#F59E0B" />
+                </View>
+                <Text style={styles.statsTitle}>Todays Progress</Text>
+              </View>
+
+              <View style={styles.statsGrid}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{dailySummary.completedActivities}</Text>
+                  <Text style={styles.statLabel}>Completed</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{dailySummary.totalActivities}</Text>
+                  <Text style={styles.statLabel}>Total Tasks</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{dailySummary.productivityScore}%</Text>
+                  <Text style={styles.statLabel}>Score</Text>
+                </View>
+              </View>
+
+              <View style={styles.progressBarContainer}>
+                <View style={styles.progressBarBg}>
+                  <View 
+                    style={[
+                      styles.progressBarFill, 
+                      { width: `${Math.min(dailySummary.productivityScore, 100)}%` }
+                    ]} 
+                  />
+                </View>
+              </View>
+            </LinearGradient>
           </View>
 
-          {badHabits.length > 0 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.habitsScroll}>
-              {badHabits.map((habit) => (
-                <BadHabitHomeCard 
-                  key={habit.id} 
-                  habit={habit} 
-                  isSuccessToday={isBadHabitSuccessToday(habit.id)}
-                  onLogSuccess={() => logSuccessBadHabit(habit.id)}
-                />
-              ))}
-            </ScrollView>
-          ) : (
-            <View style={styles.emptyHabits}>
-              <Text style={styles.emptyText}>No habits to break</Text>
-              <Text style={styles.emptySubtext}>Go to Habits tab to add some</Text>
+          <View style={styles.habitsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Good Habits</Text>
+              <TouchableOpacity style={styles.seeAllButton}>
+                <Text style={styles.seeAllText}>See All</Text>
+                <ArrowRight size={14} color="#71717A" />
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
 
-        <View style={styles.activitiesSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Todays Activities</Text>
-            <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>See All</Text>
-              <ArrowRight size={14} color="#71717A" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.activitiesList}>
-            {getTodayActivities.length > 0 ? (
-              getTodayActivities.slice(0, 5).map((activity) => (
-                <ActivityItem 
-                  key={activity.id} 
-                  activity={activity}
-                  onComplete={() => completeActivity(activity.id)}
-                />
-              ))
+            {goodHabits.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.habitsScroll}>
+                {goodHabits.map((habit) => (
+                  <HabitCard 
+                    key={habit.id} 
+                    habit={habit} 
+                    isCompleted={isHabitCompletedToday(habit.id)}
+                    onComplete={() => completeHabitForToday(habit.id)}
+                  />
+                ))}
+              </ScrollView>
             ) : (
-              <View style={styles.emptyState}>
-                <Clock size={48} color="#333" />
-                <Text style={styles.emptyStateText}>No activities for today</Text>
-                <Text style={styles.emptyStateSubtext}>Tap + to add your first activity</Text>
+              <View style={styles.emptyHabits}>
+                <Text style={styles.emptyText}>No good habits yet</Text>
+                <Text style={styles.emptySubtext}>Go to Habits tab to add some</Text>
               </View>
             )}
           </View>
-        </View>
-      </ScrollView>
+
+          <View style={styles.habitsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Breaking Habits</Text>
+              <TouchableOpacity style={styles.seeAllButton}>
+                <Text style={styles.seeAllText}>See All</Text>
+                <ArrowRight size={14} color="#71717A" />
+              </TouchableOpacity>
+            </View>
+
+            {badHabits.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.habitsScroll}>
+                {badHabits.map((habit) => (
+                  <BadHabitHomeCard 
+                    key={habit.id} 
+                    habit={habit} 
+                    isSuccessToday={isBadHabitSuccessToday(habit.id)}
+                    onLogSuccess={() => logSuccessBadHabit(habit.id)}
+                  />
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={styles.emptyHabits}>
+                <Text style={styles.emptyText}>No habits to break</Text>
+                <Text style={styles.emptySubtext}>Go to Habits tab to add some</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.activitiesSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Todays Activities</Text>
+              <TouchableOpacity style={styles.seeAllButton}>
+                <Text style={styles.seeAllText}>See All</Text>
+                <ArrowRight size={14} color="#71717A" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.activitiesList}>
+              {getTodayActivities.length > 0 ? (
+                getTodayActivities.slice(0, 5).map((activity) => (
+                  <ActivityItem 
+                    key={activity.id} 
+                    activity={activity}
+                    onComplete={() => completeActivity(activity.id)}
+                  />
+                ))
+              ) : (
+                <View style={styles.emptyState}>
+                  <Clock size={48} color="#333" />
+                  <Text style={styles.emptyStateText}>No activities for today</Text>
+                  <Text style={styles.emptyStateSubtext}>Tap + to add your first activity</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </ScrollView>
+      </Animated.View>
 
       <TouchableOpacity 
         style={styles.fab} 
@@ -362,6 +396,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  animatedContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -382,12 +419,12 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   greeting: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#A1A1AA',
   },
   userName: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '700' as const,
     color: '#FFFFFF',
@@ -403,9 +440,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   modeButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '700' as const,
     color: '#000',
@@ -448,7 +489,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   statsTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600' as const,
     color: '#FFFFFF',
@@ -467,14 +508,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
   },
   statValue: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700' as const,
     color: '#FFFFFF',
     marginBottom: 4,
   },
   statLabel: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
   },
@@ -503,7 +544,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700' as const,
     color: '#FFFFFF',
@@ -514,7 +555,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   seeAllText: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#71717A',
   },
@@ -539,7 +580,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   habitTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600' as const,
     color: '#FFFFFF',
@@ -556,7 +597,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   streakText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '600' as const,
     color: '#F59E0B',
@@ -569,14 +610,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#71717A',
     marginBottom: 4,
   },
   emptySubtext: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#52525B',
   },
@@ -596,7 +637,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   daysCleanText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '600' as const,
     color: '#10B981',
@@ -642,7 +683,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activityTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#FFFFFF',
@@ -663,7 +704,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   categoryText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 11,
     fontWeight: '600' as const,
     textTransform: 'capitalize',
@@ -674,7 +715,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   timeText: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
   },
@@ -687,7 +728,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   priorityText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '700' as const,
     color: '#FFFFFF',
@@ -697,7 +738,7 @@ const styles = StyleSheet.create({
     paddingVertical: 48,
   },
   emptyStateText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#71717A',
@@ -705,7 +746,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyStateSubtext: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#52525B',
   },

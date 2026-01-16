@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { usePersonal } from '@/contexts/PersonalContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import Markdown from 'react-native-markdown-display';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 
 const HIDDEN_START = '\u200B\u2060\u200C';
@@ -29,6 +29,7 @@ export default function CoachScreen() {
   const [input, setInput] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
   const typingAnim1 = useRef(new Animated.Value(0.3)).current;
   const typingAnim2 = useRef(new Animated.Value(0.3)).current;
   const typingAnim3 = useRef(new Animated.Value(0.3)).current;
@@ -149,12 +150,20 @@ Respond as a supportive friend who happens to be an expert life coach.`;
   });
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeAnim]);
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   useEffect(() => {
     if (status === 'streaming') {
@@ -255,7 +264,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       color: '#FFFFFF',
       fontSize: 15,
       lineHeight: 24,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayRegular,
     },
     heading1: {
       color: '#10B981',
@@ -264,7 +273,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       marginTop: 16,
       marginBottom: 8,
       letterSpacing: -0.3,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayBold,
     },
     heading2: {
       color: '#10B981',
@@ -273,7 +282,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       marginTop: 14,
       marginBottom: 6,
       letterSpacing: -0.2,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayBold,
     },
     heading3: {
       color: '#34D399',
@@ -281,17 +290,17 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontWeight: '600' as const,
       marginTop: 12,
       marginBottom: 4,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayBold,
     },
     strong: {
       color: '#FFFFFF',
       fontWeight: '700' as const,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayBold,
     },
     em: {
       color: '#A1A1AA',
       fontStyle: 'italic' as const,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayMedium,
     },
     bullet_list: {
       marginVertical: 6,
@@ -314,17 +323,17 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontSize: 14,
       fontWeight: '700' as const,
       marginRight: 8,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayBold,
     },
     paragraph: {
       marginVertical: 6,
       lineHeight: 24,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayRegular,
     },
     link: {
       color: '#3B82F6',
       textDecorationLine: 'underline' as const,
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayRegular,
     },
     blockquote: {
       backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -363,7 +372,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
     },
     text: {
       color: '#FFFFFF',
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayRegular,
     },
   }), []);
 
@@ -381,12 +390,11 @@ Respond as a supportive friend who happens to be an expert life coach.`;
     const isUser = message.role === 'user';
 
     return (
-      <Animated.View
+      <View
         key={message.id || index}
         style={[
           styles.messageContainer,
           isUser ? styles.userMessageContainer : styles.assistantMessageContainer,
-          { opacity: fadeAnim },
         ]}
       >
         {!isUser && (
@@ -452,14 +460,21 @@ Respond as a supportive friend who happens to be an expert life coach.`;
             </View>
           </View>
         )}
-      </Animated.View>
+      </View>
     );
   };
 
   return (
     <View style={styles.container}>
       <BlueGlow />
-      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+      <Animated.View style={[
+        styles.contentContainer, 
+        { 
+          paddingTop: insets.top,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }
+      ]}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <LinearGradient
@@ -571,7 +586,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
             </View>
           </View>
         </KeyboardAvoidingView>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -612,13 +627,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700' as const,
     color: '#FFFFFF',
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
   },
   headerSubtitle: {
     fontSize: 13,
     color: '#71717A',
     marginTop: 2,
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
   },
   statusIndicator: {
     flexDirection: 'row',
@@ -641,7 +656,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     color: '#A1A1AA',
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
   },
   content: {
     flex: 1,
@@ -672,7 +687,7 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: '#FFFFFF',
     marginBottom: 8,
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
   },
   emptySubtitle: {
     fontSize: 15,
@@ -680,7 +695,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 32,
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
   },
   suggestedPrompts: {
     width: '100%',
@@ -701,7 +716,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#FFFFFF',
     fontWeight: '500' as const,
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
   },
   messageContainer: {
     flexDirection: 'row',
@@ -750,7 +765,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#FFFFFF',
     lineHeight: 22,
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
   },
   userMessageText: {
     color: '#FFFFFF',
@@ -768,7 +783,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#10B981',
     fontStyle: 'italic',
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -821,7 +836,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     maxHeight: 100,
     paddingVertical: 8,
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
   },
   sendButton: {
     width: 40,

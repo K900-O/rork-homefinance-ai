@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -28,7 +29,7 @@ import { usePersonal } from '@/contexts/PersonalContext';
 import { ACTIVITY_COLORS } from '@/constants/personalTypes';
 import type { Habit } from '@/constants/personalTypes';
 import AddHabitModal from '@/components/AddHabitModal';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -53,6 +54,26 @@ export default function HabitsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'good' | 'bad'>('good');
+
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -112,7 +133,14 @@ export default function HabitsScreen() {
   return (
     <View style={styles.container}>
       <BlueGlow />
-      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+      <Animated.View style={[
+        styles.contentContainer, 
+        { 
+          paddingTop: insets.top,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }
+      ]}>
         <View style={styles.header}>
           <Text style={styles.title}>Habits</Text>
           <TouchableOpacity 
@@ -299,7 +327,7 @@ export default function HabitsScreen() {
         </ScrollView>
 
         <AddHabitModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -498,7 +526,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 32,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -535,7 +563,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
   },
   tabText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
     color: '#71717A',
@@ -559,7 +587,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DC262630',
   },
   tabBadgeText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '600',
     color: '#71717A',
@@ -592,14 +620,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 24,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   statLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 11,
     color: '#71717A',
   },
@@ -614,13 +642,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
   },
   progressText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
     color: '#10B981',
@@ -645,7 +673,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#EF4444',
   },
   motivationText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#A1A1AA',
     fontStyle: 'italic',
@@ -674,7 +702,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   habitTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
@@ -696,7 +724,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'capitalize',
@@ -707,7 +735,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   streakText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     color: '#F59E0B',
     fontWeight: '500',
@@ -727,7 +755,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   weekDayLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 11,
     color: '#71717A',
     fontWeight: '500',
@@ -769,14 +797,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   badHabitTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   badHabitCategory: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 13,
     color: '#71717A',
     textTransform: 'capitalize',
@@ -789,19 +817,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   daysCleanLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
     marginBottom: 4,
   },
   daysCleanValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 56,
     fontWeight: '700',
     color: '#10B981',
   },
   milestoneLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#A1A1AA',
     marginTop: 4,
@@ -821,7 +849,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badProgressText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#52525B',
     textAlign: 'center',
@@ -842,14 +870,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#27272A',
   },
   badStatValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   badStatLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
   },
@@ -866,7 +894,7 @@ const styles = StyleSheet.create({
     borderColor: '#EF444440',
   },
   relapseButtonText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '600',
     color: '#EF4444',
@@ -892,7 +920,7 @@ const styles = StyleSheet.create({
     borderColor: '#10B981',
   },
   successButtonText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '600',
     color: '#10B981',
@@ -905,7 +933,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyStateText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
     color: '#71717A',
@@ -913,7 +941,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyStateSubtext: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#52525B',
     marginBottom: 24,
@@ -928,7 +956,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
   },
   emptyButtonText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
