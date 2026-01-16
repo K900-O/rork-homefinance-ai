@@ -9,31 +9,33 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { 
   Plus, 
   CheckCircle2, 
   Clock, 
   Flame,
-  Zap,
-  Shield,
-  Activity as ActivityIcon,
-  ChevronDown,
-  Cloud,
+  Calendar,
+  ChevronRight,
+  Award,
   Target,
-  Layout,
-  ListTodo
+  BarChart3,
+  Sparkles,
+  AlertTriangle,
+  ShieldCheck,
+  ListTodo,
+  Heart,
 } from 'lucide-react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { usePersonal } from '@/contexts/PersonalContext';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { ACTIVITY_COLORS } from '@/constants/personalTypes';
-import type { Activity } from '@/constants/personalTypes';
+import type { Activity, Habit } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 
-// Bevel-style Circular Progress
 const CircularProgress = ({ 
   size = 80, 
   strokeWidth = 8, 
@@ -57,7 +59,6 @@ const CircularProgress = ({
     <View style={{ width: size, alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
         <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
-          {/* Background Circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -67,7 +68,6 @@ const CircularProgress = ({
             fill="transparent"
             opacity={0.2}
           />
-          {/* Progress Circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -94,8 +94,9 @@ const CircularProgress = ({
       <Text style={{ 
         color: '#A1A1AA', 
         fontFamily: sfProDisplayMedium, 
-        fontSize: 12, 
-        marginTop: 8 
+        fontSize: 11, 
+        marginTop: 8,
+        textAlign: 'center',
       }}>
         {label}
       </Text>
@@ -105,20 +106,23 @@ const CircularProgress = ({
 
 export default function PersonalHomeScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { user } = useFinance();
   const { toggleMode } = useAppMode();
   const { 
     dailySummary, 
     getTodayActivities, 
     goodHabits,
+    badHabits,
+    upcomingActivities,
     completeActivity,
     isHabitCompletedToday,
+    completeHabitForToday,
   } = usePersonal();
   
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
@@ -152,10 +156,6 @@ export default function PersonalHomeScreen() {
     });
   }, []);
 
-  const productivityColor = '#3B82F6'; // Blue
-  const habitsColor = '#60A5FA'; // Lighter Blue
-  const tasksColor = '#2563EB'; // Darker Blue
-
   const habitsCompletion = useMemo(() => {
     if (goodHabits.length === 0) return 0;
     const completed = goodHabits.filter(h => isHabitCompletedToday(h.id)).length;
@@ -166,6 +166,23 @@ export default function PersonalHomeScreen() {
     if (dailySummary.totalActivities === 0) return 0;
     return Math.round((dailySummary.completedActivities / dailySummary.totalActivities) * 100);
   }, [dailySummary]);
+
+  const totalStreak = useMemo(() => {
+    if (goodHabits.length === 0) return 0;
+    return Math.max(...goodHabits.map(h => h.currentStreak), 0);
+  }, [goodHabits]);
+
+  const longestCleanStreak = useMemo(() => {
+    if (badHabits.length === 0) return 0;
+    return Math.max(...badHabits.map(h => h.daysClean || 0), 0);
+  }, [badHabits]);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
 
   return (
     <View style={styles.container}>
@@ -180,18 +197,15 @@ export default function PersonalHomeScreen() {
         }
       ]}>
         
-        {/* Header - Bevel Style */}
         <View style={styles.header}>
           <View>
-            <TouchableOpacity style={styles.dateSelector}>
-              <Text style={styles.dateText}>{formattedDate}</Text>
-              <ChevronDown size={16} color="#A1A1AA" />
-            </TouchableOpacity>
+            <Text style={styles.greetingText}>{getGreeting()}</Text>
+            <Text style={styles.dateText}>{formattedDate}</Text>
           </View>
           <TouchableOpacity onPress={toggleMode} style={styles.avatarContainer}>
-             <View style={styles.avatarFallback}>
-               <Text style={styles.avatarText}>{user?.name?.[0] || 'U'}</Text>
-             </View>
+            <View style={styles.avatarFallback}>
+              <Text style={styles.avatarText}>{user?.name?.[0] || 'U'}</Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -202,148 +216,228 @@ export default function PersonalHomeScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3B82F6" />}
         >
           
-          {/* Status Pills */}
-          <View style={styles.statusRow}>
-            <View style={styles.statusPill}>
-              <View style={[styles.statusDot, { backgroundColor: '#10B981' }]} />
-              <Text style={styles.statusText}>Focus Mode</Text>
-              <ChevronDown size={14} color="#71717A" style={{ marginLeft: 4 }} />
-            </View>
-            <View style={styles.statusPill}>
-              <Cloud size={14} color="#A1A1AA" />
-              <Text style={styles.statusText}>22°C Clear</Text>
-            </View>
-          </View>
-
-          {/* Main Metrics Card */}
+          {/* Daily Progress Card */}
           <View style={styles.mainCard}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardTitleRow}>
+                <View style={styles.iconBadge}>
+                  <BarChart3 size={16} color="#3B82F6" />
+                </View>
+                <Text style={styles.cardTitle}>Daily Progress</Text>
+              </View>
+              <View style={styles.scoreBox}>
+                <Text style={styles.scoreValue}>{dailySummary.productivityScore}</Text>
+                <Text style={styles.scoreLabel}>Score</Text>
+              </View>
+            </View>
+
             <View style={styles.ringsRow}>
               <CircularProgress 
-                progress={dailySummary.productivityScore} 
-                value={`${dailySummary.productivityScore}%`}
-                label="Productivity"
-                color={productivityColor}
+                progress={tasksCompletion} 
+                value={`${dailySummary.completedActivities}/${dailySummary.totalActivities}`}
+                label="Tasks Done"
+                color="#3B82F6"
               />
               <CircularProgress 
                 progress={habitsCompletion} 
                 value={`${habitsCompletion}%`}
                 label="Habits"
-                color={habitsColor}
+                color="#10B981"
               />
               <CircularProgress 
-                progress={tasksCompletion} 
-                value={`${tasksCompletion}%`}
-                label="Tasks"
-                color={tasksColor}
+                progress={Math.min(totalStreak * 10, 100)} 
+                value={`${totalStreak}d`}
+                label="Best Streak"
+                color="#F59E0B"
               />
             </View>
             
             <View style={styles.divider} />
             
-            <View style={styles.insightContainer}>
-              <View style={styles.insightHeader}>
-                <ActivityIcon size={16} color={productivityColor} />
-                <Text style={styles.insightTitle}>Daily Progress</Text>
-              </View>
+            <View style={styles.insightRow}>
+              <Sparkles size={14} color="#60A5FA" />
               <Text style={styles.insightText}>
-                Great momentum! You&apos;ve completed {dailySummary.completedActivities} out of {dailySummary.totalActivities} tasks today. 
-                Keep pushing to reach your daily goals.
+                {dailySummary.productivityScore >= 70 
+                  ? "You're on fire today! Keep up the momentum."
+                  : dailySummary.productivityScore >= 40
+                  ? "Good progress! A few more tasks to hit your goal."
+                  : "Let's get started! Complete some tasks to boost your score."}
               </Text>
             </View>
           </View>
 
-          {/* Secondary Section - "Stress & Energy" equivalent */}
-          <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-               <View style={styles.sectionTitleRow}>
-                  <View style={[styles.sectionIcon, { backgroundColor: '#3B82F620' }]}>
-                    <Target size={16} color="#3B82F6" />
-                  </View>
-                  <Text style={styles.sectionTitle}>Today&apos;s Focus</Text>
-               </View>
-               <View style={styles.scoreContainer}>
-                  <Text style={styles.scoreValue}>{dailySummary.productivityScore}</Text>
-                  <Text style={styles.scoreLabel}>Score</Text>
-               </View>
+          {/* Quick Stats Row */}
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#3B82F620' }]}>
+                <Flame size={18} color="#F59E0B" />
+              </View>
+              <Text style={styles.statValue}>{totalStreak}</Text>
+              <Text style={styles.statLabel}>Day Streak</Text>
             </View>
-
-            <View style={styles.gaugeContainer}>
-               <View style={styles.gaugeRow}>
-                 <Text style={styles.gaugeLabel}>Highest</Text>
-                 <Text style={styles.gaugeLabel}>Lowest</Text>
-                 <Text style={styles.gaugeLabel}>Average</Text>
-               </View>
-               <View style={styles.gaugeValues}>
-                 <Text style={[styles.gaugeValue, { color: '#EAB308' }]}>85</Text>
-                 <Text style={[styles.gaugeValue, { color: '#3B82F6' }]}>42</Text>
-                 <Text style={[styles.gaugeValue, { color: '#10B981' }]}>64</Text>
-               </View>
-               
-               {/* Mock Bar Chart */}
-               <View style={styles.barChart}>
-                  {[40, 60, 30, 80, 50, 70, 45, 90, 60, 40, 55, 75, 50, 65, 45, 80, 60, 40, 30, 50, 70, 60, 80, 40].map((h, i) => (
-                    <View 
-                      key={i} 
-                      style={[
-                        styles.bar, 
-                        { 
-                          height: `${h}%`, 
-                          backgroundColor: h > 70 ? '#3B82F6' : '#27272A' 
-                        }
-                      ]} 
-                    />
-                  ))}
-               </View>
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
+                <ShieldCheck size={18} color="#10B981" />
+              </View>
+              <Text style={styles.statValue}>{longestCleanStreak}</Text>
+              <Text style={styles.statLabel}>Days Clean</Text>
             </View>
-            
-            <View style={styles.energyBarContainer}>
-               <Zap size={16} color="#EAB308" fill="#EAB308" />
-               <View style={styles.energyBarBg}>
-                  <View style={[styles.energyBarFill, { width: `${dailySummary.productivityScore}%` }]} />
-               </View>
-               <Text style={styles.energyValue}>{dailySummary.productivityScore}%</Text>
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
+                <Award size={18} color="#8B5CF6" />
+              </View>
+              <Text style={styles.statValue}>{goodHabits.length + badHabits.length}</Text>
+              <Text style={styles.statLabel}>Active Habits</Text>
             </View>
           </View>
 
-          {/* Activities / Habits List */}
-          <View style={styles.listSection}>
-             <Text style={styles.listHeader}>Priorities</Text>
-             
-             <View style={styles.menuGrid}>
-                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
-                   <Layout size={24} color="#FFF" />
-                   <Text style={styles.menuLabel}>Home</Text>
+          {/* Good Habits Section */}
+          {goodHabits.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleRow}>
+                  <View style={[styles.sectionDot, { backgroundColor: '#10B981' }]} />
+                  <Text style={styles.sectionTitle}>Build Habits</Text>
+                </View>
+                <TouchableOpacity onPress={() => router.push('/habits')} style={styles.seeAllBtn}>
+                  <Text style={styles.seeAllText}>See All</Text>
+                  <ChevronRight size={14} color="#60A5FA" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
-                   <ListTodo size={24} color="#A1A1AA" />
-                   <Text style={styles.menuLabel}>Tasks</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItemActive} onPress={() => setShowAddModal(true)}>
-                   <Plus size={24} color="#000" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
-                   <Flame size={24} color="#A1A1AA" />
-                   <Text style={styles.menuLabel}>Habits</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => {}}>
-                   <Shield size={24} color="#A1A1AA" />
-                   <Text style={styles.menuLabel}>Focus</Text>
-                </TouchableOpacity>
-             </View>
-
-             {/* Recent Items List */}
-             <View style={styles.activitiesList}>
-                {getTodayActivities.slice(0, 3).map((activity) => (
-                   <ActivityRow 
-                      key={activity.id} 
-                      activity={activity} 
-                      onComplete={() => completeActivity(activity.id)} 
-                    />
+              </View>
+              
+              <View style={styles.habitsList}>
+                {goodHabits.slice(0, 3).map((habit) => (
+                  <HabitCard 
+                    key={habit.id} 
+                    habit={habit} 
+                    isCompleted={isHabitCompletedToday(habit.id)}
+                    onComplete={() => completeHabitForToday(habit.id)}
+                  />
                 ))}
-                {getTodayActivities.length === 0 && (
-                  <Text style={styles.emptyText}>No activities scheduled for today</Text>
-                )}
-             </View>
+              </View>
+            </View>
+          )}
+
+          {/* Bad Habits Section */}
+          {badHabits.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleRow}>
+                  <View style={[styles.sectionDot, { backgroundColor: '#EF4444' }]} />
+                  <Text style={styles.sectionTitle}>Breaking Habits</Text>
+                </View>
+                <TouchableOpacity onPress={() => router.push('/habits')} style={styles.seeAllBtn}>
+                  <Text style={styles.seeAllText}>See All</Text>
+                  <ChevronRight size={14} color="#60A5FA" />
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.habitsList}>
+                {badHabits.slice(0, 2).map((habit) => (
+                  <BadHabitCard key={habit.id} habit={habit} />
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Today's Activities */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <View style={[styles.sectionDot, { backgroundColor: '#3B82F6' }]} />
+                <Text style={styles.sectionTitle}>Today&apos;s Tasks</Text>
+              </View>
+              <TouchableOpacity onPress={() => router.push('/schedule')} style={styles.seeAllBtn}>
+                <Text style={styles.seeAllText}>Schedule</Text>
+                <ChevronRight size={14} color="#60A5FA" />
+              </TouchableOpacity>
+            </View>
+
+            {getTodayActivities.length > 0 ? (
+              <View style={styles.activitiesList}>
+                {getTodayActivities.slice(0, 4).map((activity) => (
+                  <ActivityRow 
+                    key={activity.id} 
+                    activity={activity} 
+                    onComplete={() => completeActivity(activity.id)} 
+                  />
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Calendar size={32} color="#3F3F46" />
+                <Text style={styles.emptyTitle}>No tasks for today</Text>
+                <Text style={styles.emptySubtitle}>Add activities to stay productive</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Upcoming Activities */}
+          {upcomingActivities.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleRow}>
+                  <View style={[styles.sectionDot, { backgroundColor: '#8B5CF6' }]} />
+                  <Text style={styles.sectionTitle}>Coming Up</Text>
+                </View>
+              </View>
+              
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: 20 }}
+              >
+                {upcomingActivities.slice(0, 5).map((activity) => (
+                  <UpcomingCard key={activity.id} activity={activity} />
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* Quick Actions */}
+          <View style={styles.quickActions}>
+            <Text style={styles.quickActionsTitle}>Quick Actions</Text>
+            <View style={styles.actionsGrid}>
+              <TouchableOpacity 
+                style={styles.actionBtn} 
+                onPress={() => setShowAddModal(true)}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: '#3B82F620' }]}>
+                  <Plus size={20} color="#3B82F6" />
+                </View>
+                <Text style={styles.actionLabel}>Add Task</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.actionBtn}
+                onPress={() => router.push('/habits')}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: '#10B98120' }]}>
+                  <Target size={20} color="#10B981" />
+                </View>
+                <Text style={styles.actionLabel}>Habits</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.actionBtn}
+                onPress={() => router.push('/schedule')}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: '#F59E0B20' }]}>
+                  <Calendar size={20} color="#F59E0B" />
+                </View>
+                <Text style={styles.actionLabel}>Schedule</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.actionBtn}
+                onPress={() => router.push('/coach')}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: '#8B5CF620' }]}>
+                  <Heart size={20} color="#8B5CF6" />
+                </View>
+                <Text style={styles.actionLabel}>Coach</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
         </ScrollView>
@@ -354,25 +448,110 @@ export default function PersonalHomeScreen() {
   );
 }
 
+function HabitCard({ habit, isCompleted, onComplete }: { habit: Habit; isCompleted: boolean; onComplete: () => void }) {
+  return (
+    <TouchableOpacity 
+      style={[styles.habitCard, isCompleted && styles.habitCardCompleted]} 
+      onPress={onComplete}
+      activeOpacity={0.7}
+    >
+      <View style={styles.habitLeft}>
+        <View style={[styles.habitIcon, { backgroundColor: habit.color + '20' }]}>
+          <CheckCircle2 size={18} color={habit.color} />
+        </View>
+        <View style={styles.habitInfo}>
+          <Text style={[styles.habitTitle, isCompleted && styles.habitTitleCompleted]}>
+            {habit.title}
+          </Text>
+          <View style={styles.habitMeta}>
+            <Flame size={12} color="#F59E0B" />
+            <Text style={styles.habitStreak}>{habit.currentStreak} day streak</Text>
+          </View>
+        </View>
+      </View>
+      <View style={[styles.habitCheck, isCompleted && styles.habitCheckDone]}>
+        {isCompleted && <CheckCircle2 size={16} color="#FFF" />}
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function BadHabitCard({ habit }: { habit: Habit & { daysClean: number } }) {
+  const progress = Math.min((habit.daysClean / 30) * 100, 100);
+  
+  return (
+    <View style={styles.badHabitCard}>
+      <View style={styles.badHabitHeader}>
+        <View style={styles.badHabitLeft}>
+          <View style={[styles.habitIcon, { backgroundColor: '#EF444420' }]}>
+            <AlertTriangle size={18} color="#EF4444" />
+          </View>
+          <View>
+            <Text style={styles.habitTitle}>{habit.title}</Text>
+            <Text style={styles.badHabitSubtitle}>Stay strong!</Text>
+          </View>
+        </View>
+        <View style={styles.daysCleanBadge}>
+          <Text style={styles.daysCleanValue}>{habit.daysClean}</Text>
+          <Text style={styles.daysCleanLabel}>days clean</Text>
+        </View>
+      </View>
+      <View style={styles.progressBarBg}>
+        <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+      </View>
+      <Text style={styles.progressText}>
+        {habit.daysClean >= 30 ? '🎉 1 month milestone reached!' : `${30 - habit.daysClean} days to 1 month milestone`}
+      </Text>
+    </View>
+  );
+}
+
 function ActivityRow({ activity, onComplete }: { activity: Activity; onComplete: () => void }) {
   const isCompleted = activity.status === 'completed';
   return (
     <TouchableOpacity style={styles.activityRow} onPress={onComplete} activeOpacity={0.7}>
       <View style={[styles.activityIcon, { backgroundColor: ACTIVITY_COLORS[activity.category] + '20' }]}>
-        <Clock size={16} color={ACTIVITY_COLORS[activity.category]} />
+        <ListTodo size={16} color={ACTIVITY_COLORS[activity.category]} />
       </View>
       <View style={styles.activityContent}>
         <Text style={[styles.activityTitle, isCompleted && styles.completedText]}>{activity.title}</Text>
-        <Text style={styles.activityTime}>
-          {activity.startTime ? new Date(activity.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'All Day'}
-           {' • '}
-          <Text style={{color: ACTIVITY_COLORS[activity.category], textTransform: 'capitalize'}}>{activity.category}</Text>
-        </Text>
+        <View style={styles.activityMetaRow}>
+          <Clock size={12} color="#71717A" />
+          <Text style={styles.activityTime}>
+            {activity.startTime ? new Date(activity.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'All Day'}
+          </Text>
+          <View style={[styles.categoryTag, { backgroundColor: ACTIVITY_COLORS[activity.category] + '20' }]}>
+            <Text style={[styles.categoryText, { color: ACTIVITY_COLORS[activity.category] }]}>
+              {activity.category}
+            </Text>
+          </View>
+        </View>
       </View>
       <View style={[styles.checkBox, isCompleted && styles.checkBoxChecked]}>
         {isCompleted && <CheckCircle2 size={16} color="#FFF" />}
       </View>
     </TouchableOpacity>
+  );
+}
+
+function UpcomingCard({ activity }: { activity: Activity }) {
+  const activityDate = new Date(activity.date);
+  const dayName = activityDate.toLocaleDateString('en-US', { weekday: 'short' });
+  const dayNum = activityDate.getDate();
+
+  return (
+    <View style={styles.upcomingCard}>
+      <View style={styles.upcomingDate}>
+        <Text style={styles.upcomingDay}>{dayName}</Text>
+        <Text style={styles.upcomingNum}>{dayNum}</Text>
+      </View>
+      <Text style={styles.upcomingTitle} numberOfLines={2}>{activity.title}</Text>
+      <View style={[styles.upcomingCategory, { backgroundColor: ACTIVITY_COLORS[activity.category] + '20' }]}>
+        <Text style={[styles.upcomingCategoryText, { color: ACTIVITY_COLORS[activity.category] }]}>
+          {activity.category}
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -389,28 +568,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 16,
+    marginBottom: 20,
     marginTop: 8,
   },
-  dateSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  greetingText: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 14,
+    color: '#71717A',
+    marginBottom: 2,
   },
   dateText: {
     fontFamily: sfProDisplayBold,
-    fontSize: 22,
+    fontSize: 20,
     color: '#FFFFFF',
   },
   avatarContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#1C1C1E',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#333',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
   },
   avatarFallback: {
     alignItems: 'center',
@@ -419,260 +599,303 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   avatarText: {
-    fontFamily: sfProDisplayMedium,
+    fontFamily: sfProDisplayBold,
     color: '#FFF',
-    fontSize: 14,
+    fontSize: 16,
   },
   content: {
     flex: 1,
   },
-  statusRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    gap: 12,
-    marginBottom: 20,
-  },
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1C1C1E',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-    borderWidth: 1,
-    borderColor: '#27272A',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 13,
-    color: '#E4E4E7',
-  },
   mainCard: {
     marginHorizontal: 20,
-    backgroundColor: '#121212',
+    backgroundColor: '#0A0A0A',
     borderRadius: 24,
     padding: 20,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#27272A',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 5,
-  },
-  ringsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#27272A',
     marginBottom: 16,
-  },
-  insightContainer: {
-    gap: 8,
-  },
-  insightHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
-  },
-  insightTitle: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 15,
-    color: '#FFFFFF',
-  },
-  insightText: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 15,
-    color: '#A1A1AA',
-    lineHeight: 22,
-  },
-  sectionContainer: {
-    marginHorizontal: 20,
-    backgroundColor: '#121212',
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
   },
-  sectionHeader: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  sectionTitleRow: {
+  cardTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  sectionIcon: {
+  iconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#3B82F620',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 18,
+    color: '#FFFFFF',
+  },
+  scoreBox: {
+    alignItems: 'center',
+    backgroundColor: '#18181B',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  scoreValue: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 20,
+    color: '#3B82F6',
+  },
+  scoreLabel: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 10,
+    color: '#71717A',
+  },
+  ringsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#1F1F1F',
+    marginBottom: 16,
+  },
+  insightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#18181B',
+    padding: 12,
+    borderRadius: 12,
+  },
+  insightText: {
+    flex: 1,
+    fontFamily: sfProDisplayRegular,
+    fontSize: 13,
+    color: '#A1A1AA',
+    lineHeight: 18,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    gap: 10,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#0A0A0A',
+    borderRadius: 16,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+  },
+  statIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  statValue: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 20,
+    color: '#FFFFFF',
+  },
+  statLabel: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 11,
+    color: '#71717A',
+    marginTop: 2,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  sectionDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#3B82F6',
   },
   sectionTitle: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 17,
-    color: '#FFFFFF',
-  },
-  scoreContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: '#27272A',
-    borderRightColor: '#EAB308',
-    borderTopColor: '#EAB308',
-  },
-  scoreValue: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     color: '#FFFFFF',
   },
-  scoreLabel: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 9,
-    color: '#EAB308',
-  },
-  gaugeContainer: {
-    marginBottom: 20,
-  },
-  gaugeRow: {
+  seeAllBtn: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 4,
+    alignItems: 'center',
+    gap: 4,
   },
-  gaugeLabel: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 12,
-    color: '#71717A',
-    width: '30%',
+  seeAllText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#60A5FA',
   },
-  gaugeValues: {
+  habitsList: {
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  habitCard: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    backgroundColor: '#0A0A0A',
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
   },
-  gaugeValue: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 20,
-    width: '30%',
+  habitCardCompleted: {
+    borderColor: '#10B98140',
+    backgroundColor: '#10B98108',
   },
-  barChart: {
-    flexDirection: 'row',
-    height: 40,
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: 2,
-  },
-  bar: {
-    flex: 1,
-    borderRadius: 2,
-  },
-  energyBarContainer: {
+  habitLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#18181B',
-    padding: 12,
-    borderRadius: 16,
-  },
-  energyBarBg: {
     flex: 1,
+  },
+  habitIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  habitInfo: {
+    flex: 1,
+  },
+  habitTitle: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 15,
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  habitTitleCompleted: {
+    color: '#10B981',
+  },
+  habitMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  habitStreak: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 12,
+    color: '#71717A',
+  },
+  habitCheck: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#3F3F46',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  habitCheckDone: {
+    backgroundColor: '#10B981',
+    borderColor: '#10B981',
+  },
+  badHabitCard: {
+    backgroundColor: '#0A0A0A',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+    marginHorizontal: 20,
+    marginBottom: 10,
+  },
+  badHabitHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  badHabitLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  badHabitSubtitle: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 12,
+    color: '#71717A',
+    marginTop: 2,
+  },
+  daysCleanBadge: {
+    alignItems: 'center',
+    backgroundColor: '#10B98120',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  daysCleanValue: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 18,
+    color: '#10B981',
+  },
+  daysCleanLabel: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 10,
+    color: '#10B981',
+  },
+  progressBarBg: {
     height: 6,
-    backgroundColor: '#27272A',
+    backgroundColor: '#1F1F1F',
     borderRadius: 3,
     overflow: 'hidden',
+    marginBottom: 8,
   },
-  energyBarFill: {
+  progressBarFill: {
     height: '100%',
     backgroundColor: '#10B981',
     borderRadius: 3,
   },
-  energyValue: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 14,
-    color: '#FFFFFF',
-    width: 40,
-    textAlign: 'right',
-  },
-  listSection: {
-    paddingHorizontal: 20,
-  },
-  listHeader: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 18,
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  menuGrid: {
-    flexDirection: 'row',
-    backgroundColor: '#18181B',
-    borderRadius: 30,
-    padding: 6,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#27272A',
-  },
-  menuItem: {
-    alignItems: 'center',
-    padding: 10,
-    gap: 4,
-  },
-  menuItemActive: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: -20,
-    shadowColor: '#FFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  menuLabel: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 10,
-    color: '#A1A1AA',
+  progressText: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 12,
+    color: '#71717A',
+    textAlign: 'center',
   },
   activitiesList: {
-    gap: 12,
+    paddingHorizontal: 20,
+    gap: 10,
   },
   activityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#121212',
-    padding: 16,
-    borderRadius: 20,
+    backgroundColor: '#0A0A0A',
+    padding: 14,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
     gap: 12,
   },
   activityIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -681,18 +904,34 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontFamily: sfProDisplayMedium,
-    fontSize: 16,
+    fontSize: 15,
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   completedText: {
     textDecorationLine: 'line-through',
-    color: '#71717A',
+    color: '#52525B',
+  },
+  activityMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   activityTime: {
     fontFamily: sfProDisplayRegular,
     fontSize: 12,
     color: '#71717A',
+  },
+  categoryTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginLeft: 4,
+  },
+  categoryText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 10,
+    textTransform: 'capitalize',
   },
   checkBox: {
     width: 24,
@@ -704,13 +943,101 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkBoxChecked: {
-    borderColor: '#3B82F6',
     backgroundColor: '#3B82F6',
+    borderColor: '#3B82F6',
   },
-  emptyText: {
-    color: '#52525B',
-    textAlign: 'center',
-    marginTop: 20,
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    marginHorizontal: 20,
+    backgroundColor: '#0A0A0A',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+  },
+  emptyTitle: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 15,
+    color: '#71717A',
+    marginTop: 12,
+  },
+  emptySubtitle: {
     fontFamily: sfProDisplayRegular,
-  }
+    fontSize: 13,
+    color: '#52525B',
+    marginTop: 4,
+  },
+  upcomingCard: {
+    width: 140,
+    backgroundColor: '#0A0A0A',
+    borderRadius: 16,
+    padding: 14,
+    marginLeft: 20,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+  },
+  upcomingDate: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+    marginBottom: 10,
+  },
+  upcomingDay: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 12,
+    color: '#71717A',
+  },
+  upcomingNum: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 18,
+    color: '#FFFFFF',
+  },
+  upcomingTitle: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#E4E4E7',
+    marginBottom: 10,
+    lineHeight: 18,
+  },
+  upcomingCategory: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  upcomingCategoryText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 10,
+    textTransform: 'capitalize',
+  },
+  quickActions: {
+    paddingHorizontal: 20,
+    marginTop: 8,
+  },
+  quickActionsTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  actionBtn: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  actionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionLabel: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 12,
+    color: '#A1A1AA',
+  },
 });
