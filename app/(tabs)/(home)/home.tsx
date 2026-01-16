@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Image,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,7 +19,9 @@ import type { Transaction, BudgetStatus, PlannedTransaction } from '@/constants/
 import AddTransactionModal from '@/components/AddTransactionModal';
 import BudgetModal from '@/components/BudgetModal';
 import AddPlannedTransactionModal from '@/components/AddPlannedTransactionModal';
-import { fontFamily } from '@/constants/Typography';
+import { fontFamily, sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
+
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -29,238 +32,261 @@ export default function HomeScreen() {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [showPlannedModal, setShowPlannedModal] = useState(false);
 
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 1000);
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-           <Image 
-            source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }} 
-            style={styles.avatar} 
-          />
-          <View>
-            <Text style={styles.greeting}>Hello,</Text>
-            <Text style={styles.userName}>{user?.name || 'User'}!</Text>
-          </View>
-        </View>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-            <User color="#000" size={20} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Bell color="#FFF" size={20} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <View style={styles.container}>
+      <BlueGlow />
       <ScrollView
         style={styles.content}
+        contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
       >
-        <View style={styles.cardsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>My Card</Text>
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+          <View style={styles.header}>
+            <View style={styles.userInfo}>
+               <Image 
+                source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }} 
+                style={styles.avatar} 
+              />
+              <View>
+                <Text style={styles.greeting}>Hello,</Text>
+                <Text style={styles.userName}>{user?.name || 'User'}!</Text>
+              </View>
+            </View>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
+                <User color="#000" size={20} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconButton}>
+                <Bell color="#FFF" size={20} />
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <LinearGradient
-            colors={['#18181B', '#09090B']}
-            style={styles.card}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-             {/* Abstract card design */}
-             <LinearGradient
-                colors={['rgba(255,255,255,0.1)', 'transparent', 'rgba(255,255,255,0.05)']}
-                style={styles.cardOverlay}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-             />
-             
-            <View style={styles.cardHeader}>
-              <View style={styles.cardTypeBadge}>
-                <Text style={styles.cardTypeText}>Physical</Text>
-              </View>
-              <View style={styles.cardDots}>
-                 <View style={[styles.dot, styles.activeDot]} />
-                 <View style={styles.dot} />
-                 <View style={styles.dot} />
-              </View>
+          <View style={styles.cardsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>My Card</Text>
             </View>
 
-            <View style={styles.cardBody}>
-               {/* Simulating the fluid/holographic element on the card in the design */}
-               <View style={styles.holographicElement}>
-                  <LinearGradient
-                    colors={['rgba(255,255,255,0.4)', 'transparent']}
-                    style={{ flex: 1, borderRadius: 20 }}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  />
-               </View>
+            <LinearGradient
+              colors={['#18181B', '#09090B']}
+              style={styles.card}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+               {/* Abstract card design */}
+               <LinearGradient
+                  colors={['rgba(59, 130, 246, 0.2)', 'transparent', 'rgba(59, 130, 246, 0.05)']}
+                  style={styles.cardOverlay}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+               />
+               
+              <View style={styles.cardHeader}>
+                <View style={styles.cardTypeBadge}>
+                  <Text style={styles.cardTypeText}>Physical</Text>
+                </View>
+                <View style={styles.cardDots}>
+                   <View style={[styles.dot, styles.activeDot]} />
+                   <View style={styles.dot} />
+                   <View style={styles.dot} />
+                </View>
+              </View>
 
-               <View style={styles.cardChip}>
-                 <CreditCard color="#71717A" size={24} />
-               </View>
+              <View style={styles.cardBody}>
+                 {/* Simulating the fluid/holographic element on the card in the design */}
+                 <View style={styles.holographicElement}>
+                    <LinearGradient
+                      colors={['rgba(59, 130, 246, 0.4)', 'transparent']}
+                      style={{ flex: 1, borderRadius: 20 }}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    />
+                 </View>
 
-               <View style={styles.cardDetails}>
-                  <Text style={styles.cardBalance}>
-                    {financialSummary.balance.toLocaleString('en-US')} USD
-                  </Text>
-                  <Text style={styles.cardNumber}>.. 4568</Text>
-               </View>
-            </View>
-          </LinearGradient>
-          
+                 <View style={styles.cardChip}>
+                   <CreditCard color="#71717A" size={24} />
+                 </View>
 
-        </View>
-
-        {/* Planned Transactions Section */}
-        <View style={styles.plannedSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Upcoming</Text>
-            <TouchableOpacity style={styles.addPlannedButton} onPress={() => setShowPlannedModal(true)}>
-              <CalendarClock size={16} color="#3B82F6" />
-              <Text style={styles.addPlannedText}>Plan</Text>
-            </TouchableOpacity>
+                 <View style={styles.cardDetails}>
+                    <Text style={styles.cardBalance}>
+                      {financialSummary.balance.toLocaleString('en-US')} USD
+                    </Text>
+                    <Text style={styles.cardNumber}>.. 4568</Text>
+                 </View>
+              </View>
+            </LinearGradient>
+            
           </View>
 
-          {(upcomingPlannedTransactions.length > 0 || projectedBalance.projectedIncome > 0 || projectedBalance.projectedExpenses > 0) && (
-            <View style={styles.projectedCard}>
-              <View style={styles.projectedHeader}>
-                <Text style={styles.projectedTitle}>30-Day Forecast</Text>
-              </View>
-              <View style={styles.projectedGrid}>
-                <View style={styles.projectedItem}>
-                  <Text style={styles.projectedLabel}>Current</Text>
-                  <Text style={styles.projectedValue}>{projectedBalance.currentBalance.toFixed(0)} USD</Text>
+          {/* Planned Transactions Section */}
+          <View style={styles.plannedSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Upcoming</Text>
+              <TouchableOpacity style={styles.addPlannedButton} onPress={() => setShowPlannedModal(true)}>
+                <CalendarClock size={16} color="#3B82F6" />
+                <Text style={styles.addPlannedText}>Plan</Text>
+              </TouchableOpacity>
+            </View>
+
+            {(upcomingPlannedTransactions.length > 0 || projectedBalance.projectedIncome > 0 || projectedBalance.projectedExpenses > 0) && (
+              <View style={styles.projectedCard}>
+                <View style={styles.projectedHeader}>
+                  <Text style={styles.projectedTitle}>30-Day Forecast</Text>
                 </View>
-                <View style={styles.projectedItem}>
-                  <TrendingUp size={14} color="#10B981" />
-                  <Text style={styles.projectedIncomeValue}>+{projectedBalance.projectedIncome.toFixed(0)}</Text>
-                </View>
-                <View style={styles.projectedItem}>
-                  <TrendingDown size={14} color="#EF4444" />
-                  <Text style={styles.projectedExpenseValue}>-{projectedBalance.projectedExpenses.toFixed(0)}</Text>
-                </View>
-              </View>
-              <View style={styles.projectedResult}>
-                <Text style={styles.projectedResultLabel}>Projected Balance</Text>
-                <Text style={[
-                  styles.projectedResultValue,
-                  projectedBalance.projectedBalance >= 0 ? styles.positiveBalance : styles.negativeBalance
-                ]}>
-                  {projectedBalance.projectedBalance.toFixed(0)} USD
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {upcomingPlannedTransactions.length > 0 ? (
-            <View style={styles.plannedList}>
-              {upcomingPlannedTransactions.slice(0, 4).map((planned) => (
-                <PlannedTransactionItem 
-                  key={planned.id} 
-                  planned={planned} 
-                  onProcess={() => processPlannedTransaction(planned)}
-                  onDelete={() => deletePlannedTransaction(planned.id)}
-                />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyPlanned}>
-              <CalendarClock size={32} color="#52525B" />
-              <Text style={styles.emptyPlannedText}>No upcoming transactions</Text>
-              <Text style={styles.emptyPlannedSubtext}>Plan your income and expenses for better stability</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Budget Section */}
-        <View style={styles.budgetSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Budgets</Text>
-            <TouchableOpacity style={styles.addBudgetButton} onPress={() => setShowBudgetModal(true)}>
-              <Plus size={16} color="#10B981" />
-              <Text style={styles.addBudgetText}>Add</Text>
-            </TouchableOpacity>
-          </View>
-
-          {totalRewardPoints > 0 && (
-            <View style={styles.rewardsBar}>
-              <Trophy size={18} color="#F59E0B" />
-              <Text style={styles.rewardsText}>{totalRewardPoints} Points Earned</Text>
-              <View style={styles.rewardsBadge}>
-                <Text style={styles.rewardsBadgeText}>
-                  {budgetRewards.length} {budgetRewards.length === 1 ? 'Reward' : 'Rewards'}
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {budgetStatuses.length > 0 ? (
-            <View style={styles.budgetList}>
-              {budgetStatuses.map((status) => (
-                <BudgetItem key={status.budget.id} status={status} />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyBudget}>
-              <Wallet size={32} color="#52525B" />
-              <Text style={styles.emptyBudgetText}>No budgets set</Text>
-              <Text style={styles.emptyBudgetSubtext}>Create a budget to track household spending</Text>
-            </View>
-          )}
-
-          {budgetRules.length > 0 && (
-            <View style={styles.rulesPreview}>
-              <View style={styles.rulesHeader}>
-                <Shield size={16} color="#3B82F6" />
-                <Text style={styles.rulesTitle}>{budgetRules.length} Active Rules</Text>
-              </View>
-              <View style={styles.rulesList}>
-                {budgetRules.slice(0, 2).map(rule => (
-                  <View key={rule.id} style={styles.ruleItem}>
-                    <View style={[
-                      styles.strictnessDot,
-                      rule.strictness === 'strict' && styles.strictDot,
-                      rule.strictness === 'moderate' && styles.moderateDot,
-                      rule.strictness === 'flexible' && styles.flexibleDot,
-                    ]} />
-                    <Text style={styles.ruleName} numberOfLines={1}>{rule.name}</Text>
+                <View style={styles.projectedGrid}>
+                  <View style={styles.projectedItem}>
+                    <Text style={styles.projectedLabel}>Current</Text>
+                    <Text style={styles.projectedValue}>{projectedBalance.currentBalance.toFixed(0)} USD</Text>
                   </View>
+                  <View style={styles.projectedItem}>
+                    <TrendingUp size={14} color="#10B981" />
+                    <Text style={styles.projectedIncomeValue}>+{projectedBalance.projectedIncome.toFixed(0)}</Text>
+                  </View>
+                  <View style={styles.projectedItem}>
+                    <TrendingDown size={14} color="#EF4444" />
+                    <Text style={styles.projectedExpenseValue}>-{projectedBalance.projectedExpenses.toFixed(0)}</Text>
+                  </View>
+                </View>
+                <View style={styles.projectedResult}>
+                  <Text style={styles.projectedResultLabel}>Projected Balance</Text>
+                  <Text style={[
+                    styles.projectedResultValue,
+                    projectedBalance.projectedBalance >= 0 ? styles.positiveBalance : styles.negativeBalance
+                  ]}>
+                    {projectedBalance.projectedBalance.toFixed(0)} USD
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {upcomingPlannedTransactions.length > 0 ? (
+              <View style={styles.plannedList}>
+                {upcomingPlannedTransactions.slice(0, 4).map((planned) => (
+                  <PlannedTransactionItem 
+                    key={planned.id} 
+                    planned={planned} 
+                    onProcess={() => processPlannedTransaction(planned)}
+                    onDelete={() => deletePlannedTransaction(planned.id)}
+                  />
                 ))}
               </View>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.transactionsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>History</Text>
-            <TouchableOpacity style={styles.filterButton}>
-               <Text style={styles.filterText}>last week</Text>
-               <ArrowDownLeft size={12} color="#71717A" style={{ transform: [{ rotate: '-45deg' }] }} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.transactionsList}>
-            {transactions.length > 0 ? (
-              transactions.slice(0, 5).map((t) => (
-                <TransactionItem key={t.id} transaction={t} />
-              ))
             ) : (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyStateText}>No transactions yet</Text>
-                <Text style={styles.emptyStateSubtext}>Tap + to add your first transaction</Text>
+              <View style={styles.emptyPlanned}>
+                <CalendarClock size={32} color="#52525B" />
+                <Text style={styles.emptyPlannedText}>No upcoming transactions</Text>
+                <Text style={styles.emptyPlannedSubtext}>Plan your income and expenses for better stability</Text>
               </View>
             )}
           </View>
-        </View>
+
+          {/* Budget Section */}
+          <View style={styles.budgetSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Budgets</Text>
+              <TouchableOpacity style={styles.addBudgetButton} onPress={() => setShowBudgetModal(true)}>
+                <Plus size={16} color="#10B981" />
+                <Text style={styles.addBudgetText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+
+            {totalRewardPoints > 0 && (
+              <View style={styles.rewardsBar}>
+                <Trophy size={18} color="#F59E0B" />
+                <Text style={styles.rewardsText}>{totalRewardPoints} Points Earned</Text>
+                <View style={styles.rewardsBadge}>
+                  <Text style={styles.rewardsBadgeText}>
+                    {budgetRewards.length} {budgetRewards.length === 1 ? 'Reward' : 'Rewards'}
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {budgetStatuses.length > 0 ? (
+              <View style={styles.budgetList}>
+                {budgetStatuses.map((status) => (
+                  <BudgetItem key={status.budget.id} status={status} />
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyBudget}>
+                <Wallet size={32} color="#52525B" />
+                <Text style={styles.emptyBudgetText}>No budgets set</Text>
+                <Text style={styles.emptyBudgetSubtext}>Create a budget to track household spending</Text>
+              </View>
+            )}
+
+            {budgetRules.length > 0 && (
+              <View style={styles.rulesPreview}>
+                <View style={styles.rulesHeader}>
+                  <Shield size={16} color="#3B82F6" />
+                  <Text style={styles.rulesTitle}>{budgetRules.length} Active Rules</Text>
+                </View>
+                <View style={styles.rulesList}>
+                  {budgetRules.slice(0, 2).map(rule => (
+                    <View key={rule.id} style={styles.ruleItem}>
+                      <View style={[
+                        styles.strictnessDot,
+                        rule.strictness === 'strict' && styles.strictDot,
+                        rule.strictness === 'moderate' && styles.moderateDot,
+                        rule.strictness === 'flexible' && styles.flexibleDot,
+                      ]} />
+                      <Text style={styles.ruleName} numberOfLines={1}>{rule.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.transactionsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>History</Text>
+              <TouchableOpacity style={styles.filterButton}>
+                 <Text style={styles.filterText}>last week</Text>
+                 <ArrowDownLeft size={12} color="#71717A" style={{ transform: [{ rotate: '-45deg' }] }} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.transactionsList}>
+              {transactions.length > 0 ? (
+                transactions.slice(0, 5).map((t) => (
+                  <TransactionItem key={t.id} transaction={t} />
+                ))
+              ) : (
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyStateText}>No transactions yet</Text>
+                  <Text style={styles.emptyStateSubtext}>Tap + to add your first transaction</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </Animated.View>
       </ScrollView>
 
       <TouchableOpacity 
@@ -468,15 +494,15 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   greeting: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
     color: '#A1A1AA',
   },
   userName: {
-    fontFamily,
-    fontSize: 18,
-    fontWeight: '700',
+    fontFamily: sfProDisplayBold,
+    fontSize: 20,
     color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
   headerActions: {
     flexDirection: 'row',
@@ -486,19 +512,23 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#10B981',
+    backgroundColor: '#3B82F6',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   content: {
     flex: 1,
@@ -514,10 +544,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 24,
-    fontWeight: 'bold',
     color: '#FFFFFF',
+    letterSpacing: 0.2,
   },
 
   card: {
@@ -527,7 +557,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(59, 130, 246, 0.2)',
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -545,10 +575,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   cardTypeText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     color: '#FFF',
     fontSize: 12,
-    fontWeight: '600',
   },
   cardDots: {
     flexDirection: 'row',
@@ -561,7 +590,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.3)',
   },
   activeDot: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#3B82F6',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
   },
   cardBody: {
     flex: 1,
@@ -585,13 +618,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   cardBalance: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
-    fontWeight: 'bold',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   cardNumber: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     color: '#A1A1AA',
     marginBottom: 6,
@@ -681,14 +714,14 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#3B82F6',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FFFFFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
   },
   budgetSection: {
     paddingHorizontal: 20,
