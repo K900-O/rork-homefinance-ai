@@ -6,15 +6,26 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, Plus, Calendar, Filter, Wallet, AlertTriangle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2 } from 'lucide-react-native';
+import { Search, Plus, Filter, Wallet, AlertTriangle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import type { Transaction, TransactionType, TransactionCategory, BudgetCategory, PlannedTransaction, RecurrenceType } from '@/constants/types';
 import AddTransactionModal from '@/components/AddTransactionModal';
 import AddPlannedTransactionModal from '@/components/AddPlannedTransactionModal';
 import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
+import { LinearGradient } from 'expo-linear-gradient';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 type FilterType = 'all' | TransactionType;
 
@@ -97,154 +108,178 @@ export default function TransactionsScreen() {
     return budgetStatuses.find(s => s.budget.category === budgetCategory) || null;
   };
 
+  const togglePlannedSection = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setShowPlannedSection(!showPlannedSection);
+  };
+
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Transactions</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => setShowAddModal(true)} activeOpacity={0.8}>
-          <Plus color="#000" size={24} strokeWidth={2.5} />
-        </TouchableOpacity>
-      </View>
-
-      {budgetStatuses.length > 0 && (
-        <View style={styles.budgetSummary}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.budgetSummaryContent}>
-            {budgetStatuses.map(status => (
-              <View 
-                key={status.budget.id} 
-                style={[
-                  styles.budgetChip,
-                  status.status === 'exceeded' && styles.budgetChipExceeded,
-                  status.status === 'danger' && styles.budgetChipDanger,
-                  status.status === 'warning' && styles.budgetChipWarning,
-                ]}
-              >
-                <View style={[styles.budgetChipDot, { backgroundColor: status.budget.color }]} />
-                <Text style={styles.budgetChipName}>{status.budget.name}</Text>
-                <Text style={[
-                  styles.budgetChipPercent,
-                  status.status === 'exceeded' && styles.budgetChipPercentExceeded,
-                  status.status === 'danger' && styles.budgetChipPercentDanger,
-                  status.status === 'warning' && styles.budgetChipPercentWarning,
-                ]}>
-                  {status.percentageUsed.toFixed(0)}%
-                </Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBox}>
-          <Search color="#71717A" size={20} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search..."
-            placeholderTextColor="#71717A"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-        <TouchableOpacity style={styles.filterIconButton}>
-           <Filter color="#FFF" size={20} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.filterContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterContent}>
-            <FilterButton
-            label="All"
-            isActive={filterType === 'all'}
-            onPress={() => setFilterType('all')}
-            />
-            <FilterButton
-            label="Income"
-            isActive={filterType === 'income'}
-            onPress={() => setFilterType('income')}
-            />
-            <FilterButton
-            label="Expense"
-            isActive={filterType === 'expense'}
-            onPress={() => setFilterType('expense')}
-            />
-        </ScrollView>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Planned Transactions Section */}
-        {plannedTransactions.filter(p => p.isActive).length > 0 && (
-          <View style={styles.plannedSection}>
-            <TouchableOpacity 
-              style={styles.plannedHeader} 
-              onPress={() => setShowPlannedSection(!showPlannedSection)}
-              activeOpacity={0.7}
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Transactions</Text>
+          <TouchableOpacity 
+            style={styles.addButton} 
+            onPress={() => setShowAddModal(true)} 
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#3B82F6', '#2563EB']}
+              style={styles.addButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
             >
-              <View style={styles.plannedHeaderLeft}>
-                <CalendarClock size={18} color="#3B82F6" />
-                <Text style={styles.plannedTitle}>Planned Transactions</Text>
-                <View style={styles.plannedBadge}>
-                  <Text style={styles.plannedBadgeText}>
-                    {plannedTransactions.filter(p => p.isActive).length}
+              <Plus color="#FFF" size={24} strokeWidth={2.5} />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {budgetStatuses.length > 0 && (
+          <View style={styles.budgetSummary}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.budgetSummaryContent}>
+              {budgetStatuses.map(status => (
+                <View 
+                  key={status.budget.id} 
+                  style={[
+                    styles.budgetChip,
+                    status.status === 'exceeded' && styles.budgetChipExceeded,
+                    status.status === 'danger' && styles.budgetChipDanger,
+                    status.status === 'warning' && styles.budgetChipWarning,
+                  ]}
+                >
+                  <View style={[styles.budgetChipDot, { backgroundColor: status.budget.color }]} />
+                  <Text style={styles.budgetChipName}>{status.budget.name}</Text>
+                  <Text style={[
+                    styles.budgetChipPercent,
+                    status.status === 'exceeded' && styles.budgetChipPercentExceeded,
+                    status.status === 'danger' && styles.budgetChipPercentDanger,
+                    status.status === 'warning' && styles.budgetChipPercentWarning,
+                  ]}>
+                    {status.percentageUsed.toFixed(0)}%
                   </Text>
                 </View>
-              </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBox}>
+            <Search color="#71717A" size={20} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search..."
+              placeholderTextColor="#71717A"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+          <TouchableOpacity style={styles.filterIconButton}>
+             <Filter color="#FFF" size={20} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.filterContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterContent}>
+              <FilterButton
+              label="All"
+              isActive={filterType === 'all'}
+              onPress={() => setFilterType('all')}
+              />
+              <FilterButton
+              label="Income"
+              isActive={filterType === 'income'}
+              onPress={() => setFilterType('income')}
+              />
+              <FilterButton
+              label="Expense"
+              isActive={filterType === 'expense'}
+              onPress={() => setFilterType('expense')}
+              />
+          </ScrollView>
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Planned Transactions Section */}
+          {plannedTransactions.filter(p => p.isActive).length > 0 && (
+            <View style={styles.plannedSection}>
               <TouchableOpacity 
-                style={styles.addPlannedBtn}
-                onPress={() => setShowPlannedModal(true)}
+                style={styles.plannedHeader} 
+                onPress={togglePlannedSection}
+                activeOpacity={0.7}
               >
-                <Plus size={16} color="#3B82F6" />
+                <View style={styles.plannedHeaderLeft}>
+                  <View style={styles.plannedIconBg}>
+                    <CalendarClock size={16} color="#3B82F6" />
+                  </View>
+                  <Text style={styles.plannedTitle}>Planned</Text>
+                  <View style={styles.plannedBadge}>
+                    <Text style={styles.plannedBadgeText}>
+                      {plannedTransactions.filter(p => p.isActive).length}
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity 
+                  style={styles.addPlannedBtn}
+                  onPress={() => setShowPlannedModal(true)}
+                >
+                  <Plus size={16} color="#3B82F6" />
+                </TouchableOpacity>
               </TouchableOpacity>
-            </TouchableOpacity>
-            
-            {showPlannedSection && (
-              <View style={styles.plannedList}>
-                {plannedTransactions.filter(p => p.isActive).slice(0, 5).map((planned) => (
-                  <PlannedItem 
-                    key={planned.id} 
-                    planned={planned}
-                    onProcess={() => processPlannedTransaction(planned)}
-                    onDelete={() => deletePlannedTransaction(planned.id)}
-                  />
-                ))}
-              </View>
-            )}
-          </View>
-        )}
-
-        {groupedTransactions.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Calendar color="#333" size={48} />
-            <Text style={styles.emptyStateTitle}>No transactions found</Text>
-            <Text style={styles.emptyStateText}>
-              {searchQuery ? 'Try a different search query' : 'Start tracking your expenses'}
-            </Text>
-          </View>
-        ) : (
-          groupedTransactions.map(([date, items]) => (
-            <View key={date} style={styles.transactionGroup}>
-              <View style={styles.dateHeader}>
-                <Text style={styles.dateText}>{date}</Text>
-                <Text style={styles.dateAmount}>
-                  {items.reduce((sum, t) => t.type === 'income' ? sum + t.amount : sum - t.amount, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
-                </Text>
-              </View>
-              <View style={styles.transactionsList}>
-                {items.map(transaction => (
-                  <TransactionItem 
-                    key={transaction.id} 
-                    transaction={transaction} 
-                    budgetStatus={getBudgetStatusForTransaction(transaction)}
-                  />
-                ))}
-              </View>
+              
+              {showPlannedSection && (
+                <View style={styles.plannedList}>
+                  {plannedTransactions.filter(p => p.isActive).slice(0, 5).map((planned) => (
+                    <PlannedItem 
+                      key={planned.id} 
+                      planned={planned}
+                      onProcess={() => processPlannedTransaction(planned)}
+                      onDelete={() => deletePlannedTransaction(planned.id)}
+                    />
+                  ))}
+                </View>
+              )}
             </View>
-          ))
-        )}
-      </ScrollView>
+          )}
 
-      <AddTransactionModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
-      <AddPlannedTransactionModal visible={showPlannedModal} onClose={() => setShowPlannedModal(false)} />
+          {groupedTransactions.length === 0 ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconContainer}>
+                <Wallet color="#333" size={48} />
+              </View>
+              <Text style={styles.emptyStateTitle}>No transactions found</Text>
+              <Text style={styles.emptyStateText}>
+                {searchQuery ? 'Try a different search query' : 'Start tracking your expenses'}
+              </Text>
+            </View>
+          ) : (
+            groupedTransactions.map(([date, items]) => (
+              <View key={date} style={styles.transactionGroup}>
+                <View style={styles.dateHeader}>
+                  <Text style={styles.dateText}>{date}</Text>
+                  <Text style={styles.dateAmount}>
+                    {items.reduce((sum, t) => t.type === 'income' ? sum + t.amount : sum - t.amount, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+                  </Text>
+                </View>
+                <View style={styles.transactionsList}>
+                  {items.map(transaction => (
+                    <TransactionItem 
+                      key={transaction.id} 
+                      transaction={transaction} 
+                      budgetStatus={getBudgetStatusForTransaction(transaction)}
+                    />
+                  ))}
+                </View>
+              </View>
+            ))
+          )}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        <AddTransactionModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
+        <AddPlannedTransactionModal visible={showPlannedModal} onClose={() => setShowPlannedModal(false)} />
+      </View>
     </View>
   );
 }
@@ -363,9 +398,11 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
   return (
     <TouchableOpacity style={styles.transactionItem} activeOpacity={0.7}>
       <View style={[styles.transactionIcon]}>
-        <Text style={styles.transactionIconText}>
-          {transaction.category.charAt(0).toUpperCase()}
-        </Text>
+        {isIncome ? (
+          <ArrowDownLeft color="#10B981" size={20} />
+        ) : (
+          <ArrowUpRight color="#FFFFFF" size={20} />
+        )}
       </View>
       <View style={styles.transactionDetails}>
         <Text style={styles.transactionDescription}>{transaction.description}</Text>
@@ -377,7 +414,7 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
             <>
               <Text style={styles.dotSeparator}>•</Text>
               <View style={styles.budgetIndicator}>
-                <Wallet size={12} color={getStatusColor(budgetStatus.status)} />
+                <Wallet size={10} color={getStatusColor(budgetStatus.status)} />
                 <Text style={[styles.budgetIndicatorText, { color: getStatusColor(budgetStatus.status) }]}>
                   {budgetStatus.budget.name}
                 </Text>
@@ -406,6 +443,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -414,16 +454,22 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 28,
-    fontWeight: 'bold' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   addButton: {
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addButtonGradient: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -463,26 +509,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   budgetChipName: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: '#FFFFFF',
-    fontWeight: '500' as const,
+    fontWeight: '500',
   },
   budgetChipPercent: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#71717A',
-    fontWeight: '600' as const,
+    fontWeight: '600',
   },
-  budgetChipPercentExceeded: {
-    color: '#DC2626',
-  },
-  budgetChipPercentDanger: {
-    color: '#EF4444',
-  },
-  budgetChipPercentWarning: {
-    color: '#F59E0B',
-  },
+  budgetChipPercentExceeded: { color: '#DC2626' },
+  budgetChipPercentDanger: { color: '#EF4444' },
+  budgetChipPercentWarning: { color: '#F59E0B' },
   searchContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -493,8 +533,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
-    borderRadius: 12,
+    backgroundColor: 'rgba(24, 24, 27, 0.6)',
+    borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
@@ -502,7 +542,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   searchInput: {
-    fontFamily,
+    fontFamily: fontFamily,
     flex: 1,
     fontSize: 16,
     color: '#FFFFFF',
@@ -510,8 +550,8 @@ const styles = StyleSheet.create({
   filterIconButton: {
     width: 48,
     height: 48,
-    borderRadius: 12,
-    backgroundColor: '#18181B',
+    borderRadius: 16,
+    backgroundColor: 'rgba(24, 24, 27, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -528,7 +568,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(24, 24, 27, 0.6)',
     borderWidth: 1,
     borderColor: '#333',
   },
@@ -537,9 +577,9 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   filterButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#A1A1AA',
   },
   filterButtonTextActive: {
@@ -554,16 +594,26 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
     paddingHorizontal: 40,
   },
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#18181B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
   emptyStateTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
-    marginTop: 16,
     marginBottom: 8,
   },
   emptyStateText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     textAlign: 'center',
@@ -579,26 +629,31 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   dateText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#A1A1AA',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   dateAmount: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#A1A1AA',
   },
   transactionsList: {
     paddingHorizontal: 20,
-    gap: 16,
+    gap: 12,
   },
   transactionItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#18181B',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#27272A',
   },
   transactionIcon: {
     width: 48,
@@ -607,23 +662,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  transactionIconText: {
-    fontFamily,
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
+    backgroundColor: '#27272A',
   },
   transactionDetails: {
     flex: 1,
   },
   transactionDescription: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 4,
   },
@@ -633,12 +680,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   transactionCategory: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: '#A1A1AA',
   },
   dotSeparator: {
-      fontFamily,
+      fontFamily: fontFamily,
       fontSize: 13,
       color: '#333',
       marginHorizontal: 6,
@@ -647,14 +694,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
   budgetIndicatorText: {
-    fontFamily,
-    fontSize: 12,
-    fontWeight: '500' as const,
+    fontFamily: fontFamily,
+    fontSize: 11,
+    fontWeight: '500',
   },
   transactionTime: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#52525B',
     marginTop: 2,
@@ -663,9 +714,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   transactionAmount: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   incomeText: {
@@ -674,11 +725,11 @@ const styles = StyleSheet.create({
   plannedSection: {
     marginHorizontal: 20,
     marginBottom: 24,
-    backgroundColor: '#18181B',
-    borderRadius: 16,
+    backgroundColor: 'rgba(24, 24, 27, 0.6)',
+    borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#333',
   },
   plannedHeader: {
     flexDirection: 'row',
@@ -689,43 +740,52 @@ const styles = StyleSheet.create({
   plannedHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
+  },
+  plannedIconBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   plannedTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   plannedBadge: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    backgroundColor: '#27272A',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
   },
   plannedBadgeText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#3B82F6',
   },
   addPlannedBtn: {
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   plannedList: {
     gap: 10,
+    marginTop: 4,
   },
   plannedItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#27272A',
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 12,
   },
   plannedItemLeft: {
@@ -734,12 +794,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   plannedIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 12,
   },
   plannedIconIncome: {
     backgroundColor: 'rgba(16, 185, 129, 0.15)',
@@ -751,9 +811,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   plannedName: {
-    fontFamily,
-    fontSize: 13,
-    fontWeight: '600' as const,
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 2,
   },
@@ -763,31 +823,31 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   plannedRecurrence: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
-    color: '#71717A',
+    color: '#A1A1AA',
   },
   plannedMetaDot: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
     color: '#52525B',
   },
   plannedDate: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
-    color: '#71717A',
+    color: '#A1A1AA',
   },
   plannedDateToday: {
     color: '#F59E0B',
-    fontWeight: '600' as const,
+    fontWeight: '600',
   },
   plannedItemRight: {
     alignItems: 'flex-end',
   },
   plannedAmount: {
-    fontFamily,
-    fontSize: 13,
-    fontWeight: '700' as const,
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: '700',
     marginBottom: 4,
   },
   plannedAmountIncome: {
@@ -798,20 +858,20 @@ const styles = StyleSheet.create({
   },
   plannedActions: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   processBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
+    width: 28,
+    height: 28,
+    borderRadius: 8,
     backgroundColor: 'rgba(16, 185, 129, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   deleteBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
+    width: 28,
+    height: 28,
+    borderRadius: 8,
     backgroundColor: '#333',
     alignItems: 'center',
     justifyContent: 'center',

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Plus, Target, Calendar, ArrowUpRight } from 'lucide-react-native';
+import { Plus, Target, Calendar, ArrowUpRight, TrendingUp } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import type { SavingsGoal } from '@/constants/types';
@@ -15,6 +15,7 @@ import AddGoalModal from '@/components/AddGoalModal';
 import AddContributionModal from '@/components/AddContributionModal';
 import { LinearGradient } from 'expo-linear-gradient';
 import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
 
 export default function GoalsScreen() {
   const insets = useSafeAreaInsets();
@@ -27,92 +28,114 @@ export default function GoalsScreen() {
   const overallProgress = totalTargetAmount > 0 ? (totalCurrentAmount / totalTargetAmount) * 100 : 0;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Savings Goals</Text>
-          <Text style={styles.headerSubtitle}>{goals.length} active goals</Text>
-        </View>
-        <TouchableOpacity style={styles.addButton} onPress={() => setShowAddModal(true)} activeOpacity={0.8}>
-          <Plus color="#000" size={24} strokeWidth={2.5} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.summaryCard}>
-            <LinearGradient
-                colors={['#18181B', '#09090B']}
-                style={StyleSheet.absoluteFill}
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>Savings Goals</Text>
+            <Text style={styles.headerSubtitle}>{goals.length} active goals</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.addButton} 
+            onPress={() => setShowAddModal(true)} 
+            activeOpacity={0.8}
+          >
+             <LinearGradient
+                colors={['#10B981', '#059669']}
+                style={styles.addButtonGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-            />
-          <View style={styles.summaryHeader}>
-            <View style={styles.summaryIconContainer}>
-              <Target color="#FFFFFF" size={24} />
-            </View>
-            <View style={styles.summaryTextContainer}>
-              <Text style={styles.summaryLabel}>Overall Progress</Text>
-              <Text style={styles.summaryValue}>{overallProgress.toFixed(1)}%</Text>
-            </View>
-          </View>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressBarFill, { width: `${Math.min(100, overallProgress)}%` }]} />
-          </View>
-          <View style={styles.summaryFooter}>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryItemLabel}>Saved</Text>
-              <Text style={styles.summaryItemValue}>
-                JD {totalCurrentAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-              </Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryItemLabel}>Target</Text>
-              <Text style={styles.summaryItemValue}>
-                JD {totalTargetAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-              </Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryItemLabel}>Remaining</Text>
-              <Text style={styles.summaryItemValue}>
-                JD {(totalTargetAmount - totalCurrentAmount).toLocaleString('en-US', { maximumFractionDigits: 0 })}
-              </Text>
-            </View>
-          </View>
+              >
+                <Plus color="#FFF" size={24} strokeWidth={2.5} />
+              </LinearGradient>
+          </TouchableOpacity>
         </View>
 
-        {goals.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Target color="#333" size={64} />
-            <Text style={styles.emptyStateTitle}>No goals yet</Text>
-            <Text style={styles.emptyStateText}>
-              Set your first savings goal to start tracking your financial milestones
-            </Text>
-            <TouchableOpacity style={styles.emptyStateButton} onPress={() => setShowAddModal(true)} activeOpacity={0.8}>
-              <Text style={styles.emptyStateButtonText}>Create Goal</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.goalsSection}>
-            <Text style={styles.sectionTitle}>Your Goals</Text>
-            <View style={styles.goalsList}>
-              {goals.map(goal => (
-                <GoalCard key={goal.id} goal={goal} onContribute={() => setSelectedGoal(goal)} />
-              ))}
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.summaryCard}>
+              <LinearGradient
+                  colors={['#18181B', '#09090B']}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+              />
+            <View style={styles.summaryHeader}>
+              <View style={styles.summaryIconContainer}>
+                <TrendingUp color="#10B981" size={24} />
+              </View>
+              <View style={styles.summaryTextContainer}>
+                <Text style={styles.summaryLabel}>Overall Progress</Text>
+                <Text style={styles.summaryValue}>{overallProgress.toFixed(1)}%</Text>
+              </View>
+            </View>
+            <View style={styles.progressBar}>
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                style={[styles.progressBarFill, { width: `${Math.min(100, overallProgress)}%` }]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              />
+            </View>
+            <View style={styles.summaryFooter}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryItemLabel}>Saved</Text>
+                <Text style={styles.summaryItemValue}>
+                  JD {totalCurrentAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </Text>
+              </View>
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryItemLabel}>Target</Text>
+                <Text style={styles.summaryItemValue}>
+                  JD {totalTargetAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </Text>
+              </View>
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryItemLabel}>Remaining</Text>
+                <Text style={styles.summaryItemValue}>
+                  JD {(totalTargetAmount - totalCurrentAmount).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </Text>
+              </View>
             </View>
           </View>
-        )}
-      </ScrollView>
 
-      <AddGoalModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
-      {selectedGoal && (
-        <AddContributionModal
-          visible={selectedGoal !== null}
-          onClose={() => setSelectedGoal(null)}
-          goal={selectedGoal}
-        />
-      )}
+          {goals.length === 0 ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconContainer}>
+                <Target color="#FFF" size={48} />
+              </View>
+              <Text style={styles.emptyStateTitle}>No goals yet</Text>
+              <Text style={styles.emptyStateText}>
+                Set your first savings goal to start tracking your financial milestones
+              </Text>
+              <TouchableOpacity style={styles.emptyStateButton} onPress={() => setShowAddModal(true)} activeOpacity={0.8}>
+                <Text style={styles.emptyStateButtonText}>Create Goal</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.goalsSection}>
+              <Text style={styles.sectionTitle}>Your Goals</Text>
+              <View style={styles.goalsList}>
+                {goals.map(goal => (
+                  <GoalCard key={goal.id} goal={goal} onContribute={() => setSelectedGoal(goal)} />
+                ))}
+              </View>
+            </View>
+          )}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        <AddGoalModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
+        {selectedGoal && (
+          <AddContributionModal
+            visible={selectedGoal !== null}
+            onClose={() => setSelectedGoal(null)}
+            goal={selectedGoal}
+          />
+        )}
+      </View>
     </View>
   );
 }
@@ -126,10 +149,10 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
     : null;
 
   return (
-    <TouchableOpacity style={styles.goalCard} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.goalCard} activeOpacity={0.8}>
       <View style={styles.goalHeader}>
-        <View style={[styles.goalIconContainer, { backgroundColor: '#18181B' }]}>
-          <Target color="#FFFFFF" size={24} />
+        <View style={[styles.goalIconContainer]}>
+          <Target color="#10B981" size={24} />
         </View>
         <View style={styles.goalInfo}>
           <Text style={styles.goalTitle}>{goal.title}</Text>
@@ -137,7 +160,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
         </View>
         {daysRemaining !== null && (
           <View style={[styles.deadlineBadge, daysRemaining < 30 && styles.deadlineBadgeUrgent]}>
-            <Calendar size={14} color={daysRemaining < 30 ? AppColors.danger : '#A1A1AA'} />
+            <Calendar size={12} color={daysRemaining < 30 ? AppColors.danger : '#A1A1AA'} />
             <Text style={[styles.deadlineText, daysRemaining < 30 && styles.deadlineTextUrgent]}>
               {daysRemaining}d
             </Text>
@@ -147,7 +170,12 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
 
       <View style={styles.goalProgress}>
         <View style={styles.goalProgressBar}>
-          <View style={[styles.goalProgressBarFill, { width: `${Math.min(100, progress)}%`, backgroundColor: '#FFFFFF' }]} />
+          <LinearGradient
+            colors={['#10B981', '#059669']}
+            style={[styles.goalProgressBarFill, { width: `${Math.min(100, progress)}%` }]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
         </View>
         <Text style={styles.goalProgressText}>{progress.toFixed(0)}%</Text>
       </View>
@@ -186,6 +214,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -194,22 +225,28 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
   },
   addButton: {
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addButtonGradient: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -218,7 +255,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     margin: 20,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 24,
     borderWidth: 1,
     borderColor: '#333',
@@ -227,13 +264,13 @@ const styles = StyleSheet.create({
   summaryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   summaryIconContainer: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: '#333',
+    borderRadius: 16,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -242,15 +279,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     marginBottom: 4,
   },
   summaryValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   progressBar: {
@@ -258,11 +295,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#FFFFFF',
     borderRadius: 4,
   },
   summaryFooter: {
@@ -274,13 +310,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryItemLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     marginBottom: 4,
   },
   summaryItemValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -296,16 +332,26 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
     paddingHorizontal: 40,
   },
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#18181B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
   emptyStateTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginTop: 20,
     marginBottom: 8,
   },
   emptyStateText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     textAlign: 'center',
@@ -316,10 +362,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingVertical: 14,
     paddingHorizontal: 32,
-    borderRadius: 12,
+    borderRadius: 30,
   },
   emptyStateButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
@@ -328,7 +374,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -338,11 +384,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   goalCard: {
-    backgroundColor: '#09090B',
-    borderRadius: 20,
+    backgroundColor: '#18181B',
+    borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#27272A',
   },
   goalHeader: {
     flexDirection: 'row',
@@ -356,21 +402,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
   },
   goalInfo: {
     flex: 1,
   },
   goalTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   goalCategory: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: '#A1A1AA',
     textTransform: 'capitalize',
@@ -378,7 +423,7 @@ const styles = StyleSheet.create({
   deadlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: '#27272A',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
@@ -391,7 +436,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(239, 68, 68, 0.2)',
   },
   deadlineText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: '600',
     color: '#A1A1AA',
@@ -407,17 +452,17 @@ const styles = StyleSheet.create({
   },
   goalProgressBar: {
     flex: 1,
-    height: 6,
+    height: 8,
     backgroundColor: '#333',
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   goalProgressBarFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   goalProgressText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -429,20 +474,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: '#27272A',
   },
   goalAmount: {
     flex: 1,
   },
   goalAmountLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     marginBottom: 4,
   },
   goalAmountValue: {
-    fontFamily,
-    fontSize: 16,
+    fontFamily: fontFamily,
+    fontSize: 15,
     fontWeight: '700',
     color: '#FFFFFF',
   },
@@ -451,12 +496,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 8,
     backgroundColor: '#FFFFFF',
   },
   contributeButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: '600',
     color: '#000000',

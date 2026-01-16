@@ -11,6 +11,7 @@ import { TrendingUp, TrendingDown, AlertCircle, Lightbulb } from 'lucide-react-n
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
 
 const { width } = Dimensions.get('window');
 
@@ -34,119 +35,123 @@ export default function InsightsScreen() {
   }, [categorySpending, transactions]);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Insights</Text>
-          <Text style={styles.headerSubtitle}>AI-powered financial analysis</Text>
-        </View>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>This Month</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              label="Total Income"
-              value={`JD ${financialSummary.totalIncome.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-              icon={<TrendingUp color={AppColors.success} size={24} />}
-              color={AppColors.success}
-            />
-            <StatCard
-              label="Total Expenses"
-              value={`JD ${financialSummary.totalExpenses.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-              icon={<TrendingDown color={AppColors.danger} size={24} />}
-              color={AppColors.danger}
-            />
-            <StatCard
-              label="Net Savings"
-              value={`JD ${financialSummary.balance.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-              icon={<TrendingUp color="#FFFFFF" size={24} />}
-              color="#FFFFFF"
-            />
-            <StatCard
-              label="Savings Rate"
-              value={`${financialSummary.savingsRate.toFixed(1)}%`}
-              icon={<TrendingUp color="#A1A1AA" size={24} />}
-              color="#A1A1AA"
-            />
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>Insights</Text>
+            <Text style={styles.headerSubtitle}>AI-powered financial analysis</Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Spending Breakdown</Text>
-          {categorySpending.slice(0, 5).map((item, index) => (
-            <CategoryBar key={item.category} item={item} index={index} />
-          ))}
-        </View>
-
-        {insights.weeklyComparison.change !== 0 && (
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Weekly Trend</Text>
-            <View style={[
-              styles.trendCard,
-              { borderLeftColor: insights.weeklyComparison.change > 0 ? AppColors.danger : AppColors.success }
-            ]}>
-              <View style={styles.trendHeader}>
-                {insights.weeklyComparison.change > 0 ? (
-                  <TrendingUp color={AppColors.danger} size={24} />
-                ) : (
-                  <TrendingDown color={AppColors.success} size={24} />
-                )}
-                <Text style={[
-                  styles.trendValue,
-                  { color: insights.weeklyComparison.change > 0 ? AppColors.danger : AppColors.success }
-                ]}>
-                  {Math.abs(insights.weeklyComparison.change).toFixed(1)}%
-                </Text>
-              </View>
-              <Text style={styles.trendDescription}>
-                Your spending is {insights.weeklyComparison.change > 0 ? 'up' : 'down'} compared to last week.
-                {insights.weeklyComparison.change > 0 
-                  ? ' Consider reviewing your recent expenses.' 
-                  : ' Great job keeping your spending under control!'}
-              </Text>
+            <Text style={styles.sectionTitle}>This Month</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                label="Total Income"
+                value={`JD ${financialSummary.totalIncome.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+                icon={<TrendingUp color={AppColors.success} size={24} />}
+                color={AppColors.success}
+              />
+              <StatCard
+                label="Total Expenses"
+                value={`JD ${financialSummary.totalExpenses.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+                icon={<TrendingDown color={AppColors.danger} size={24} />}
+                color={AppColors.danger}
+              />
+              <StatCard
+                label="Net Savings"
+                value={`JD ${financialSummary.balance.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+                icon={<TrendingUp color="#FFFFFF" size={24} />}
+                color="#FFFFFF"
+              />
+              <StatCard
+                label="Savings Rate"
+                value={`${financialSummary.savingsRate.toFixed(1)}%`}
+                icon={<TrendingUp color="#A1A1AA" size={24} />}
+                color="#A1A1AA"
+              />
             </View>
           </View>
-        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>AI Recommendations</Text>
-          <RecommendationCard
-            icon={<Lightbulb color={AppColors.warning} size={24} />}
-            title="Optimize Spending"
-            description={`Your top spending category is ${insights.topCategory?.category || 'unknown'}. Consider setting a monthly budget for this category.`}
-            type="tip"
-          />
-          {financialSummary.savingsRate < 20 && (
-            <RecommendationCard
-              icon={<AlertCircle color={AppColors.danger} size={24} />}
-              title="Increase Savings"
-              description="Your savings rate is below 20%. Try to increase it by reducing non-essential expenses."
-              type="alert"
-            />
-          )}
-          {financialSummary.healthScore >= 70 && (
-            <RecommendationCard
-              icon={<TrendingUp color={AppColors.success} size={24} />}
-              title="Great Financial Health!"
-              description="Your financial health score is excellent. Consider investing your extra savings for long-term growth."
-              type="success"
-            />
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Stats</Text>
-          <View style={styles.quickStatsCard}>
-            <QuickStat label="Avg Daily Expense" value={`JD ${insights.monthlyExpenseAverage.toFixed(2)}`} />
-            <View style={styles.statDivider} />
-            <QuickStat label="Transactions" value={transactions.length.toString()} />
-            <View style={styles.statDivider} />
-            <QuickStat label="Categories" value={categorySpending.length.toString()} />
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Spending Breakdown</Text>
+            {categorySpending.slice(0, 5).map((item, index) => (
+              <CategoryBar key={item.category} item={item} index={index} />
+            ))}
           </View>
-        </View>
-      </ScrollView>
+
+          {insights.weeklyComparison.change !== 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Weekly Trend</Text>
+              <View style={[
+                styles.trendCard,
+                { borderLeftColor: insights.weeklyComparison.change > 0 ? AppColors.danger : AppColors.success }
+              ]}>
+                <View style={styles.trendHeader}>
+                  {insights.weeklyComparison.change > 0 ? (
+                    <TrendingUp color={AppColors.danger} size={24} />
+                  ) : (
+                    <TrendingDown color={AppColors.success} size={24} />
+                  )}
+                  <Text style={[
+                    styles.trendValue,
+                    { color: insights.weeklyComparison.change > 0 ? AppColors.danger : AppColors.success }
+                  ]}>
+                    {Math.abs(insights.weeklyComparison.change).toFixed(1)}%
+                  </Text>
+                </View>
+                <Text style={styles.trendDescription}>
+                  Your spending is {insights.weeklyComparison.change > 0 ? 'up' : 'down'} compared to last week.
+                  {insights.weeklyComparison.change > 0 
+                    ? ' Consider reviewing your recent expenses.' 
+                    : ' Great job keeping your spending under control!'}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>AI Recommendations</Text>
+            <RecommendationCard
+              icon={<Lightbulb color={AppColors.warning} size={24} />}
+              title="Optimize Spending"
+              description={`Your top spending category is ${insights.topCategory?.category || 'unknown'}. Consider setting a monthly budget for this category.`}
+              type="tip"
+            />
+            {financialSummary.savingsRate < 20 && (
+              <RecommendationCard
+                icon={<AlertCircle color={AppColors.danger} size={24} />}
+                title="Increase Savings"
+                description="Your savings rate is below 20%. Try to increase it by reducing non-essential expenses."
+                type="alert"
+              />
+            )}
+            {financialSummary.healthScore >= 70 && (
+              <RecommendationCard
+                icon={<TrendingUp color={AppColors.success} size={24} />}
+                title="Great Financial Health!"
+                description="Your financial health score is excellent. Consider investing your extra savings for long-term growth."
+                type="success"
+              />
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Quick Stats</Text>
+            <View style={styles.quickStatsCard}>
+              <QuickStat label="Avg Daily Expense" value={`JD ${insights.monthlyExpenseAverage.toFixed(2)}`} />
+              <View style={styles.statDivider} />
+              <QuickStat label="Transactions" value={transactions.length.toString()} />
+              <View style={styles.statDivider} />
+              <QuickStat label="Categories" value={categorySpending.length.toString()} />
+            </View>
+          </View>
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -154,7 +159,7 @@ export default function InsightsScreen() {
 function StatCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
   return (
     <View style={styles.statCard}>
-      <View style={[styles.statIcon, { backgroundColor: '#18181B' }]}>
+      <View style={[styles.statIcon]}>
         {icon}
       </View>
       <Text style={styles.statLabel}>{label}</Text>
@@ -235,6 +240,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -243,14 +251,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
   },
@@ -261,7 +269,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -274,11 +282,11 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: (width - 52) / 2,
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#27272A',
   },
   statIcon: {
     width: 48,
@@ -287,17 +295,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: '#27272A',
   },
   statLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     marginBottom: 4,
   },
   statValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
   },
@@ -321,7 +328,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   categoryBarName: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
@@ -332,13 +339,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   categoryBarAmount: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
   },
   categoryBarPercentage: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: '600',
     color: '#A1A1AA',
@@ -354,7 +361,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   trendCard: {
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 4,
@@ -368,19 +375,19 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   trendValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 24,
     fontWeight: '700',
   },
   trendDescription: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     lineHeight: 20,
   },
   recommendationCard: {
     flexDirection: 'row',
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -395,21 +402,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   recommendationTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 15,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 6,
   },
   recommendationDescription: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: '#A1A1AA',
     lineHeight: 18,
   },
   quickStatsCard: {
     flexDirection: 'row',
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
@@ -420,14 +427,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickStatValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 6,
   },
   quickStatLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     textAlign: 'center',

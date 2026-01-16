@@ -12,13 +12,15 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Send, Bot, User, Sparkles, Target, TrendingUp, Heart, Zap, Brain } from 'lucide-react-native';
 import { useRorkAgent, createRorkTool } from '@rork-ai/toolkit-sdk';
 import { z } from 'zod';
 import { usePersonal } from '@/contexts/PersonalContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import Markdown from 'react-native-markdown-display';
+import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
 
 const HIDDEN_START = '\u200B\u2060\u200C';
 const HIDDEN_END = '\u200C\u2060\u200B';
@@ -30,6 +32,7 @@ export default function CoachScreen() {
   const typingAnim1 = useRef(new Animated.Value(0.3)).current;
   const typingAnim2 = useRef(new Animated.Value(0.3)).current;
   const typingAnim3 = useRef(new Animated.Value(0.3)).current;
+  const insets = useSafeAreaInsets();
   
   const {
     goodHabits,
@@ -252,6 +255,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       color: '#FFFFFF',
       fontSize: 15,
       lineHeight: 24,
+      fontFamily: fontFamily,
     },
     heading1: {
       color: '#10B981',
@@ -260,6 +264,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       marginTop: 16,
       marginBottom: 8,
       letterSpacing: -0.3,
+      fontFamily: fontFamily,
     },
     heading2: {
       color: '#10B981',
@@ -268,6 +273,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       marginTop: 14,
       marginBottom: 6,
       letterSpacing: -0.2,
+      fontFamily: fontFamily,
     },
     heading3: {
       color: '#34D399',
@@ -275,14 +281,17 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontWeight: '600' as const,
       marginTop: 12,
       marginBottom: 4,
+      fontFamily: fontFamily,
     },
     strong: {
       color: '#FFFFFF',
       fontWeight: '700' as const,
+      fontFamily: fontFamily,
     },
     em: {
       color: '#A1A1AA',
       fontStyle: 'italic' as const,
+      fontFamily: fontFamily,
     },
     bullet_list: {
       marginVertical: 6,
@@ -305,14 +314,17 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontSize: 14,
       fontWeight: '700' as const,
       marginRight: 8,
+      fontFamily: fontFamily,
     },
     paragraph: {
       marginVertical: 6,
       lineHeight: 24,
+      fontFamily: fontFamily,
     },
     link: {
       color: '#3B82F6',
       textDecorationLine: 'underline' as const,
+      fontFamily: fontFamily,
     },
     blockquote: {
       backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -351,6 +363,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
     },
     text: {
       color: '#FFFFFF',
+      fontFamily: fontFamily,
     },
   }), []);
 
@@ -445,11 +458,8 @@ Respond as a supportive friend who happens to be an expert life coach.`;
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0A0A0A', '#0F1A15', '#0A0A0A']}
-        style={StyleSheet.absoluteFill}
-      />
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <LinearGradient
@@ -561,7 +571,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
             </View>
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
@@ -569,7 +579,10 @@ Respond as a supportive friend who happens to be an expert life coach.`;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#000000',
+  },
+  contentContainer: {
+    flex: 1,
   },
   safeArea: {
     flex: 1,
@@ -599,11 +612,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700' as const,
     color: '#FFFFFF',
+    fontFamily: fontFamily,
   },
   headerSubtitle: {
     fontSize: 13,
     color: '#71717A',
     marginTop: 2,
+    fontFamily: fontFamily,
   },
   statusIndicator: {
     flexDirection: 'row',
@@ -626,6 +641,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     color: '#A1A1AA',
+    fontFamily: fontFamily,
   },
   content: {
     flex: 1,
@@ -656,6 +672,7 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: '#FFFFFF',
     marginBottom: 8,
+    fontFamily: fontFamily,
   },
   emptySubtitle: {
     fontSize: 15,
@@ -663,6 +680,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 32,
+    fontFamily: fontFamily,
   },
   suggestedPrompts: {
     width: '100%',
@@ -683,6 +701,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#FFFFFF',
     fontWeight: '500' as const,
+    fontFamily: fontFamily,
   },
   messageContainer: {
     flexDirection: 'row',
@@ -731,6 +750,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#FFFFFF',
     lineHeight: 22,
+    fontFamily: fontFamily,
   },
   userMessageText: {
     color: '#FFFFFF',
@@ -748,6 +768,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#10B981',
     fontStyle: 'italic',
+    fontFamily: fontFamily,
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -800,6 +821,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     maxHeight: 100,
     paddingVertical: 8,
+    fontFamily: fontFamily,
   },
   sendButton: {
     width: 40,

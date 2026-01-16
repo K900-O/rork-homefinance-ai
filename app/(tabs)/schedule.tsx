@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -21,6 +23,13 @@ import { ACTIVITY_COLORS } from '@/constants/personalTypes';
 import type { Activity } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
 import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -81,95 +90,99 @@ export default function ScheduleScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Schedule</Text>
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
-        >
-          <Plus color="#000" size={20} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.monthNavigation}>
-        <TouchableOpacity onPress={goToPreviousWeek} style={styles.navButton}>
-          <ChevronLeft color="#FFF" size={24} />
-        </TouchableOpacity>
-        <Text style={styles.monthTitle}>
-          {MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}
-        </Text>
-        <TouchableOpacity onPress={goToNextWeek} style={styles.navButton}>
-          <ChevronRight color="#FFF" size={24} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.weekContainer}>
-        {weekDates.map((date, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.dayItem,
-              isSelected(date) && styles.dayItemSelected,
-              isToday(date) && styles.dayItemToday,
-            ]}
-            onPress={() => setSelectedDate(date)}
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Schedule</Text>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => setShowAddModal(true)}
           >
-            <Text style={[styles.dayName, isSelected(date) && styles.dayNameSelected]}>
-              {DAYS[date.getDay()]}
-            </Text>
-            <Text style={[styles.dayNumber, isSelected(date) && styles.dayNumberSelected]}>
-              {date.getDate()}
-            </Text>
-            {hasActivities(date) && (
-              <View style={[styles.activityDot, isSelected(date) && styles.activityDotSelected]} />
-            )}
+            <Plus color="#000" size={20} />
           </TouchableOpacity>
-        ))}
+        </View>
+
+        <View style={styles.monthNavigation}>
+          <TouchableOpacity onPress={goToPreviousWeek} style={styles.navButton}>
+            <ChevronLeft color="#FFF" size={24} />
+          </TouchableOpacity>
+          <Text style={styles.monthTitle}>
+            {MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+          </Text>
+          <TouchableOpacity onPress={goToNextWeek} style={styles.navButton}>
+            <ChevronRight color="#FFF" size={24} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.weekContainer}>
+          {weekDates.map((date, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.dayItem,
+                isSelected(date) && styles.dayItemSelected,
+                isToday(date) && styles.dayItemToday,
+              ]}
+              onPress={() => setSelectedDate(date)}
+            >
+              <Text style={[styles.dayName, isSelected(date) && styles.dayNameSelected]}>
+                {DAYS[date.getDay()]}
+              </Text>
+              <Text style={[styles.dayNumber, isSelected(date) && styles.dayNumberSelected]}>
+                {date.getDate()}
+              </Text>
+              {hasActivities(date) && (
+                <View style={[styles.activityDot, isSelected(date) && styles.activityDotSelected]} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
+        >
+          <View style={styles.dateHeader}>
+            <Text style={styles.selectedDateText}>
+              {selectedDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </Text>
+            <Text style={styles.activityCount}>
+              {dayActivities.length} {dayActivities.length === 1 ? 'activity' : 'activities'}
+            </Text>
+          </View>
+
+          <View style={styles.activitiesList}>
+            {dayActivities.length > 0 ? (
+              dayActivities.map((activity) => (
+                <ScheduleActivityItem 
+                  key={activity.id} 
+                  activity={activity}
+                  onComplete={() => completeActivity(activity.id)}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Clock size={48} color="#333" />
+                <Text style={styles.emptyStateText}>No activities scheduled</Text>
+                <Text style={styles.emptyStateSubtext}>Tap + to add an activity</Text>
+              </View>
+            )}
+          </View>
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        <AddActivityModal 
+          visible={showAddModal} 
+          onClose={() => setShowAddModal(false)}
+          initialDate={selectedDateStr}
+        />
       </View>
-
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
-      >
-        <View style={styles.dateHeader}>
-          <Text style={styles.selectedDateText}>
-            {selectedDate.toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </Text>
-          <Text style={styles.activityCount}>
-            {dayActivities.length} {dayActivities.length === 1 ? 'activity' : 'activities'}
-          </Text>
-        </View>
-
-        <View style={styles.activitiesList}>
-          {dayActivities.length > 0 ? (
-            dayActivities.map((activity) => (
-              <ScheduleActivityItem 
-                key={activity.id} 
-                activity={activity}
-                onComplete={() => completeActivity(activity.id)}
-              />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Clock size={48} color="#333" />
-              <Text style={styles.emptyStateText}>No activities scheduled</Text>
-              <Text style={styles.emptyStateSubtext}>Tap + to add an activity</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
-
-      <AddActivityModal 
-        visible={showAddModal} 
-        onClose={() => setShowAddModal(false)}
-        initialDate={selectedDateStr}
-      />
     </View>
   );
 }
@@ -251,6 +264,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -259,9 +275,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 32,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   addButton: {
@@ -288,9 +304,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   monthTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   weekContainer: {
@@ -315,7 +331,7 @@ const styles = StyleSheet.create({
     borderColor: '#F59E0B',
   },
   dayName: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
     color: '#71717A',
     marginBottom: 4,
@@ -324,9 +340,9 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   dayNumber: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   dayNumberSelected: {
@@ -350,14 +366,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   selectedDateText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   activityCount: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#71717A',
   },
@@ -374,13 +390,13 @@ const styles = StyleSheet.create({
     paddingRight: 12,
   },
   timeText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
-    fontWeight: '500' as const,
+    fontWeight: '500',
     color: '#FFFFFF',
   },
   timeTextEnd: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
     color: '#71717A',
     marginTop: 2,
@@ -415,9 +431,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   activityTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
     flex: 1,
     marginRight: 12,
@@ -427,7 +443,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   activityDescription: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     marginBottom: 12,
@@ -443,13 +459,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     textTransform: 'capitalize',
   },
   durationText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#71717A',
   },
@@ -458,15 +474,15 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyStateText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#71717A',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateSubtext: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#52525B',
   },

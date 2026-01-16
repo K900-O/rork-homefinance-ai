@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Sparkles, TrendingDown, TrendingUp, Target, CheckCircle, Circle, Zap, Clock, AlertCircle } from 'lucide-react-native';
@@ -14,6 +17,14 @@ import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import type { OptimizationSuggestion } from '@/constants/types';
 import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
+import { LinearGradient } from 'expo-linear-gradient';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 export default function OptimizerScreen() {
   const insets = useSafeAreaInsets();
@@ -76,6 +87,7 @@ export default function OptimizerScreen() {
   };
 
   const toggleExpand = (id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedIds(prev => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
@@ -107,181 +119,191 @@ export default function OptimizerScreen() {
   const investments = optimizations.filter(o => o.type === 'investment_opportunity');
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>AI Optimizer</Text>
-          <Text style={styles.headerSubtitle}>Maximize savings & income</Text>
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>AI Optimizer</Text>
+            <Text style={styles.headerSubtitle}>Maximize savings & income</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.optimizeButton}
+            onPress={handleOptimize}
+            disabled={isOptimizing}
+            activeOpacity={0.8}
+          >
+            {isOptimizing ? (
+              <ActivityIndicator color="#000" size="small" />
+            ) : (
+              <>
+                <Sparkles color="#000" size={20} />
+                <Text style={styles.optimizeButtonText}>
+                  {optimizations.length > 0 ? 'Re-analyze' : 'Optimize'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.optimizeButton}
-          onPress={handleOptimize}
-          disabled={isOptimizing}
-          activeOpacity={0.8}
-        >
-          {isOptimizing ? (
-            <ActivityIndicator color="#000" size="small" />
-          ) : (
-            <>
-              <Sparkles color="#000" size={20} />
-              <Text style={styles.optimizeButtonText}>
-                {optimizations.length > 0 ? 'Re-analyze' : 'Optimize'}
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {isOptimizing && (
+            <View style={styles.loadingCard}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+              <Text style={styles.loadingTitle}>Analyzing Your Finances</Text>
+              <Text style={styles.loadingText}>
+                Our AI is examining your spending patterns, income, and goals to generate personalized recommendations...
               </Text>
-            </>
+              <View style={styles.loadingSteps}>
+                <View style={styles.loadingStep}>
+                  <CheckCircle color={AppColors.success} size={16} />
+                  <Text style={styles.loadingStepText}>Analyzing transactions</Text>
+                </View>
+                <View style={styles.loadingStep}>
+                  <CheckCircle color={AppColors.success} size={16} />
+                  <Text style={styles.loadingStepText}>Identifying patterns</Text>
+                </View>
+                <View style={styles.loadingStep}>
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <Text style={styles.loadingStepText}>Generating recommendations</Text>
+                </View>
+              </View>
+            </View>
           )}
-        </TouchableOpacity>
-      </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {isOptimizing && (
-          <View style={styles.loadingCard}>
-            <ActivityIndicator size="large" color="#FFFFFF" />
-            <Text style={styles.loadingTitle}>Analyzing Your Finances</Text>
-            <Text style={styles.loadingText}>
-              Our AI is examining your spending patterns, income, and goals to generate personalized recommendations...
-            </Text>
-            <View style={styles.loadingSteps}>
-              <View style={styles.loadingStep}>
-                <CheckCircle color={AppColors.success} size={16} />
-                <Text style={styles.loadingStepText}>Analyzing transactions</Text>
+          {report && !isOptimizing && (
+            <View style={styles.summaryCard}>
+              <LinearGradient
+                  colors={['#18181B', '#09090B']}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+              />
+              <View style={styles.summaryHeader}>
+                <Zap color="#F59E0B" size={28} fill="#F59E0B" />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.summaryTitle}>Your Optimization Plan</Text>
+                  <Text style={styles.summarySubtitle}>AI-generated recommendations</Text>
+                </View>
               </View>
-              <View style={styles.loadingStep}>
-                <CheckCircle color={AppColors.success} size={16} />
-                <Text style={styles.loadingStepText}>Identifying patterns</Text>
+              <View style={styles.summaryMetrics}>
+                <View style={styles.summaryMetric}>
+                  <TrendingDown color={AppColors.success} size={24} />
+                  <Text style={styles.summaryMetricLabel}>Monthly Savings</Text>
+                  <Text style={[styles.summaryMetricValue, { color: AppColors.success }]}>
+                    JD {report.totalSavings.toFixed(0)}
+                  </Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryMetric}>
+                  <TrendingUp color="#FFFFFF" size={24} />
+                  <Text style={styles.summaryMetricLabel}>Income Growth</Text>
+                  <Text style={[styles.summaryMetricValue, { color: '#FFFFFF' }]}>
+                    JD {report.totalIncome.toFixed(0)}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.loadingStep}>
-                <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={styles.loadingStepText}>Generating recommendations</Text>
+              <View style={styles.summaryTotal}>
+                <Text style={styles.summaryTotalLabel}>Total Monthly Impact</Text>
+                <Text style={styles.summaryTotalValue}>
+                  +JD {(report.totalSavings + report.totalIncome).toFixed(0)}
+                </Text>
+                <Text style={styles.summaryTotalSubtext}>
+                  That&apos;s JD {((report.totalSavings + report.totalIncome) * 12).toFixed(0)} per year!
+                </Text>
               </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {report && !isOptimizing && (
-          <View style={styles.summaryCard}>
-            <View style={styles.summaryHeader}>
-              <Zap color={AppColors.warning} size={28} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.summaryTitle}>Your Optimization Plan</Text>
-                <Text style={styles.summarySubtitle}>AI-generated recommendations</Text>
+          {optimizations.length === 0 && !isOptimizing ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconContainer}>
+                <Sparkles color="#FFFFFF" size={48} />
               </View>
+              <Text style={styles.emptyTitle}>Ready to Optimize?</Text>
+              <Text style={styles.emptyText}>
+                Get personalized AI-powered recommendations to reduce expenses and increase your income
+              </Text>
+              <TouchableOpacity style={styles.emptyButton} onPress={handleOptimize}>
+                <Text style={styles.emptyButtonText}>Generate Recommendations</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.summaryMetrics}>
-              <View style={styles.summaryMetric}>
+          ) : null}
+
+          {expenseReductions.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
                 <TrendingDown color={AppColors.success} size={24} />
-                <Text style={styles.summaryMetricLabel}>Monthly Savings</Text>
-                <Text style={[styles.summaryMetricValue, { color: AppColors.success }]}>
-                  JD {report.totalSavings.toFixed(0)}
-                </Text>
+                <Text style={styles.sectionTitle}>Expense Reduction</Text>
               </View>
-              <View style={styles.summaryDivider} />
-              <View style={styles.summaryMetric}>
+              {expenseReductions.map(suggestion => (
+                <OptimizationCard
+                  key={suggestion.id}
+                  suggestion={suggestion}
+                  isExpanded={expandedIds.has(suggestion.id)}
+                  onToggle={() => toggleExpand(suggestion.id)}
+                  onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
+                />
+              ))}
+            </View>
+          )}
+
+          {incomeIncreases.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
                 <TrendingUp color="#FFFFFF" size={24} />
-                <Text style={styles.summaryMetricLabel}>Income Growth</Text>
-                <Text style={[styles.summaryMetricValue, { color: '#FFFFFF' }]}>
-                  JD {report.totalIncome.toFixed(0)}
-                </Text>
+                <Text style={styles.sectionTitle}>Income Opportunities</Text>
               </View>
+              {incomeIncreases.map(suggestion => (
+                <OptimizationCard
+                  key={suggestion.id}
+                  suggestion={suggestion}
+                  isExpanded={expandedIds.has(suggestion.id)}
+                  onToggle={() => toggleExpand(suggestion.id)}
+                  onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
+                />
+              ))}
             </View>
-            <View style={styles.summaryTotal}>
-              <Text style={styles.summaryTotalLabel}>Total Monthly Impact</Text>
-              <Text style={styles.summaryTotalValue}>
-                +JD {(report.totalSavings + report.totalIncome).toFixed(0)}
-              </Text>
-              <Text style={styles.summaryTotalSubtext}>
-                That&apos;s JD {((report.totalSavings + report.totalIncome) * 12).toFixed(0)} per year!
-              </Text>
-            </View>
-          </View>
-        )}
+          )}
 
-        {optimizations.length === 0 && !isOptimizing ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Sparkles color="#FFFFFF" size={48} />
+          {savingsBoosts.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Target color="#A1A1AA" size={24} />
+                <Text style={styles.sectionTitle}>Savings Boost</Text>
+              </View>
+              {savingsBoosts.map(suggestion => (
+                <OptimizationCard
+                  key={suggestion.id}
+                  suggestion={suggestion}
+                  isExpanded={expandedIds.has(suggestion.id)}
+                  onToggle={() => toggleExpand(suggestion.id)}
+                  onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
+                />
+              ))}
             </View>
-            <Text style={styles.emptyTitle}>Ready to Optimize?</Text>
-            <Text style={styles.emptyText}>
-              Get personalized AI-powered recommendations to reduce expenses and increase your income
-            </Text>
-            <TouchableOpacity style={styles.emptyButton} onPress={handleOptimize}>
-              <Text style={styles.emptyButtonText}>Generate Recommendations</Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
+          )}
 
-        {expenseReductions.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <TrendingDown color={AppColors.success} size={24} />
-              <Text style={styles.sectionTitle}>Expense Reduction</Text>
+          {investments.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Sparkles color={AppColors.warning} size={24} />
+                <Text style={styles.sectionTitle}>Investment Opportunities</Text>
+              </View>
+              {investments.map(suggestion => (
+                <OptimizationCard
+                  key={suggestion.id}
+                  suggestion={suggestion}
+                  isExpanded={expandedIds.has(suggestion.id)}
+                  onToggle={() => toggleExpand(suggestion.id)}
+                  onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
+                />
+              ))}
             </View>
-            {expenseReductions.map(suggestion => (
-              <OptimizationCard
-                key={suggestion.id}
-                suggestion={suggestion}
-                isExpanded={expandedIds.has(suggestion.id)}
-                onToggle={() => toggleExpand(suggestion.id)}
-                onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
-              />
-            ))}
-          </View>
-        )}
-
-        {incomeIncreases.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <TrendingUp color="#FFFFFF" size={24} />
-              <Text style={styles.sectionTitle}>Income Opportunities</Text>
-            </View>
-            {incomeIncreases.map(suggestion => (
-              <OptimizationCard
-                key={suggestion.id}
-                suggestion={suggestion}
-                isExpanded={expandedIds.has(suggestion.id)}
-                onToggle={() => toggleExpand(suggestion.id)}
-                onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
-              />
-            ))}
-          </View>
-        )}
-
-        {savingsBoosts.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Target color="#A1A1AA" size={24} />
-              <Text style={styles.sectionTitle}>Savings Boost</Text>
-            </View>
-            {savingsBoosts.map(suggestion => (
-              <OptimizationCard
-                key={suggestion.id}
-                suggestion={suggestion}
-                isExpanded={expandedIds.has(suggestion.id)}
-                onToggle={() => toggleExpand(suggestion.id)}
-                onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
-              />
-            ))}
-          </View>
-        )}
-
-        {investments.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Sparkles color={AppColors.warning} size={24} />
-              <Text style={styles.sectionTitle}>Investment Opportunities</Text>
-            </View>
-            {investments.map(suggestion => (
-              <OptimizationCard
-                key={suggestion.id}
-                suggestion={suggestion}
-                isExpanded={expandedIds.has(suggestion.id)}
-                onToggle={() => toggleExpand(suggestion.id)}
-                onMarkImplemented={() => handleMarkImplemented(suggestion.id)}
-              />
-            ))}
-          </View>
-        )}
-      </ScrollView>
+          )}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -402,6 +424,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -410,14 +435,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
   },
@@ -431,7 +456,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   optimizeButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     color: '#000000',
     fontSize: 15,
     fontWeight: '700',
@@ -440,13 +465,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryCard: {
-    backgroundColor: '#09090B',
     margin: 20,
     marginBottom: 0,
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
     borderColor: '#333',
+    overflow: 'hidden',
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -455,7 +480,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   summaryTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -470,13 +495,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   summaryMetricLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     textAlign: 'center',
   },
   summaryMetricValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
   },
@@ -486,37 +511,37 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   summarySubtitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     marginTop: 2,
   },
   summaryTotal: {
-    backgroundColor: '#18181B',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
   },
   summaryTotalLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     marginBottom: 6,
   },
   summaryTotalValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 32,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   summaryTotalSubtext: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#A1A1AA',
     marginTop: 6,
   },
   loadingCard: {
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     margin: 20,
     marginBottom: 0,
     borderRadius: 20,
@@ -526,7 +551,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   loadingTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -534,7 +559,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   loadingText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     textAlign: 'center',
@@ -551,7 +576,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingStepText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
   },
@@ -559,7 +584,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 40,
     margin: 20,
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#333',
@@ -568,20 +593,20 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#18181B',
+    backgroundColor: '#27272A',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
   },
   emptyTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 24,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 12,
   },
   emptyText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 15,
     color: '#A1A1AA',
     textAlign: 'center',
@@ -595,7 +620,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   emptyButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     color: '#000000',
     fontSize: 16,
     fontWeight: '700',
@@ -610,13 +635,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
     fontWeight: '700',
     color: '#FFFFFF',
   },
   card: {
-    backgroundColor: '#09090B',
+    backgroundColor: '#18181B',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -642,7 +667,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -663,7 +688,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   priorityBadgeText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 10,
     fontWeight: '700',
   },
@@ -677,7 +702,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   savingsBadgeText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: '700',
     color: AppColors.success,
@@ -692,13 +717,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   incomeBadgeText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',
   },
   cardDescription: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     lineHeight: 20,
@@ -720,7 +745,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   cardMetaText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: '#A1A1AA',
   },
@@ -728,7 +753,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   actionItemsTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -748,7 +773,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   actionItemText: {
-    fontFamily,
+    fontFamily: fontFamily,
     flex: 1,
     fontSize: 13,
     color: '#A1A1AA',
@@ -764,7 +789,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   implementButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     color: '#000000',
     fontSize: 15,
     fontWeight: '700',

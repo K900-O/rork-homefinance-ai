@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -26,6 +29,14 @@ import { ACTIVITY_COLORS } from '@/constants/personalTypes';
 import type { Habit } from '@/constants/personalTypes';
 import AddHabitModal from '@/components/AddHabitModal';
 import { fontFamily } from '@/constants/Typography';
+import { BlueGlow } from '@/components/BlueGlow';
+import { LinearGradient } from 'expo-linear-gradient';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 export default function HabitsScreen() {
   const insets = useSafeAreaInsets();
@@ -81,6 +92,11 @@ export default function HabitsScreen() {
     );
   };
 
+  const switchTab = (tab: 'good' | 'bad') => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setActiveTab(tab);
+  };
+
   const completedGoodToday = goodHabits.filter(h => isHabitCompletedToday(h.id)).length;
   const goodCompletionRate = goodHabits.length > 0 
     ? Math.round((completedGoodToday / goodHabits.length) * 100) 
@@ -94,187 +110,196 @@ export default function HabitsScreen() {
   const totalRelapses = badHabits.reduce((sum, h) => sum + h.totalRelapses, 0);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Habits</Text>
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Habits</Text>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => setShowAddModal(true)}
+          >
+            <Plus color="#000" size={20} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.tabContainer}>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'good' && styles.tabActiveGood]}
+            onPress={() => switchTab('good')}
+          >
+            <TrendingUp size={18} color={activeTab === 'good' ? '#000' : '#71717A'} />
+            <Text style={[styles.tabText, activeTab === 'good' && styles.tabTextActiveGood]}>
+              Good Habits
+            </Text>
+            {goodHabits.length > 0 && (
+              <View style={[styles.tabBadge, activeTab === 'good' && styles.tabBadgeActiveGood]}>
+                <Text style={[styles.tabBadgeText, activeTab === 'good' && styles.tabBadgeTextActive]}>
+                  {goodHabits.length}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'bad' && styles.tabActiveBad]}
+            onPress={() => switchTab('bad')}
+          >
+            <Shield size={18} color={activeTab === 'bad' ? '#000' : '#71717A'} />
+            <Text style={[styles.tabText, activeTab === 'bad' && styles.tabTextActiveBad]}>
+              Breaking
+            </Text>
+            {badHabits.length > 0 && (
+              <View style={[styles.tabBadge, activeTab === 'bad' && styles.tabBadgeActiveBad]}>
+                <Text style={[styles.tabBadgeText, activeTab === 'bad' && styles.tabBadgeTextActive]}>
+                  {badHabits.length}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
         >
-          <Plus color="#000" size={20} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.tabContainer}>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'good' && styles.tabActiveGood]}
-          onPress={() => setActiveTab('good')}
-        >
-          <TrendingUp size={18} color={activeTab === 'good' ? '#000' : '#71717A'} />
-          <Text style={[styles.tabText, activeTab === 'good' && styles.tabTextActiveGood]}>
-            Good Habits
-          </Text>
-          {goodHabits.length > 0 && (
-            <View style={[styles.tabBadge, activeTab === 'good' && styles.tabBadgeActiveGood]}>
-              <Text style={[styles.tabBadgeText, activeTab === 'good' && styles.tabBadgeTextActive]}>
-                {goodHabits.length}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'bad' && styles.tabActiveBad]}
-          onPress={() => setActiveTab('bad')}
-        >
-          <Shield size={18} color={activeTab === 'bad' ? '#000' : '#71717A'} />
-          <Text style={[styles.tabText, activeTab === 'bad' && styles.tabTextActiveBad]}>
-            Breaking
-          </Text>
-          {badHabits.length > 0 && (
-            <View style={[styles.tabBadge, activeTab === 'bad' && styles.tabBadgeActiveBad]}>
-              <Text style={[styles.tabBadgeText, activeTab === 'bad' && styles.tabBadgeTextActive]}>
-                {badHabits.length}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
-      >
-        {activeTab === 'good' ? (
-          <>
-            <View style={styles.statsRow}>
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: '#F59E0B20' }]}>
-                  <Flame size={20} color="#F59E0B" />
+          {activeTab === 'good' ? (
+            <>
+              <View style={styles.statsRow}>
+                <View style={styles.statCard}>
+                  <View style={[styles.statIcon, { backgroundColor: '#F59E0B20' }]}>
+                    <Flame size={20} color="#F59E0B" />
+                  </View>
+                  <Text style={styles.statValue}>{totalGoodStreak}</Text>
+                  <Text style={styles.statLabel}>Total Streak</Text>
                 </View>
-                <Text style={styles.statValue}>{totalGoodStreak}</Text>
-                <Text style={styles.statLabel}>Total Streak</Text>
-              </View>
-              
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
-                  <TrendingUp size={20} color="#10B981" />
+                
+                <View style={styles.statCard}>
+                  <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
+                    <TrendingUp size={20} color="#10B981" />
+                  </View>
+                  <Text style={styles.statValue}>{goodCompletionRate}%</Text>
+                  <Text style={styles.statLabel}>Today</Text>
                 </View>
-                <Text style={styles.statValue}>{goodCompletionRate}%</Text>
-                <Text style={styles.statLabel}>Today</Text>
-              </View>
-              
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
-                  <Trophy size={20} color="#8B5CF6" />
+                
+                <View style={styles.statCard}>
+                  <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
+                    <Trophy size={20} color="#8B5CF6" />
+                  </View>
+                  <Text style={styles.statValue}>{longestGoodStreak}</Text>
+                  <Text style={styles.statLabel}>Best Streak</Text>
                 </View>
-                <Text style={styles.statValue}>{longestGoodStreak}</Text>
-                <Text style={styles.statLabel}>Best Streak</Text>
-              </View>
-            </View>
-
-            <View style={styles.todaySection}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Today&apos;s Progress</Text>
-                <Text style={styles.progressText}>{completedGoodToday}/{goodHabits.length}</Text>
               </View>
 
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${goodCompletionRate}%` }]} />
-              </View>
-            </View>
+              <View style={styles.todaySection}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Today&apos;s Progress</Text>
+                  <Text style={styles.progressText}>{completedGoodToday}/{goodHabits.length}</Text>
+                </View>
 
-            <View style={styles.habitsList}>
-              {goodHabits.length > 0 ? (
-                goodHabits.map((habit) => (
-                  <GoodHabitCard
-                    key={habit.id}
-                    habit={habit}
-                    isCompleted={isHabitCompletedToday(habit.id)}
-                    onComplete={() => completeHabitForToday(habit.id)}
-                    onDelete={() => handleDeleteHabit(habit)}
+                <View style={styles.progressBar}>
+                  <LinearGradient
+                    colors={['#10B981', '#059669']}
+                    style={[styles.progressFill, { width: `${goodCompletionRate}%` }]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
                   />
-                ))
-              ) : (
-                <View style={styles.emptyState}>
-                  <TrendingUp size={48} color="#10B981" />
-                  <Text style={styles.emptyStateText}>No good habits yet</Text>
-                  <Text style={styles.emptyStateSubtext}>Start building positive habits</Text>
-                  <TouchableOpacity 
-                    style={styles.emptyButton}
-                    onPress={() => setShowAddModal(true)}
-                  >
-                    <Text style={styles.emptyButtonText}>Add Good Habit</Text>
-                  </TouchableOpacity>
                 </View>
-              )}
-            </View>
-          </>
-        ) : (
-          <>
-            <View style={styles.statsRow}>
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
-                  <Shield size={20} color="#10B981" />
-                </View>
-                <Text style={styles.statValue}>{totalDaysClean}</Text>
-                <Text style={styles.statLabel}>Days Clean</Text>
               </View>
-              
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: '#3B82F620' }]}>
-                  <Calendar size={20} color="#3B82F6" />
-                </View>
-                <Text style={styles.statValue}>{longestCleanStreak}</Text>
-                <Text style={styles.statLabel}>Best Streak</Text>
+
+              <View style={styles.habitsList}>
+                {goodHabits.length > 0 ? (
+                  goodHabits.map((habit) => (
+                    <GoodHabitCard
+                      key={habit.id}
+                      habit={habit}
+                      isCompleted={isHabitCompletedToday(habit.id)}
+                      onComplete={() => completeHabitForToday(habit.id)}
+                      onDelete={() => handleDeleteHabit(habit)}
+                    />
+                  ))
+                ) : (
+                  <View style={styles.emptyState}>
+                    <TrendingUp size={48} color="#10B981" />
+                    <Text style={styles.emptyStateText}>No good habits yet</Text>
+                    <Text style={styles.emptyStateSubtext}>Start building positive habits</Text>
+                    <TouchableOpacity 
+                      style={styles.emptyButton}
+                      onPress={() => setShowAddModal(true)}
+                    >
+                      <Text style={styles.emptyButtonText}>Add Good Habit</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-              
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: '#EF444420' }]}>
-                  <AlertTriangle size={20} color="#EF4444" />
+            </>
+          ) : (
+            <>
+              <View style={styles.statsRow}>
+                <View style={styles.statCard}>
+                  <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
+                    <Shield size={20} color="#10B981" />
+                  </View>
+                  <Text style={styles.statValue}>{totalDaysClean}</Text>
+                  <Text style={styles.statLabel}>Days Clean</Text>
                 </View>
-                <Text style={styles.statValue}>{totalRelapses}</Text>
-                <Text style={styles.statLabel}>Relapses</Text>
+                
+                <View style={styles.statCard}>
+                  <View style={[styles.statIcon, { backgroundColor: '#3B82F620' }]}>
+                    <Calendar size={20} color="#3B82F6" />
+                  </View>
+                  <Text style={styles.statValue}>{longestCleanStreak}</Text>
+                  <Text style={styles.statLabel}>Best Streak</Text>
+                </View>
+                
+                <View style={styles.statCard}>
+                  <View style={[styles.statIcon, { backgroundColor: '#EF444420' }]}>
+                    <AlertTriangle size={20} color="#EF4444" />
+                  </View>
+                  <Text style={styles.statValue}>{totalRelapses}</Text>
+                  <Text style={styles.statLabel}>Relapses</Text>
+                </View>
               </View>
-            </View>
 
-            <View style={styles.motivationCard}>
-              <Text style={styles.motivationText}>
-                Every day without these habits is a victory. Stay strong!
-              </Text>
-            </View>
+              <View style={styles.motivationCard}>
+                <Text style={styles.motivationText}>
+                  Every day without these habits is a victory. Stay strong!
+                </Text>
+              </View>
 
-            <View style={styles.habitsList}>
-              {badHabits.length > 0 ? (
-                badHabits.map((habit) => (
-                  <BadHabitCard
-                    key={habit.id}
-                    habit={habit}
-                    isSuccessToday={isBadHabitSuccessToday(habit.id)}
-                    onLogSuccess={() => handleLogSuccess(habit)}
-                    onRelapse={() => handleRelapse(habit)}
-                    onDelete={() => handleDeleteHabit(habit)}
-                  />
-                ))
-              ) : (
-                <View style={styles.emptyState}>
-                  <Shield size={48} color="#EF4444" />
-                  <Text style={styles.emptyStateText}>No habits to break</Text>
-                  <Text style={styles.emptyStateSubtext}>Track habits you want to quit</Text>
-                  <TouchableOpacity 
-                    style={[styles.emptyButton, styles.emptyButtonBad]}
-                    onPress={() => setShowAddModal(true)}
-                  >
-                    <Text style={styles.emptyButtonText}>Add Bad Habit</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </>
-        )}
-      </ScrollView>
+              <View style={styles.habitsList}>
+                {badHabits.length > 0 ? (
+                  badHabits.map((habit) => (
+                    <BadHabitCard
+                      key={habit.id}
+                      habit={habit}
+                      isSuccessToday={isBadHabitSuccessToday(habit.id)}
+                      onLogSuccess={() => handleLogSuccess(habit)}
+                      onRelapse={() => handleRelapse(habit)}
+                      onDelete={() => handleDeleteHabit(habit)}
+                    />
+                  ))
+                ) : (
+                  <View style={styles.emptyState}>
+                    <Shield size={48} color="#EF4444" />
+                    <Text style={styles.emptyStateText}>No habits to break</Text>
+                    <Text style={styles.emptyStateSubtext}>Track habits you want to quit</Text>
+                    <TouchableOpacity 
+                      style={[styles.emptyButton, styles.emptyButtonBad]}
+                      onPress={() => setShowAddModal(true)}
+                    >
+                      <Text style={styles.emptyButtonText}>Add Bad Habit</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            </>
+          )}
+          <View style={{ height: 100 }} />
+        </ScrollView>
 
-      <AddHabitModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
+        <AddHabitModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
+      </View>
     </View>
   );
 }
@@ -412,7 +437,12 @@ function BadHabitCard({
 
       <View style={styles.badProgressContainer}>
         <View style={styles.badProgressBar}>
-          <View style={[styles.badProgressFill, { width: `${progress}%` }]} />
+          <LinearGradient
+            colors={['#10B981', '#059669']}
+            style={[styles.badProgressFill, { width: `${progress}%` }]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
         </View>
         <Text style={styles.badProgressText}>
           {daysClean} / {nextMilestone} days to next milestone
@@ -457,6 +487,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -465,9 +498,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 32,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   addButton: {
@@ -502,9 +535,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
   },
   tabText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#71717A',
   },
   tabTextActiveGood: {
@@ -526,9 +559,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#DC262630',
   },
   tabBadgeText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#71717A',
   },
   tabBadgeTextActive: {
@@ -559,14 +592,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 24,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   statLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
     color: '#71717A',
   },
@@ -581,15 +614,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   progressText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#10B981',
   },
   progressBar: {
@@ -600,7 +633,6 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
     borderRadius: 4,
   },
   motivationCard: {
@@ -613,7 +645,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#EF4444',
   },
   motivationText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     fontStyle: 'italic',
@@ -642,9 +674,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   habitTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 8,
   },
@@ -664,9 +696,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     textTransform: 'capitalize',
   },
   streakBadge: {
@@ -675,10 +707,10 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   streakText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#F59E0B',
-    fontWeight: '500' as const,
+    fontWeight: '500',
   },
   deleteButton: {
     padding: 8,
@@ -695,10 +727,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   weekDayLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
     color: '#71717A',
-    fontWeight: '500' as const,
+    fontWeight: '500',
   },
   weekDot: {
     width: 24,
@@ -737,14 +769,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   badHabitTitle: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   badHabitCategory: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: '#71717A',
     textTransform: 'capitalize',
@@ -757,19 +789,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   daysCleanLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#71717A',
     marginBottom: 4,
   },
   daysCleanValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 56,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#10B981',
   },
   milestoneLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#A1A1AA',
     marginTop: 4,
@@ -786,11 +818,10 @@ const styles = StyleSheet.create({
   },
   badProgressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
     borderRadius: 3,
   },
   badProgressText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#52525B',
     textAlign: 'center',
@@ -811,14 +842,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#27272A',
   },
   badStatValue: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
   badStatLabel: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 12,
     color: '#71717A',
   },
@@ -835,9 +866,9 @@ const styles = StyleSheet.create({
     borderColor: '#EF444440',
   },
   relapseButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#EF4444',
   },
   badHabitActions: {
@@ -861,9 +892,9 @@ const styles = StyleSheet.create({
     borderColor: '#10B981',
   },
   successButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#10B981',
   },
   successButtonTextActive: {
@@ -874,15 +905,15 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyStateText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#71717A',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateSubtext: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: '#52525B',
     marginBottom: 24,
@@ -897,9 +928,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
   },
   emptyButtonText: {
-    fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     color: '#000',
   },
 });

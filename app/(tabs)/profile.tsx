@@ -28,13 +28,13 @@ import {
   X,
   Wallet,
   TrendingUp,
-  Calendar,
   Award,
   Settings,
   Globe,
   HelpCircle,
   FileText,
   Sparkles,
+  Calendar,
 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
@@ -42,6 +42,7 @@ import { useAppMode } from '@/contexts/AppModeContext';
 import { fontFamily } from '@/constants/Typography';
 import { router } from 'expo-router';
 import type { RiskTolerance } from '@/constants/types';
+import { BlueGlow } from '@/components/BlueGlow';
 
 const RISK_OPTIONS: { value: RiskTolerance; label: string; description: string }[] = [
   { value: 'conservative', label: 'Conservative', description: 'Low risk, stable returns' },
@@ -140,343 +141,346 @@ export default function ProfileScreen() {
   
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Settings color="#A1A1AA" size={22} />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      <BlueGlow />
+      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profile</Text>
+          <TouchableOpacity style={styles.settingsButton}>
+            <Settings color="#A1A1AA" size={22} />
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView 
-        style={styles.content} 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-      >
-        <LinearGradient
-          colors={['#18181B', '#09090B']}
-          style={styles.profileCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
         >
-          <View style={styles.avatarSection}>
-            <Image
-              source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }}
-              style={styles.avatar}
-            />
-            <TouchableOpacity style={styles.editAvatarButton}>
-              <Edit3 color="#FFF" size={14} />
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user?.name || 'User'}</Text>
-            <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
-            <View style={styles.memberBadge}>
-              <Calendar size={12} color="#10B981" />
-              <Text style={styles.memberText}>Member since {memberSince}</Text>
-            </View>
-          </View>
-        </LinearGradient>
-
-        <View style={styles.statsSection}>
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-              <Wallet size={20} color="#10B981" />
-            </View>
-            <Text style={styles.statValue}>{financialSummary.balance.toLocaleString()}</Text>
-            <Text style={styles.statLabel}>Balance</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
-              <TrendingUp size={20} color="#3B82F6" />
-            </View>
-            <Text style={styles.statValue}>{totalTransactions}</Text>
-            <Text style={styles.statLabel}>Transactions</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
-              <Award size={20} color="#F59E0B" />
-            </View>
-            <Text style={styles.statValue}>{totalRewardPoints}</Text>
-            <Text style={styles.statLabel}>Points</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Details</Text>
-          
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => openEditModal('name', user?.name || '')}
+          <LinearGradient
+            colors={['#18181B', '#09090B']}
+            style={styles.profileCard}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
           >
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-                <User size={18} color="#6366F1" />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>Name</Text>
-                <Text style={styles.menuValue}>{user?.name || 'Not set'}</Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => openEditModal('email', user?.email || '')}
-          >
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(236, 72, 153, 0.15)' }]}>
-                <Mail size={18} color="#EC4899" />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>Email</Text>
-                <Text style={styles.menuValue}>{user?.email || 'Not set'}</Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => openEditModal('monthlyIncome', user?.monthlyIncome?.toString() || '')}
-          >
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                <DollarSign size={18} color="#10B981" />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>Monthly Income</Text>
-                <Text style={styles.menuValue}>
-                  {user?.monthlyIncome?.toLocaleString() || '0'} {user?.currency || 'USD'}
-                </Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => openEditModal('householdSize', user?.householdSize?.toString() || '')}
-          >
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
-                <Users size={18} color="#3B82F6" />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>Household Size</Text>
-                <Text style={styles.menuValue}>{user?.householdSize || 1} {user?.householdSize === 1 ? 'person' : 'people'}</Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
-
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => openEditModal('currency', user?.currency || 'USD')}
-          >
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
-                <Globe size={18} color="#F59E0B" />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>Currency</Text>
-                <Text style={styles.menuValue}>{user?.currency || 'USD'}</Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => openEditModal('riskTolerance', user?.riskTolerance || 'moderate')}
-          >
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
-                <Shield size={18} color="#EF4444" />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>Risk Tolerance</Text>
-                <Text style={styles.menuValue}>
-                  {user?.riskTolerance ? user.riskTolerance.charAt(0).toUpperCase() + user.riskTolerance.slice(1) : 'Moderate'}
-                </Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={toggleMode}>
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: isFinancialMode ? 'rgba(16, 185, 129, 0.15)' : 'rgba(139, 92, 246, 0.15)' }]}>
-                <Sparkles size={18} color={isFinancialMode ? '#10B981' : '#8B5CF6'} />
-              </View>
-              <View>
-                <Text style={styles.menuLabel}>App Mode</Text>
-                <Text style={styles.menuValue}>{isFinancialMode ? 'Financial' : 'Personal'}</Text>
-              </View>
-            </View>
-            <View style={[styles.modeBadge, isFinancialMode ? styles.financialBadge : styles.personalBadge]}>
-              <Text style={[styles.modeBadgeText, isFinancialMode ? styles.financialText : styles.personalText]}>
-                Switch
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Goals</Text>
-          
-          {user?.primaryGoals && user.primaryGoals.length > 0 ? (
-            <View style={styles.goalsContainer}>
-              {user.primaryGoals.map((goal, index) => (
-                <View key={index} style={styles.goalTag}>
-                  <Target size={12} color="#10B981" />
-                  <Text style={styles.goalTagText}>{goal}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyGoals}>
-              <Target size={24} color="#52525B" />
-              <Text style={styles.emptyGoalsText}>No goals set</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
-          
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-                <HelpCircle size={18} color="#6366F1" />
-              </View>
-              <Text style={styles.menuLabel}>Help Center</Text>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: 'rgba(161, 161, 170, 0.15)' }]}>
-                <FileText size={18} color="#A1A1AA" />
-              </View>
-              <Text style={styles.menuLabel}>Terms & Privacy</Text>
-            </View>
-            <ChevronRight size={20} color="#52525B" />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <LogOut size={20} color="#EF4444" />
-          <Text style={styles.logoutText}>Sign Out</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.versionText}>Version 1.0.0</Text>
-      </ScrollView>
-
-      <Modal
-        visible={showEditModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowEditModal(false)}
-      >
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                Edit {editField.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-              </Text>
-              <TouchableOpacity onPress={() => setShowEditModal(false)}>
-                <X size={24} color="#A1A1AA" />
+            <View style={styles.avatarSection}>
+              <Image
+                source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }}
+                style={styles.avatar}
+              />
+              <TouchableOpacity style={styles.editAvatarButton}>
+                <Edit3 color="#FFF" size={14} />
               </TouchableOpacity>
             </View>
-
-            {editField === 'currency' ? (
-              <View style={styles.optionsContainer}>
-                {CURRENCY_OPTIONS.map((currency) => (
-                  <TouchableOpacity
-                    key={currency}
-                    style={[
-                      styles.optionButton,
-                      editValue === currency && styles.optionButtonActive
-                    ]}
-                    onPress={() => setEditValue(currency)}
-                  >
-                    <Text style={[
-                      styles.optionText,
-                      editValue === currency && styles.optionTextActive
-                    ]}>
-                      {currency}
-                    </Text>
-                    {editValue === currency && <Check size={16} color="#10B981" />}
-                  </TouchableOpacity>
-                ))}
+            
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{user?.name || 'User'}</Text>
+              <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
+              <View style={styles.memberBadge}>
+                <Calendar size={12} color="#10B981" />
+                <Text style={styles.memberText}>Member since {memberSince}</Text>
               </View>
-            ) : editField === 'riskTolerance' ? (
-              <View style={styles.optionsContainer}>
-                {RISK_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.riskOption,
-                      editValue === option.value && styles.riskOptionActive
-                    ]}
-                    onPress={() => setEditValue(option.value)}
-                  >
-                    <View style={styles.riskOptionContent}>
-                      <Text style={[
-                        styles.riskOptionLabel,
-                        editValue === option.value && styles.riskOptionLabelActive
-                      ]}>
-                        {option.label}
-                      </Text>
-                      <Text style={styles.riskOptionDescription}>{option.description}</Text>
-                    </View>
-                    {editValue === option.value && <Check size={18} color="#10B981" />}
-                  </TouchableOpacity>
+            </View>
+          </LinearGradient>
+
+          <View style={styles.statsSection}>
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+                <Wallet size={20} color="#10B981" />
+              </View>
+              <Text style={styles.statValue}>{financialSummary.balance.toLocaleString()}</Text>
+              <Text style={styles.statLabel}>Balance</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                <TrendingUp size={20} color="#3B82F6" />
+              </View>
+              <Text style={styles.statValue}>{totalTransactions}</Text>
+              <Text style={styles.statLabel}>Transactions</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+                <Award size={20} color="#F59E0B" />
+              </View>
+              <Text style={styles.statValue}>{totalRewardPoints}</Text>
+              <Text style={styles.statLabel}>Points</Text>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account Details</Text>
+            
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => openEditModal('name', user?.name || '')}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
+                  <User size={18} color="#6366F1" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>Name</Text>
+                  <Text style={styles.menuValue}>{user?.name || 'Not set'}</Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => openEditModal('email', user?.email || '')}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(236, 72, 153, 0.15)' }]}>
+                  <Mail size={18} color="#EC4899" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>Email</Text>
+                  <Text style={styles.menuValue}>{user?.email || 'Not set'}</Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => openEditModal('monthlyIncome', user?.monthlyIncome?.toString() || '')}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+                  <DollarSign size={18} color="#10B981" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>Monthly Income</Text>
+                  <Text style={styles.menuValue}>
+                    {user?.monthlyIncome?.toLocaleString() || '0'} {user?.currency || 'USD'}
+                  </Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => openEditModal('householdSize', user?.householdSize?.toString() || '')}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                  <Users size={18} color="#3B82F6" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>Household Size</Text>
+                  <Text style={styles.menuValue}>{user?.householdSize || 1} {user?.householdSize === 1 ? 'person' : 'people'}</Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferences</Text>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => openEditModal('currency', user?.currency || 'USD')}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+                  <Globe size={18} color="#F59E0B" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>Currency</Text>
+                  <Text style={styles.menuValue}>{user?.currency || 'USD'}</Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => openEditModal('riskTolerance', user?.riskTolerance || 'moderate')}
+            >
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+                  <Shield size={18} color="#EF4444" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>Risk Tolerance</Text>
+                  <Text style={styles.menuValue}>
+                    {user?.riskTolerance ? user.riskTolerance.charAt(0).toUpperCase() + user.riskTolerance.slice(1) : 'Moderate'}
+                  </Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={toggleMode}>
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: isFinancialMode ? 'rgba(16, 185, 129, 0.15)' : 'rgba(139, 92, 246, 0.15)' }]}>
+                  <Sparkles size={18} color={isFinancialMode ? '#10B981' : '#8B5CF6'} />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>App Mode</Text>
+                  <Text style={styles.menuValue}>{isFinancialMode ? 'Financial' : 'Personal'}</Text>
+                </View>
+              </View>
+              <View style={[styles.modeBadge, isFinancialMode ? styles.financialBadge : styles.personalBadge]}>
+                <Text style={[styles.modeBadgeText, isFinancialMode ? styles.financialText : styles.personalText]}>
+                  Switch
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Goals</Text>
+            
+            {user?.primaryGoals && user.primaryGoals.length > 0 ? (
+              <View style={styles.goalsContainer}>
+                {user.primaryGoals.map((goal, index) => (
+                  <View key={index} style={styles.goalTag}>
+                    <Target size={12} color="#10B981" />
+                    <Text style={styles.goalTagText}>{goal}</Text>
+                  </View>
                 ))}
               </View>
             ) : (
-              <TextInput
-                style={styles.modalInput}
-                value={editValue}
-                onChangeText={setEditValue}
-                placeholder={`Enter ${editField}`}
-                placeholderTextColor="#52525B"
-                keyboardType={editField === 'monthlyIncome' || editField === 'householdSize' ? 'numeric' : 'default'}
-                autoCapitalize={editField === 'email' ? 'none' : 'words'}
-                autoFocus
-              />
+              <View style={styles.emptyGoals}>
+                <Target size={24} color="#52525B" />
+                <Text style={styles.emptyGoalsText}>No goals set</Text>
+              </View>
             )}
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity 
-                style={styles.cancelButton}
-                onPress={() => setShowEditModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.saveButton}
-                onPress={handleSaveEdit}
-              >
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </View>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Support</Text>
+            
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
+                  <HelpCircle size={18} color="#6366F1" />
+                </View>
+                <Text style={styles.menuLabel}>Help Center</Text>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemLeft}>
+                <View style={[styles.menuIcon, { backgroundColor: 'rgba(161, 161, 170, 0.15)' }]}>
+                  <FileText size={18} color="#A1A1AA" />
+                </View>
+                <Text style={styles.menuLabel}>Terms & Privacy</Text>
+              </View>
+              <ChevronRight size={20} color="#52525B" />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <LogOut size={20} color="#EF4444" />
+            <Text style={styles.logoutText}>Sign Out</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.versionText}>Version 1.0.0</Text>
+        </ScrollView>
+
+        <Modal
+          visible={showEditModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowEditModal(false)}
+        >
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalOverlay}
+          >
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>
+                  Edit {editField.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                </Text>
+                <TouchableOpacity onPress={() => setShowEditModal(false)}>
+                  <X size={24} color="#A1A1AA" />
+                </TouchableOpacity>
+              </View>
+
+              {editField === 'currency' ? (
+                <View style={styles.optionsContainer}>
+                  {CURRENCY_OPTIONS.map((currency) => (
+                    <TouchableOpacity
+                      key={currency}
+                      style={[
+                        styles.optionButton,
+                        editValue === currency && styles.optionButtonActive
+                      ]}
+                      onPress={() => setEditValue(currency)}
+                    >
+                      <Text style={[
+                        styles.optionText,
+                        editValue === currency && styles.optionTextActive
+                      ]}>
+                        {currency}
+                      </Text>
+                      {editValue === currency && <Check size={16} color="#10B981" />}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : editField === 'riskTolerance' ? (
+                <View style={styles.optionsContainer}>
+                  {RISK_OPTIONS.map((option) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={[
+                        styles.riskOption,
+                        editValue === option.value && styles.riskOptionActive
+                      ]}
+                      onPress={() => setEditValue(option.value)}
+                    >
+                      <View style={styles.riskOptionContent}>
+                        <Text style={[
+                          styles.riskOptionLabel,
+                          editValue === option.value && styles.riskOptionLabelActive
+                        ]}>
+                          {option.label}
+                        </Text>
+                        <Text style={styles.riskOptionDescription}>{option.description}</Text>
+                      </View>
+                      {editValue === option.value && <Check size={18} color="#10B981" />}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : (
+                <TextInput
+                  style={styles.modalInput}
+                  value={editValue}
+                  onChangeText={setEditValue}
+                  placeholder={`Enter ${editField}`}
+                  placeholderTextColor="#52525B"
+                  keyboardType={editField === 'monthlyIncome' || editField === 'householdSize' ? 'numeric' : 'default'}
+                  autoCapitalize={editField === 'email' ? 'none' : 'words'}
+                  autoFocus
+                />
+              )}
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity 
+                  style={styles.cancelButton}
+                  onPress={() => setShowEditModal(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.saveButton}
+                  onPress={handleSaveEdit}
+                >
+                  <Text style={styles.saveButtonText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+      </View>
     </View>
   );
 }
@@ -485,6 +489,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000000',
+  },
+  contentContainer: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
