@@ -14,7 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, Bell, ArrowDownLeft, CreditCard, User, Wallet, Shield, Trophy, AlertTriangle, CheckCircle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { AppColors } from '@/constants/colors';
 import type { Transaction, BudgetStatus, PlannedTransaction } from '@/constants/types';
 import AddTransactionModal from '@/components/AddTransactionModal';
@@ -28,7 +27,6 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { user, financialSummary, transactions, budgetStatuses, budgetRules, totalRewardPoints, budgetRewards, upcomingPlannedTransactions, projectedBalance, processPlannedTransaction, deletePlannedTransaction } = useFinance();
   const { toggleMode } = useAppMode();
-  const { colors, isDark } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -60,8 +58,8 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {isDark && <BlueGlow />}
+    <View style={styles.container}>
+      <BlueGlow />
       <ScrollView
         style={styles.content}
         contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 100 }}
