@@ -62,7 +62,6 @@ export default function ProfileScreen() {
   const [editField, setEditField] = useState<string>('');
   const [editValue, setEditValue] = useState<string>('');
 
-  // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
@@ -175,7 +174,7 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Profile</Text>
           <TouchableOpacity style={styles.settingsButton}>
-            <Settings color="#A1A1AA" size={22} />
+            <Settings color="#71717A" size={22} />
           </TouchableOpacity>
         </View>
 
@@ -185,7 +184,7 @@ export default function ProfileScreen() {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <LinearGradient
-            colors={['#18181B', '#09090B']}
+            colors={['#2563EB', '#1D4ED8']}
             style={styles.profileCard}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -204,7 +203,7 @@ export default function ProfileScreen() {
               <Text style={styles.profileName}>{user?.name || 'User'}</Text>
               <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
               <View style={styles.memberBadge}>
-                <Calendar size={12} color="#10B981" />
+                <Calendar size={12} color="#FFF" />
                 <Text style={styles.memberText}>Member since {memberSince}</Text>
               </View>
             </View>
@@ -212,23 +211,23 @@ export default function ProfileScreen() {
 
           <View style={styles.statsSection}>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                <Wallet size={20} color="#10B981" />
+              <View style={[styles.statIcon, { backgroundColor: '#DBEAFE' }]}>
+                <Wallet size={20} color="#2563EB" />
               </View>
               <Text style={styles.statValue}>{financialSummary.balance.toLocaleString()}</Text>
               <Text style={styles.statLabel}>Balance</Text>
             </View>
             
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
-                <TrendingUp size={20} color="#3B82F6" />
+              <View style={[styles.statIcon, { backgroundColor: '#DBEAFE' }]}>
+                <TrendingUp size={20} color="#2563EB" />
               </View>
               <Text style={styles.statValue}>{totalTransactions}</Text>
               <Text style={styles.statLabel}>Transactions</Text>
             </View>
             
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+              <View style={[styles.statIcon, { backgroundColor: '#FEF3C7' }]}>
                 <Award size={20} color="#F59E0B" />
               </View>
               <Text style={styles.statValue}>{totalRewardPoints}</Text>
@@ -244,15 +243,15 @@ export default function ProfileScreen() {
               onPress={() => openEditModal('name', user?.name || '')}
             >
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-                  <User size={18} color="#6366F1" />
+                <View style={[styles.menuIcon, { backgroundColor: '#EDE9FE' }]}>
+                  <User size={18} color="#8B5CF6" />
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Name</Text>
                   <Text style={styles.menuValue}>{user?.name || 'Not set'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -260,7 +259,7 @@ export default function ProfileScreen() {
               onPress={() => openEditModal('email', user?.email || '')}
             >
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(236, 72, 153, 0.15)' }]}>
+                <View style={[styles.menuIcon, { backgroundColor: '#FCE7F3' }]}>
                   <Mail size={18} color="#EC4899" />
                 </View>
                 <View>
@@ -268,7 +267,7 @@ export default function ProfileScreen() {
                   <Text style={styles.menuValue}>{user?.email || 'Not set'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -276,8 +275,8 @@ export default function ProfileScreen() {
               onPress={() => openEditModal('monthlyIncome', user?.monthlyIncome?.toString() || '')}
             >
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                  <DollarSign size={18} color="#10B981" />
+                <View style={[styles.menuIcon, { backgroundColor: '#DBEAFE' }]}>
+                  <DollarSign size={18} color="#2563EB" />
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Monthly Income</Text>
@@ -286,7 +285,7 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -294,15 +293,15 @@ export default function ProfileScreen() {
               onPress={() => openEditModal('householdSize', user?.householdSize?.toString() || '')}
             >
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
-                  <Users size={18} color="#3B82F6" />
+                <View style={[styles.menuIcon, { backgroundColor: '#DBEAFE' }]}>
+                  <Users size={18} color="#2563EB" />
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Household Size</Text>
                   <Text style={styles.menuValue}>{user?.householdSize || 1} {user?.householdSize === 1 ? 'person' : 'people'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
           </View>
 
@@ -314,7 +313,7 @@ export default function ProfileScreen() {
               onPress={() => openEditModal('currency', user?.currency || 'USD')}
             >
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+                <View style={[styles.menuIcon, { backgroundColor: '#FEF3C7' }]}>
                   <Globe size={18} color="#F59E0B" />
                 </View>
                 <View>
@@ -322,7 +321,7 @@ export default function ProfileScreen() {
                   <Text style={styles.menuValue}>{user?.currency || 'USD'}</Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -330,7 +329,7 @@ export default function ProfileScreen() {
               onPress={() => openEditModal('riskTolerance', user?.riskTolerance || 'moderate')}
             >
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+                <View style={[styles.menuIcon, { backgroundColor: '#FEE2E2' }]}>
                   <Shield size={18} color="#EF4444" />
                 </View>
                 <View>
@@ -340,13 +339,13 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={toggleMode}>
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: isFinancialMode ? 'rgba(16, 185, 129, 0.15)' : 'rgba(139, 92, 246, 0.15)' }]}>
-                  <Sparkles size={18} color={isFinancialMode ? '#10B981' : '#8B5CF6'} />
+                <View style={[styles.menuIcon, { backgroundColor: isFinancialMode ? '#DBEAFE' : '#EDE9FE' }]}>
+                  <Sparkles size={18} color={isFinancialMode ? '#2563EB' : '#8B5CF6'} />
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>App Mode</Text>
@@ -368,14 +367,14 @@ export default function ProfileScreen() {
               <View style={styles.goalsContainer}>
                 {user.primaryGoals.map((goal, index) => (
                   <View key={index} style={styles.goalTag}>
-                    <Target size={12} color="#10B981" />
+                    <Target size={12} color="#2563EB" />
                     <Text style={styles.goalTagText}>{goal}</Text>
                   </View>
                 ))}
               </View>
             ) : (
               <View style={styles.emptyGoals}>
-                <Target size={24} color="#52525B" />
+                <Target size={24} color="#A1A1AA" />
                 <Text style={styles.emptyGoalsText}>No goals set</Text>
               </View>
             )}
@@ -386,22 +385,22 @@ export default function ProfileScreen() {
             
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-                  <HelpCircle size={18} color="#6366F1" />
+                <View style={[styles.menuIcon, { backgroundColor: '#EDE9FE' }]}>
+                  <HelpCircle size={18} color="#8B5CF6" />
                 </View>
                 <Text style={styles.menuLabel}>Help Center</Text>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemLeft}>
-                <View style={[styles.menuIcon, { backgroundColor: 'rgba(161, 161, 170, 0.15)' }]}>
-                  <FileText size={18} color="#A1A1AA" />
+                <View style={[styles.menuIcon, { backgroundColor: '#F5F5F5' }]}>
+                  <FileText size={18} color="#71717A" />
                 </View>
                 <Text style={styles.menuLabel}>Terms & Privacy</Text>
               </View>
-              <ChevronRight size={20} color="#52525B" />
+              <ChevronRight size={20} color="#A1A1AA" />
             </TouchableOpacity>
           </View>
 
@@ -429,7 +428,7 @@ export default function ProfileScreen() {
                   Edit {editField.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                 </Text>
                 <TouchableOpacity onPress={() => setShowEditModal(false)}>
-                  <X size={24} color="#A1A1AA" />
+                  <X size={24} color="#71717A" />
                 </TouchableOpacity>
               </View>
 
@@ -450,7 +449,7 @@ export default function ProfileScreen() {
                       ]}>
                         {currency}
                       </Text>
-                      {editValue === currency && <Check size={16} color="#10B981" />}
+                      {editValue === currency && <Check size={16} color="#2563EB" />}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -474,7 +473,7 @@ export default function ProfileScreen() {
                         </Text>
                         <Text style={styles.riskOptionDescription}>{option.description}</Text>
                       </View>
-                      {editValue === option.value && <Check size={18} color="#10B981" />}
+                      {editValue === option.value && <Check size={18} color="#2563EB" />}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -484,7 +483,7 @@ export default function ProfileScreen() {
                   value={editValue}
                   onChangeText={setEditValue}
                   placeholder={`Enter ${editField}`}
-                  placeholderTextColor="#52525B"
+                  placeholderTextColor="#A1A1AA"
                   keyboardType={editField === 'monthlyIncome' || editField === 'householdSize' ? 'numeric' : 'default'}
                   autoCapitalize={editField === 'email' ? 'none' : 'words'}
                   autoFocus
@@ -516,7 +515,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -532,15 +531,17 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   settingsButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   content: {
     flex: 1,
@@ -551,8 +552,6 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#27272A',
   },
   avatarSection: {
     position: 'relative',
@@ -563,7 +562,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: '#27272A',
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   editAvatarButton: {
     position: 'absolute',
@@ -572,11 +571,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1D4ED8',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: '#FFF',
   },
   profileInfo: {
     alignItems: 'center',
@@ -591,13 +590,13 @@ const styles = StyleSheet.create({
   profileEmail: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: 'rgba(255,255,255,0.8)',
     marginBottom: 12,
   },
   memberBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -606,7 +605,7 @@ const styles = StyleSheet.create({
   memberText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 12,
-    color: '#10B981',
+    color: '#FFFFFF',
     fontWeight: '500' as const,
   },
   statsSection: {
@@ -616,12 +615,17 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   statIcon: {
     width: 40,
@@ -635,7 +639,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '700' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 2,
   },
   statLabel: {
@@ -650,7 +654,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 12,
     marginLeft: 4,
   },
@@ -658,12 +662,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 14,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   menuItemLeft: {
     flexDirection: 'row',
@@ -681,7 +690,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayMedium,
     fontSize: 15,
     fontWeight: '500' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   menuValue: {
     fontFamily: sfProDisplayRegular,
@@ -695,10 +704,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   financialBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: '#DBEAFE',
   },
   personalBadge: {
-    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    backgroundColor: '#EDE9FE',
   },
   modeBadgeText: {
     fontFamily: sfProDisplayBold,
@@ -706,7 +715,7 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
   },
   financialText: {
-    color: '#10B981',
+    color: '#2563EB',
   },
   personalText: {
     color: '#8B5CF6',
@@ -715,17 +724,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
   },
   goalTag: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: '#DBEAFE',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -733,34 +742,34 @@ const styles = StyleSheet.create({
   goalTagText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#10B981',
+    color: '#2563EB',
     fontWeight: '500' as const,
   },
   emptyGoals: {
     alignItems: 'center',
     paddingVertical: 24,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FAFAFA',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
     gap: 8,
   },
   emptyGoalsText: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#52525B',
+    color: '#A1A1AA',
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: '#FEE2E2',
     padding: 16,
     borderRadius: 14,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.2)',
+    borderColor: '#FECACA',
   },
   logoutText: {
     fontFamily: sfProDisplayBold,
@@ -771,24 +780,24 @@ const styles = StyleSheet.create({
   versionText: {
     fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#52525B',
+    color: '#A1A1AA',
     textAlign: 'center',
     marginBottom: 20,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   modalContent: {
     width: '100%',
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -800,18 +809,18 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   modalInput: {
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontFamily: sfProDisplayRegular,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderColor: '#E5E5E5',
   },
   optionsContainer: {
     marginBottom: 24,
@@ -820,40 +829,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderColor: '#E5E5E5',
   },
   optionButtonActive: {
-    borderColor: '#10B981',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderColor: '#2563EB',
+    backgroundColor: '#DBEAFE',
   },
   optionText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 16,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   optionTextActive: {
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontWeight: '600' as const,
   },
   riskOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderColor: '#E5E5E5',
   },
   riskOptionActive: {
-    borderColor: '#10B981',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderColor: '#2563EB',
+    backgroundColor: '#DBEAFE',
   },
   riskOptionContent: {
     flex: 1,
@@ -861,11 +870,11 @@ const styles = StyleSheet.create({
   riskOptionLabel: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 2,
   },
   riskOptionLabelActive: {
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontWeight: '600' as const,
   },
   riskOptionDescription: {
@@ -881,26 +890,28 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   cancelButtonText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   saveButton: {
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
   },
   saveButtonText: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#000000',
+    color: '#FFFFFF',
   },
 });

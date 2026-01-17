@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TrendingUp, TrendingDown, AlertCircle, Lightbulb } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 
 const { width } = Dimensions.get('window');
@@ -52,8 +52,8 @@ export default function InsightsScreen() {
               <StatCard
                 label="Total Income"
                 value={`JD ${financialSummary.totalIncome.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-                icon={<TrendingUp color={AppColors.success} size={24} />}
-                color={AppColors.success}
+                icon={<TrendingUp color="#2563EB" size={24} />}
+                color="#2563EB"
               />
               <StatCard
                 label="Total Expenses"
@@ -64,14 +64,14 @@ export default function InsightsScreen() {
               <StatCard
                 label="Net Savings"
                 value={`JD ${financialSummary.balance.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-                icon={<TrendingUp color="#FFFFFF" size={24} />}
-                color="#FFFFFF"
+                icon={<TrendingUp color="#2563EB" size={24} />}
+                color="#2563EB"
               />
               <StatCard
                 label="Savings Rate"
                 value={`${financialSummary.savingsRate.toFixed(1)}%`}
-                icon={<TrendingUp color="#A1A1AA" size={24} />}
-                color="#A1A1AA"
+                icon={<TrendingUp color="#71717A" size={24} />}
+                color="#71717A"
               />
             </View>
           </View>
@@ -88,17 +88,17 @@ export default function InsightsScreen() {
               <Text style={styles.sectionTitle}>Weekly Trend</Text>
               <View style={[
                 styles.trendCard,
-                { borderLeftColor: insights.weeklyComparison.change > 0 ? AppColors.danger : AppColors.success }
+                { borderLeftColor: insights.weeklyComparison.change > 0 ? AppColors.danger : '#2563EB' }
               ]}>
                 <View style={styles.trendHeader}>
                   {insights.weeklyComparison.change > 0 ? (
                     <TrendingUp color={AppColors.danger} size={24} />
                   ) : (
-                    <TrendingDown color={AppColors.success} size={24} />
+                    <TrendingDown color="#2563EB" size={24} />
                   )}
                   <Text style={[
                     styles.trendValue,
-                    { color: insights.weeklyComparison.change > 0 ? AppColors.danger : AppColors.success }
+                    { color: insights.weeklyComparison.change > 0 ? AppColors.danger : '#2563EB' }
                   ]}>
                     {Math.abs(insights.weeklyComparison.change).toFixed(1)}%
                   </Text>
@@ -131,7 +131,7 @@ export default function InsightsScreen() {
             )}
             {financialSummary.healthScore >= 70 && (
               <RecommendationCard
-                icon={<TrendingUp color={AppColors.success} size={24} />}
+                icon={<TrendingUp color="#2563EB" size={24} />}
                 title="Great Financial Health!"
                 description="Your financial health score is excellent. Consider investing your extra savings for long-term growth."
                 type="success"
@@ -169,7 +169,7 @@ function StatCard({ label, value, icon, color }: { label: string; value: string;
 }
 
 function CategoryBar({ item, index }: { item: { category: string; amount: number; percentage: number }; index: number }) {
-  const categoryColor = '#FFFFFF';
+  const categoryColor = '#2563EB';
   
   return (
     <View style={styles.categoryBar}>
@@ -195,7 +195,7 @@ function CategoryBar({ item, index }: { item: { category: string; amount: number
 }
 
 function RecommendationCard({ icon, title, description, type }: { icon: React.ReactNode; title: string; description: string; type: 'tip' | 'alert' | 'success' }) {
-  const borderColor = type === 'alert' ? AppColors.danger : type === 'success' ? AppColors.success : AppColors.warning;
+  const borderColor = type === 'alert' ? AppColors.danger : type === 'success' ? '#2563EB' : AppColors.warning;
   
   return (
     <View style={[styles.recommendationCard, { borderLeftColor: borderColor }]}>
@@ -238,7 +238,7 @@ function calculateWeeklyComparison(transactions: any[]) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -251,16 +251,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   content: {
     flex: 1,
@@ -269,10 +269,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 16,
   },
   statsGrid: {
@@ -282,11 +282,16 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: (width - 52) / 2,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   statIcon: {
     width: 48,
@@ -295,16 +300,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    backgroundColor: '#27272A',
+    backgroundColor: '#DBEAFE',
   },
   statLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 4,
   },
   statValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
   },
@@ -328,10 +333,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   categoryBarName: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   categoryBarValues: {
     flexDirection: 'row',
@@ -339,20 +344,20 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   categoryBarAmount: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   categoryBarPercentage: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     fontWeight: '600',
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   categoryBarProgress: {
     height: 8,
-    backgroundColor: '#333',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -361,12 +366,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   trendCard: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 4,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   trendHeader: {
     flexDirection: 'row',
@@ -375,25 +380,25 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   trendValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 24,
     fontWeight: '700',
   },
   trendDescription: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     lineHeight: 20,
   },
   recommendationCard: {
     flexDirection: 'row',
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   recommendationIcon: {
     marginRight: 12,
@@ -402,46 +407,51 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   recommendationTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 6,
   },
   recommendationDescription: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#71717A',
     lineHeight: 18,
   },
   quickStatsCard: {
     flexDirection: 'row',
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   quickStat: {
     flex: 1,
     alignItems: 'center',
   },
   quickStatValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 6,
   },
   quickStatLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     textAlign: 'center',
   },
   statDivider: {
     width: 1,
     height: '100%',
-    backgroundColor: '#333',
+    backgroundColor: '#E5E5E5',
   },
 });

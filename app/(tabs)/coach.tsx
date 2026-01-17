@@ -261,13 +261,13 @@ Respond as a supportive friend who happens to be an expert life coach.`;
 
   const markdownStyles = useMemo(() => ({
     body: {
-      color: '#FFFFFF',
+      color: '#1A1A1A',
       fontSize: 15,
       lineHeight: 24,
       fontFamily: sfProDisplayRegular,
     },
     heading1: {
-      color: '#10B981',
+      color: '#2563EB',
       fontSize: 18,
       fontWeight: '700' as const,
       marginTop: 16,
@@ -276,7 +276,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontFamily: sfProDisplayBold,
     },
     heading2: {
-      color: '#10B981',
+      color: '#2563EB',
       fontSize: 16,
       fontWeight: '600' as const,
       marginTop: 14,
@@ -285,7 +285,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontFamily: sfProDisplayBold,
     },
     heading3: {
-      color: '#34D399',
+      color: '#3B82F6',
       fontSize: 15,
       fontWeight: '600' as const,
       marginTop: 12,
@@ -293,12 +293,12 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontFamily: sfProDisplayBold,
     },
     strong: {
-      color: '#FFFFFF',
+      color: '#1A1A1A',
       fontWeight: '700' as const,
       fontFamily: sfProDisplayBold,
     },
     em: {
-      color: '#A1A1AA',
+      color: '#71717A',
       fontStyle: 'italic' as const,
       fontFamily: sfProDisplayMedium,
     },
@@ -313,13 +313,13 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       flexDirection: 'row' as const,
     },
     bullet_list_icon: {
-      color: '#10B981',
+      color: '#2563EB',
       fontSize: 6,
       marginTop: 10,
       marginRight: 8,
     },
     ordered_list_icon: {
-      color: '#10B981',
+      color: '#2563EB',
       fontSize: 14,
       fontWeight: '700' as const,
       marginRight: 8,
@@ -331,13 +331,13 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontFamily: sfProDisplayRegular,
     },
     link: {
-      color: '#3B82F6',
+      color: '#2563EB',
       textDecorationLine: 'underline' as const,
       fontFamily: sfProDisplayRegular,
     },
     blockquote: {
-      backgroundColor: 'rgba(16, 185, 129, 0.1)',
-      borderLeftColor: '#10B981',
+      backgroundColor: '#DBEAFE',
+      borderLeftColor: '#2563EB',
       borderLeftWidth: 3,
       paddingHorizontal: 14,
       paddingVertical: 10,
@@ -345,8 +345,8 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       borderRadius: 6,
     },
     code_inline: {
-      backgroundColor: '#27272A',
-      color: '#34D399',
+      backgroundColor: '#F5F5F5',
+      color: '#2563EB',
       paddingHorizontal: 6,
       paddingVertical: 2,
       borderRadius: 4,
@@ -354,24 +354,24 @@ Respond as a supportive friend who happens to be an expert life coach.`;
       fontSize: 13,
     },
     code_block: {
-      backgroundColor: '#18181B',
+      backgroundColor: '#F5F5F5',
       padding: 14,
       borderRadius: 10,
       marginVertical: 10,
     },
     fence: {
-      backgroundColor: '#18181B',
+      backgroundColor: '#F5F5F5',
       padding: 14,
       borderRadius: 10,
       marginVertical: 10,
     },
     hr: {
-      backgroundColor: '#27272A',
+      backgroundColor: '#E5E5E5',
       height: 1,
       marginVertical: 12,
     },
     text: {
-      color: '#FFFFFF',
+      color: '#1A1A1A',
       fontFamily: sfProDisplayRegular,
     },
   }), []);
@@ -379,7 +379,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
   const isLoading = status === 'streaming';
 
   const suggestedPrompts = [
-    { icon: Target, text: "How can I stay consistent?", color: '#10B981' },
+    { icon: Target, text: "How can I stay consistent?", color: '#2563EB' },
     { icon: TrendingUp, text: "Review my progress", color: '#3B82F6' },
     { icon: Heart, text: "I'm struggling today", color: '#EC4899' },
     { icon: Brain, text: "Help me build a routine", color: '#8B5CF6' },
@@ -400,7 +400,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
         {!isUser && (
           <View style={styles.avatarContainer}>
             <LinearGradient
-              colors={['#10B981', '#059669']}
+              colors={['#3B82F6', '#2563EB']}
               style={styles.avatar}
             >
               <Bot color="#FFF" size={18} />
@@ -441,7 +441,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
               if (part.state === 'output-available') {
                 return (
                   <View key={`${message.id}-${partIndex}`} style={styles.toolResult}>
-                    <Sparkles color="#10B981" size={14} />
+                    <Sparkles color="#2563EB" size={14} />
                     <Text style={styles.toolResultText}>
                       {typeof part.output === 'object' ? part.output.message : 'Action completed'}
                     </Text>
@@ -478,7 +478,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <LinearGradient
-              colors={['#10B981', '#059669']}
+              colors={['#3B82F6', '#2563EB']}
               style={styles.headerIcon}
             >
               <Bot color="#FFF" size={24} />
@@ -508,7 +508,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
             {messages.length === 0 ? (
               <View style={styles.emptyState}>
                 <LinearGradient
-                  colors={['#10B981', '#059669']}
+                  colors={['#3B82F6', '#2563EB']}
                   style={styles.emptyIcon}
                 >
                   <Sparkles color="#FFF" size={32} />
@@ -538,7 +538,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
                   <View style={styles.loadingContainer}>
                     <View style={styles.avatarContainer}>
                       <LinearGradient
-                        colors={['#10B981', '#059669']}
+                        colors={['#3B82F6', '#2563EB']}
                         style={styles.avatar}
                       >
                         <Bot color="#FFF" size={18} />
@@ -560,7 +560,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
               <TextInput
                 style={styles.input}
                 placeholder="Ask your coach..."
-                placeholderTextColor="#52525B"
+                placeholderTextColor="#A1A1AA"
                 value={input}
                 onChangeText={setInput}
                 multiline
@@ -594,7 +594,7 @@ Respond as a supportive friend who happens to be an expert life coach.`;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -609,7 +609,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C1C1E',
+    borderBottomColor: '#E5E5E5',
   },
   headerLeft: {
     flexDirection: 'row',
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontFamily: sfProDisplayBold,
   },
   headerSubtitle: {
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#18181B',
+    backgroundColor: '#F5F5F5',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
@@ -648,14 +648,14 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
   },
   statusDotActive: {
     backgroundColor: '#F59E0B',
   },
   statusText: {
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     fontFamily: sfProDisplayMedium,
   },
   content: {
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '700' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 8,
     fontFamily: sfProDisplayBold,
   },
@@ -705,16 +705,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   promptText: {
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontWeight: '500' as const,
     fontFamily: sfProDisplayMedium,
   },
@@ -740,7 +745,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userAvatar: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#2563EB',
   },
   messageBubble: {
     maxWidth: '75%',
@@ -749,21 +754,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userBubble: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
     borderBottomRightRadius: 6,
   },
   assistantBubble: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#F5F5F5',
     borderBottomLeftRadius: 6,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
   },
   markdownContainer: {
     flexShrink: 1,
   },
   messageText: {
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     lineHeight: 22,
     fontFamily: sfProDisplayRegular,
   },
@@ -777,11 +782,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#27272A',
+    borderTopColor: '#E5E5E5',
   },
   toolResultText: {
     fontSize: 13,
-    color: '#10B981',
+    color: '#2563EB',
     fontStyle: 'italic',
     fontFamily: sfProDisplayRegular,
   },
@@ -794,19 +799,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#F5F5F5',
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 20,
     borderBottomLeftRadius: 6,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
   },
   typingDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
   },
   inputContainer: {
     position: 'absolute',
@@ -815,17 +820,17 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
     paddingBottom: Platform.OS === 'ios' ? 90 : 80,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#1C1C1E',
+    borderTopColor: '#E5E5E5',
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    backgroundColor: '#18181B',
+    backgroundColor: '#F5F5F5',
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
     paddingLeft: 16,
     paddingRight: 6,
     paddingVertical: 6,
@@ -833,7 +838,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     maxHeight: 100,
     paddingVertical: 8,
     fontFamily: sfProDisplayRegular,
@@ -842,11 +847,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: '#27272A',
+    backgroundColor: '#D4D4D4',
   },
 });

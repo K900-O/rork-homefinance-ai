@@ -16,9 +16,8 @@ import { Sparkles, TrendingDown, TrendingUp, Target, CheckCircle, Circle, Zap, C
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import type { OptimizationSuggestion } from '@/constants/types';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
-import { LinearGradient } from 'expo-linear-gradient';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -134,10 +133,10 @@ export default function OptimizerScreen() {
             activeOpacity={0.8}
           >
             {isOptimizing ? (
-              <ActivityIndicator color="#000" size="small" />
+              <ActivityIndicator color="#FFF" size="small" />
             ) : (
               <>
-                <Sparkles color="#000" size={20} />
+                <Sparkles color="#FFF" size={20} />
                 <Text style={styles.optimizeButtonText}>
                   {optimizations.length > 0 ? 'Re-analyze' : 'Optimize'}
                 </Text>
@@ -149,22 +148,22 @@ export default function OptimizerScreen() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {isOptimizing && (
             <View style={styles.loadingCard}>
-              <ActivityIndicator size="large" color="#FFFFFF" />
+              <ActivityIndicator size="large" color="#2563EB" />
               <Text style={styles.loadingTitle}>Analyzing Your Finances</Text>
               <Text style={styles.loadingText}>
                 Our AI is examining your spending patterns, income, and goals to generate personalized recommendations...
               </Text>
               <View style={styles.loadingSteps}>
                 <View style={styles.loadingStep}>
-                  <CheckCircle color={AppColors.success} size={16} />
+                  <CheckCircle color="#2563EB" size={16} />
                   <Text style={styles.loadingStepText}>Analyzing transactions</Text>
                 </View>
                 <View style={styles.loadingStep}>
-                  <CheckCircle color={AppColors.success} size={16} />
+                  <CheckCircle color="#2563EB" size={16} />
                   <Text style={styles.loadingStepText}>Identifying patterns</Text>
                 </View>
                 <View style={styles.loadingStep}>
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <ActivityIndicator size="small" color="#2563EB" />
                   <Text style={styles.loadingStepText}>Generating recommendations</Text>
                 </View>
               </View>
@@ -173,12 +172,6 @@ export default function OptimizerScreen() {
 
           {report && !isOptimizing && (
             <View style={styles.summaryCard}>
-              <LinearGradient
-                  colors={['#18181B', '#09090B']}
-                  style={StyleSheet.absoluteFill}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-              />
               <View style={styles.summaryHeader}>
                 <Zap color="#F59E0B" size={28} fill="#F59E0B" />
                 <View style={{ flex: 1 }}>
@@ -188,17 +181,17 @@ export default function OptimizerScreen() {
               </View>
               <View style={styles.summaryMetrics}>
                 <View style={styles.summaryMetric}>
-                  <TrendingDown color={AppColors.success} size={24} />
+                  <TrendingDown color="#2563EB" size={24} />
                   <Text style={styles.summaryMetricLabel}>Monthly Savings</Text>
-                  <Text style={[styles.summaryMetricValue, { color: AppColors.success }]}>
+                  <Text style={[styles.summaryMetricValue, { color: '#2563EB' }]}>
                     JD {report.totalSavings.toFixed(0)}
                   </Text>
                 </View>
                 <View style={styles.summaryDivider} />
                 <View style={styles.summaryMetric}>
-                  <TrendingUp color="#FFFFFF" size={24} />
+                  <TrendingUp color="#1D4ED8" size={24} />
                   <Text style={styles.summaryMetricLabel}>Income Growth</Text>
-                  <Text style={[styles.summaryMetricValue, { color: '#FFFFFF' }]}>
+                  <Text style={[styles.summaryMetricValue, { color: '#1D4ED8' }]}>
                     JD {report.totalIncome.toFixed(0)}
                   </Text>
                 </View>
@@ -218,7 +211,7 @@ export default function OptimizerScreen() {
           {optimizations.length === 0 && !isOptimizing ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconContainer}>
-                <Sparkles color="#FFFFFF" size={48} />
+                <Sparkles color="#2563EB" size={48} />
               </View>
               <Text style={styles.emptyTitle}>Ready to Optimize?</Text>
               <Text style={styles.emptyText}>
@@ -233,7 +226,7 @@ export default function OptimizerScreen() {
           {expenseReductions.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <TrendingDown color={AppColors.success} size={24} />
+                <TrendingDown color="#2563EB" size={24} />
                 <Text style={styles.sectionTitle}>Expense Reduction</Text>
               </View>
               {expenseReductions.map(suggestion => (
@@ -251,7 +244,7 @@ export default function OptimizerScreen() {
           {incomeIncreases.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <TrendingUp color="#FFFFFF" size={24} />
+                <TrendingUp color="#1D4ED8" size={24} />
                 <Text style={styles.sectionTitle}>Income Opportunities</Text>
               </View>
               {incomeIncreases.map(suggestion => (
@@ -269,7 +262,7 @@ export default function OptimizerScreen() {
           {savingsBoosts.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Target color="#A1A1AA" size={24} />
+                <Target color="#71717A" size={24} />
                 <Text style={styles.sectionTitle}>Savings Boost</Text>
               </View>
               {savingsBoosts.map(suggestion => (
@@ -323,10 +316,10 @@ function OptimizationCard({
     ? AppColors.danger 
     : suggestion.priority === 'medium' 
     ? AppColors.warning 
-    : '#A1A1AA';
+    : '#71717A';
 
   const difficultyColor = suggestion.implementationDifficulty === 'easy'
-    ? AppColors.success
+    ? '#2563EB'
     : suggestion.implementationDifficulty === 'moderate'
     ? AppColors.warning
     : AppColors.danger;
@@ -340,7 +333,7 @@ function OptimizationCard({
       <View style={styles.cardHeader}>
         <View style={styles.cardHeaderLeft}>
           {suggestion.implemented ? (
-            <CheckCircle color={AppColors.success} size={24} />
+            <CheckCircle color="#2563EB" size={24} />
           ) : (
             <Circle color={priorityColor} size={24} />
           )}
@@ -356,7 +349,7 @@ function OptimizationCard({
               </View>
               {suggestion.potentialSavings && suggestion.potentialSavings > 0 && (
                 <View style={styles.savingsBadge}>
-                  <TrendingDown color={AppColors.success} size={14} />
+                  <TrendingDown color="#2563EB" size={14} />
                   <Text style={styles.savingsBadgeText}>
                     JD {suggestion.potentialSavings.toFixed(0)}
                   </Text>
@@ -364,7 +357,7 @@ function OptimizationCard({
               )}
               {suggestion.potentialIncome && suggestion.potentialIncome > 0 && (
                 <View style={styles.incomeBadge}>
-                  <TrendingUp color="#FFFFFF" size={14} />
+                  <TrendingUp color="#1D4ED8" size={14} />
                   <Text style={styles.incomeBadgeText}>
                     JD {suggestion.potentialIncome.toFixed(0)}
                   </Text>
@@ -381,7 +374,7 @@ function OptimizationCard({
         <View style={styles.cardExpanded}>
           <View style={styles.cardMetaRow}>
             <View style={styles.cardMetaItem}>
-              <Clock color="#A1A1AA" size={16} />
+              <Clock color="#71717A" size={16} />
               <Text style={styles.cardMetaText}>{suggestion.timeframe}</Text>
             </View>
             <View style={styles.cardMetaItem}>
@@ -409,7 +402,7 @@ function OptimizationCard({
               onPress={onMarkImplemented}
               activeOpacity={0.8}
             >
-              <CheckCircle color="#000" size={20} />
+              <CheckCircle color="#FFF" size={20} />
               <Text style={styles.implementButtonText}>Mark as Implemented</Text>
             </TouchableOpacity>
           )}
@@ -422,7 +415,7 @@ function OptimizationCard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -435,29 +428,29 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   optimizeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
   },
   optimizeButtonText: {
-    fontFamily: fontFamily,
-    color: '#000000',
+    fontFamily: sfProDisplayBold,
+    color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
   },
@@ -470,8 +463,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#333',
-    overflow: 'hidden',
+    borderColor: '#E5E5E5',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -480,10 +478,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   summaryTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   summaryMetrics: {
     flexDirection: 'row',
@@ -495,73 +493,73 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   summaryMetricLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     textAlign: 'center',
   },
   summaryMetricValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
   },
   summaryDivider: {
     width: 1,
-    backgroundColor: '#333',
+    backgroundColor: '#E5E5E5',
     marginHorizontal: 16,
   },
   summarySubtitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginTop: 2,
   },
   summaryTotal: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#DBEAFE',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
   },
   summaryTotalLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#1D4ED8',
     marginBottom: 6,
   },
   summaryTotalValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#2563EB',
   },
   summaryTotalSubtext: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#1D4ED8',
     marginTop: 6,
   },
   loadingCard: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     margin: 20,
     marginBottom: 0,
     borderRadius: 20,
     padding: 32,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   loadingTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginTop: 16,
     marginBottom: 8,
   },
   loadingText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
@@ -576,52 +574,52 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingStepText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   emptyState: {
     alignItems: 'center',
     padding: 40,
     margin: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FAFAFA',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   emptyIconContainer: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#27272A',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
   },
   emptyTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 24,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 12,
   },
   emptyText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 15,
-    color: '#A1A1AA',
+    color: '#71717A',
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 24,
   },
   emptyButtonText: {
-    fontFamily: fontFamily,
-    color: '#000000',
+    fontFamily: sfProDisplayBold,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
@@ -635,22 +633,27 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   card: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   cardImplemented: {
     opacity: 0.7,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FAFAFA',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -667,10 +670,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 8,
   },
   cardTitleImplemented: {
@@ -688,7 +691,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   priorityBadgeText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 10,
     fontWeight: '700',
   },
@@ -696,43 +699,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+    backgroundColor: '#DBEAFE',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   savingsBadgeText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '700',
-    color: AppColors.success,
+    color: '#2563EB',
   },
   incomeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   incomeBadgeText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1D4ED8',
   },
   cardDescription: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     lineHeight: 20,
   },
   cardExpanded: {
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: '#E5E5E5',
   },
   cardMetaRow: {
     flexDirection: 'row',
@@ -745,18 +748,18 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   cardMetaText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   actionItemsContainer: {
     marginBottom: 16,
   },
   actionItemsTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 12,
   },
   actionItem: {
@@ -769,14 +772,14 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     marginTop: 6,
   },
   actionItemText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     flex: 1,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#71717A',
     lineHeight: 18,
   },
   implementButton: {
@@ -784,13 +787,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     paddingVertical: 12,
     borderRadius: 12,
   },
   implementButtonText: {
-    fontFamily: fontFamily,
-    color: '#000000',
+    fontFamily: sfProDisplayBold,
+    color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
   },

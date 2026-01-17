@@ -13,11 +13,10 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, Plus, Filter, Wallet, AlertTriangle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
-import { AppColors } from '@/constants/colors';
 import type { Transaction, TransactionType, TransactionCategory, BudgetCategory, PlannedTransaction, RecurrenceType } from '@/constants/types';
 import AddTransactionModal from '@/components/AddTransactionModal';
 import AddPlannedTransactionModal from '@/components/AddPlannedTransactionModal';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -201,7 +200,6 @@ export default function TransactionsScreen() {
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Planned Transactions Section */}
           {plannedTransactions.filter(p => p.isActive).length > 0 && (
             <View style={styles.plannedSection}>
               <TouchableOpacity 
@@ -211,7 +209,7 @@ export default function TransactionsScreen() {
               >
                 <View style={styles.plannedHeaderLeft}>
                   <View style={styles.plannedIconBg}>
-                    <CalendarClock size={16} color="#3B82F6" />
+                    <CalendarClock size={16} color="#2563EB" />
                   </View>
                   <Text style={styles.plannedTitle}>Planned</Text>
                   <View style={styles.plannedBadge}>
@@ -224,7 +222,7 @@ export default function TransactionsScreen() {
                   style={styles.addPlannedBtn}
                   onPress={() => setShowPlannedModal(true)}
                 >
-                  <Plus size={16} color="#3B82F6" />
+                  <Plus size={16} color="#2563EB" />
                 </TouchableOpacity>
               </TouchableOpacity>
               
@@ -246,7 +244,7 @@ export default function TransactionsScreen() {
           {groupedTransactions.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconContainer}>
-                <Wallet color="#333" size={48} />
+                <Wallet color="#2563EB" size={48} />
               </View>
               <Text style={styles.emptyStateTitle}>No transactions found</Text>
               <Text style={styles.emptyStateText}>
@@ -340,7 +338,7 @@ function PlannedItem({ planned, onProcess, onDelete }: PlannedItemProps) {
           isIncome ? styles.plannedIconIncome : styles.plannedIconExpense
         ]}>
           {isIncome ? (
-            <TrendingUp size={16} color="#10B981" />
+            <TrendingUp size={16} color="#2563EB" />
           ) : (
             <TrendingDown size={16} color="#EF4444" />
           )}
@@ -370,7 +368,7 @@ function PlannedItem({ planned, onProcess, onDelete }: PlannedItemProps) {
         <View style={styles.plannedActions}>
           {isToday && (
             <TouchableOpacity style={styles.processBtn} onPress={onProcess}>
-              <Play size={12} color="#10B981" />
+              <Play size={12} color="#2563EB" />
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
@@ -387,7 +385,7 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'safe': return '#10B981';
+      case 'safe': return '#2563EB';
       case 'warning': return '#F59E0B';
       case 'danger': return '#EF4444';
       case 'exceeded': return '#DC2626';
@@ -399,9 +397,9 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
     <TouchableOpacity style={styles.transactionItem} activeOpacity={0.7}>
       <View style={[styles.transactionIcon]}>
         {isIncome ? (
-          <ArrowDownLeft color="#10B981" size={20} />
+          <ArrowDownLeft color="#2563EB" size={20} />
         ) : (
-          <ArrowUpRight color="#FFFFFF" size={20} />
+          <ArrowUpRight color="#EF4444" size={20} />
         )}
       </View>
       <View style={styles.transactionDetails}>
@@ -441,7 +439,7 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -454,13 +452,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   addButton: {
-    shadowColor: '#3B82F6',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -483,13 +481,13 @@ const styles = StyleSheet.create({
   budgetChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: '#F5F5F5',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     gap: 6,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
   },
   budgetChipExceeded: {
     backgroundColor: 'rgba(220, 38, 38, 0.1)',
@@ -509,13 +507,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   budgetChipName: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     fontWeight: '500',
   },
   budgetChipPercent: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     color: '#71717A',
     fontWeight: '600',
@@ -533,29 +531,27 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(24, 24, 27, 0.6)',
+    backgroundColor: '#F5F5F5',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   searchInput: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     flex: 1,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   filterIconButton: {
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: 'rgba(24, 24, 27, 0.6)',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#333',
   },
   filterContainer: {
     marginBottom: 24,
@@ -568,22 +564,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: 'rgba(24, 24, 27, 0.6)',
+    backgroundColor: '#F5F5F5',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   filterButtonActive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
   },
   filterButtonText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   filterButtonTextActive: {
-    color: '#000000',
+    color: '#FFFFFF',
   },
   content: {
     flex: 1,
@@ -598,24 +594,22 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#18181B',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#333',
   },
   emptyStateTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 8,
   },
   emptyStateText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     textAlign: 'center',
   },
   transactionGroup: {
@@ -629,18 +623,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   dateText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#A1A1AA',
+    color: '#71717A',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   dateAmount: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   transactionsList: {
     paddingHorizontal: 20,
@@ -649,11 +643,16 @@ const styles = StyleSheet.create({
   transactionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   transactionIcon: {
     width: 48,
@@ -662,16 +661,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
   },
   transactionDetails: {
     flex: 1,
   },
   transactionDescription: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   transactionMeta: {
@@ -680,56 +679,56 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   transactionCategory: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   dotSeparator: {
-      fontFamily: fontFamily,
+      fontFamily: sfProDisplayRegular,
       fontSize: 13,
-      color: '#333',
+      color: '#D4D4D4',
       marginHorizontal: 6,
   },
   budgetIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#F5F5F5',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
   },
   budgetIndicatorText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 11,
     fontWeight: '500',
   },
   transactionTime: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#52525B',
+    color: '#A1A1AA',
     marginTop: 2,
   },
   transactionAmountContainer: {
     alignItems: 'flex-end',
   },
   transactionAmount: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   incomeText: {
-    color: AppColors.success,
+    color: '#2563EB',
   },
   plannedSection: {
     marginHorizontal: 20,
     marginBottom: 24,
-    backgroundColor: 'rgba(24, 24, 27, 0.6)',
+    backgroundColor: '#FAFAFA',
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   plannedHeader: {
     flexDirection: 'row',
@@ -746,33 +745,33 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
   },
   plannedTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   plannedBadge: {
-    backgroundColor: '#27272A',
+    backgroundColor: '#DBEAFE',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
   },
   plannedBadgeText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '600',
-    color: '#3B82F6',
+    color: '#2563EB',
   },
   addPlannedBtn: {
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -784,9 +783,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#27272A',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   plannedItemLeft: {
     flexDirection: 'row',
@@ -802,19 +803,19 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   plannedIconIncome: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: '#DBEAFE',
   },
   plannedIconExpense: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: '#FEE2E2',
   },
   plannedInfo: {
     flex: 1,
   },
   plannedName: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 2,
   },
   plannedMeta: {
@@ -823,19 +824,19 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   plannedRecurrence: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 11,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   plannedMetaDot: {
-    fontFamily: fontFamily,
-    fontSize: 11,
-    color: '#52525B',
-  },
-  plannedDate: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 11,
     color: '#A1A1AA',
+  },
+  plannedDate: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 11,
+    color: '#71717A',
   },
   plannedDateToday: {
     color: '#F59E0B',
@@ -845,13 +846,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   plannedAmount: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 4,
   },
   plannedAmountIncome: {
-    color: '#10B981',
+    color: '#2563EB',
   },
   plannedAmountExpense: {
     color: '#EF4444',
@@ -864,7 +865,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -872,7 +873,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#333',
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
   },

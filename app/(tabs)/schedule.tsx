@@ -42,7 +42,6 @@ export default function ScheduleScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
@@ -127,19 +126,19 @@ export default function ScheduleScreen() {
             style={styles.addButton}
             onPress={() => setShowAddModal(true)}
           >
-            <Plus color="#000" size={20} />
+            <Plus color="#FFF" size={20} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.monthNavigation}>
           <TouchableOpacity onPress={goToPreviousWeek} style={styles.navButton}>
-            <ChevronLeft color="#FFF" size={24} />
+            <ChevronLeft color="#2563EB" size={24} />
           </TouchableOpacity>
           <Text style={styles.monthTitle}>
             {MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}
           </Text>
           <TouchableOpacity onPress={goToNextWeek} style={styles.navButton}>
-            <ChevronRight color="#FFF" size={24} />
+            <ChevronRight color="#2563EB" size={24} />
           </TouchableOpacity>
         </View>
 
@@ -170,7 +169,7 @@ export default function ScheduleScreen() {
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
         >
           <View style={styles.dateHeader}>
             <Text style={styles.selectedDateText}>
@@ -196,7 +195,7 @@ export default function ScheduleScreen() {
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Clock size={48} color="#333" />
+                <Clock size={48} color="#A1A1AA" />
                 <Text style={styles.emptyStateText}>No activities scheduled</Text>
                 <Text style={styles.emptyStateSubtext}>Tap + to add an activity</Text>
               </View>
@@ -259,9 +258,9 @@ function ScheduleActivityItem({
           </Text>
           <TouchableOpacity onPress={onComplete}>
             {isCompleted ? (
-              <CheckCircle2 size={24} color="#10B981" fill="#10B981" />
+              <CheckCircle2 size={24} color="#2563EB" fill="#2563EB" />
             ) : (
-              <Circle size={24} color="#52525B" />
+              <Circle size={24} color="#A1A1AA" />
             )}
           </TouchableOpacity>
         </View>
@@ -290,7 +289,7 @@ function ScheduleActivityItem({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -306,13 +305,13 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   addButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -327,7 +326,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -335,7 +334,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   weekContainer: {
     flexDirection: 'row',
@@ -349,10 +348,10 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: '#F5F5F5',
   },
   dayItemSelected: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
   },
   dayItemToday: {
     borderWidth: 2,
@@ -365,26 +364,26 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   dayNameSelected: {
-    color: '#000',
+    color: '#FFFFFF',
   },
   dayNumber: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   dayNumberSelected: {
-    color: '#000',
+    color: '#FFFFFF',
   },
   activityDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
     marginTop: 4,
   },
   activityDotSelected: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
@@ -397,7 +396,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   activityCount: {
@@ -421,7 +420,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayMedium,
     fontSize: 13,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   timeTextEnd: {
     fontFamily: sfProDisplayRegular,
@@ -442,15 +441,22 @@ const styles = StyleSheet.create({
     top: 16,
     bottom: -20,
     width: 2,
-    backgroundColor: '#27272A',
+    backgroundColor: '#E5E5E5',
   },
   activityCard: {
     flex: 1,
     marginLeft: 16,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   activityHeader: {
     flexDirection: 'row',
@@ -462,7 +468,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     flex: 1,
     marginRight: 12,
   },
@@ -473,7 +479,7 @@ const styles = StyleSheet.create({
   activityDescription: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 12,
   },
   activityFooter: {
@@ -512,6 +518,6 @@ const styles = StyleSheet.create({
   emptyStateSubtext: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#52525B',
+    color: '#A1A1AA',
   },
 });

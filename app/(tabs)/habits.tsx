@@ -55,7 +55,6 @@ export default function HabitsScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'good' | 'bad'>('good');
 
-  // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
@@ -147,7 +146,7 @@ export default function HabitsScreen() {
             style={styles.addButton}
             onPress={() => setShowAddModal(true)}
           >
-            <Plus color="#000" size={20} />
+            <Plus color="#FFF" size={20} />
           </TouchableOpacity>
         </View>
 
@@ -156,7 +155,7 @@ export default function HabitsScreen() {
             style={[styles.tab, activeTab === 'good' && styles.tabActiveGood]}
             onPress={() => switchTab('good')}
           >
-            <TrendingUp size={18} color={activeTab === 'good' ? '#000' : '#71717A'} />
+            <TrendingUp size={18} color={activeTab === 'good' ? '#FFF' : '#71717A'} />
             <Text style={[styles.tabText, activeTab === 'good' && styles.tabTextActiveGood]}>
               Good Habits
             </Text>
@@ -172,7 +171,7 @@ export default function HabitsScreen() {
             style={[styles.tab, activeTab === 'bad' && styles.tabActiveBad]}
             onPress={() => switchTab('bad')}
           >
-            <Shield size={18} color={activeTab === 'bad' ? '#000' : '#71717A'} />
+            <Shield size={18} color={activeTab === 'bad' ? '#FFF' : '#71717A'} />
             <Text style={[styles.tabText, activeTab === 'bad' && styles.tabTextActiveBad]}>
               Breaking
             </Text>
@@ -189,13 +188,13 @@ export default function HabitsScreen() {
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
         >
           {activeTab === 'good' ? (
             <>
               <View style={styles.statsRow}>
                 <View style={styles.statCard}>
-                  <View style={[styles.statIcon, { backgroundColor: '#F59E0B20' }]}>
+                  <View style={[styles.statIcon, { backgroundColor: '#FEF3C7' }]}>
                     <Flame size={20} color="#F59E0B" />
                   </View>
                   <Text style={styles.statValue}>{totalGoodStreak}</Text>
@@ -203,15 +202,15 @@ export default function HabitsScreen() {
                 </View>
                 
                 <View style={styles.statCard}>
-                  <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
-                    <TrendingUp size={20} color="#10B981" />
+                  <View style={[styles.statIcon, { backgroundColor: '#DBEAFE' }]}>
+                    <TrendingUp size={20} color="#2563EB" />
                   </View>
                   <Text style={styles.statValue}>{goodCompletionRate}%</Text>
                   <Text style={styles.statLabel}>Today</Text>
                 </View>
                 
                 <View style={styles.statCard}>
-                  <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
+                  <View style={[styles.statIcon, { backgroundColor: '#EDE9FE' }]}>
                     <Trophy size={20} color="#8B5CF6" />
                   </View>
                   <Text style={styles.statValue}>{longestGoodStreak}</Text>
@@ -227,7 +226,7 @@ export default function HabitsScreen() {
 
                 <View style={styles.progressBar}>
                   <LinearGradient
-                    colors={['#10B981', '#059669']}
+                    colors={['#3B82F6', '#2563EB']}
                     style={[styles.progressFill, { width: `${goodCompletionRate}%` }]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
@@ -248,7 +247,7 @@ export default function HabitsScreen() {
                   ))
                 ) : (
                   <View style={styles.emptyState}>
-                    <TrendingUp size={48} color="#10B981" />
+                    <TrendingUp size={48} color="#2563EB" />
                     <Text style={styles.emptyStateText}>No good habits yet</Text>
                     <Text style={styles.emptyStateSubtext}>Start building positive habits</Text>
                     <TouchableOpacity 
@@ -265,23 +264,23 @@ export default function HabitsScreen() {
             <>
               <View style={styles.statsRow}>
                 <View style={styles.statCard}>
-                  <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
-                    <Shield size={20} color="#10B981" />
+                  <View style={[styles.statIcon, { backgroundColor: '#DBEAFE' }]}>
+                    <Shield size={20} color="#2563EB" />
                   </View>
                   <Text style={styles.statValue}>{totalDaysClean}</Text>
                   <Text style={styles.statLabel}>Days Clean</Text>
                 </View>
                 
                 <View style={styles.statCard}>
-                  <View style={[styles.statIcon, { backgroundColor: '#3B82F620' }]}>
-                    <Calendar size={20} color="#3B82F6" />
+                  <View style={[styles.statIcon, { backgroundColor: '#DBEAFE' }]}>
+                    <Calendar size={20} color="#2563EB" />
                   </View>
                   <Text style={styles.statValue}>{longestCleanStreak}</Text>
                   <Text style={styles.statLabel}>Best Streak</Text>
                 </View>
                 
                 <View style={styles.statCard}>
-                  <View style={[styles.statIcon, { backgroundColor: '#EF444420' }]}>
+                  <View style={[styles.statIcon, { backgroundColor: '#FEE2E2' }]}>
                     <AlertTriangle size={20} color="#EF4444" />
                   </View>
                   <Text style={styles.statValue}>{totalRelapses}</Text>
@@ -369,9 +368,9 @@ function GoodHabitCard({
           onPress={onComplete}
         >
           {isCompleted ? (
-            <CheckCircle2 size={28} color="#10B981" fill="#10B981" />
+            <CheckCircle2 size={28} color="#2563EB" fill="#2563EB" />
           ) : (
-            <Circle size={28} color="#52525B" />
+            <Circle size={28} color="#A1A1AA" />
           )}
         </TouchableOpacity>
         
@@ -466,7 +465,7 @@ function BadHabitCard({
       <View style={styles.badProgressContainer}>
         <View style={styles.badProgressBar}>
           <LinearGradient
-            colors={['#10B981', '#059669']}
+            colors={['#3B82F6', '#2563EB']}
             style={[styles.badProgressFill, { width: `${progress}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -495,7 +494,7 @@ function BadHabitCard({
           onPress={onLogSuccess}
           disabled={isSuccessToday}
         >
-          <CheckCircle2 size={16} color={isSuccessToday ? "#000" : "#10B981"} />
+          <CheckCircle2 size={16} color={isSuccessToday ? "#FFF" : "#2563EB"} />
           <Text style={[styles.successButtonText, isSuccessToday && styles.successButtonTextActive]}>
             {isSuccessToday ? 'Success Logged!' : 'Log Success'}
           </Text>
@@ -513,7 +512,7 @@ function BadHabitCard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -529,13 +528,13 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   addButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -554,13 +553,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: '#18181B',
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   tabActiveGood: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
   },
   tabActiveBad: {
     backgroundColor: '#EF4444',
+    borderColor: '#EF4444',
   },
   tabText: {
     fontFamily: sfProDisplayMedium,
@@ -569,22 +572,22 @@ const styles = StyleSheet.create({
     color: '#71717A',
   },
   tabTextActiveGood: {
-    color: '#000',
+    color: '#FFF',
   },
   tabTextActiveBad: {
-    color: '#000',
+    color: '#FFF',
   },
   tabBadge: {
-    backgroundColor: '#27272A',
+    backgroundColor: '#E5E5E5',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
   },
   tabBadgeActiveGood: {
-    backgroundColor: '#05966930',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   tabBadgeActiveBad: {
-    backgroundColor: '#DC262630',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   tabBadgeText: {
     fontFamily: sfProDisplayBold,
@@ -593,7 +596,7 @@ const styles = StyleSheet.create({
     color: '#71717A',
   },
   tabBadgeTextActive: {
-    color: '#000',
+    color: '#FFF',
   },
   content: {
     flex: 1,
@@ -606,10 +609,17 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   statIcon: {
     width: 40,
@@ -623,7 +633,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 24,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   statLabel: {
@@ -645,17 +655,17 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   progressText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#2563EB',
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -667,15 +677,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 24,
     padding: 16,
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#EF4444',
+    borderLeftColor: '#2563EB',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   motivationText: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     fontStyle: 'italic',
   },
   habitsList: {
@@ -684,10 +696,17 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   habitCard: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 20,
     borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   habitMain: {
     flexDirection: 'row',
@@ -705,7 +724,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 8,
   },
   habitTitleCompleted: {
@@ -748,7 +767,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#27272A',
+    borderTopColor: '#E5E5E5',
   },
   weekDay: {
     alignItems: 'center',
@@ -764,14 +783,21 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
   },
   badHabitCard: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 20,
     borderLeftWidth: 4,
     borderLeftColor: '#EF4444',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   badHabitHeader: {
     flexDirection: 'row',
@@ -788,7 +814,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#EF444420',
+    backgroundColor: '#FEE2E2',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -800,7 +826,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   badHabitCategory: {
@@ -812,7 +838,7 @@ const styles = StyleSheet.create({
   daysCleanSection: {
     alignItems: 'center',
     paddingVertical: 20,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FAFAFA',
     borderRadius: 16,
     marginBottom: 16,
   },
@@ -826,12 +852,12 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 56,
     fontWeight: '700',
-    color: '#10B981',
+    color: '#2563EB',
   },
   milestoneLabel: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginTop: 4,
   },
   badProgressContainer: {
@@ -839,7 +865,7 @@ const styles = StyleSheet.create({
   },
   badProgressBar: {
     height: 6,
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 8,
@@ -851,12 +877,12 @@ const styles = StyleSheet.create({
   badProgressText: {
     fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#52525B',
+    color: '#71717A',
     textAlign: 'center',
   },
   badHabitStats: {
     flexDirection: 'row',
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FAFAFA',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -867,13 +893,13 @@ const styles = StyleSheet.create({
   },
   badStatDivider: {
     width: 1,
-    backgroundColor: '#27272A',
+    backgroundColor: '#E5E5E5',
   },
   badStatValue: {
     fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   badStatLabel: {
@@ -889,9 +915,9 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: '#EF444420',
+    backgroundColor: '#FEE2E2',
     borderWidth: 1,
-    borderColor: '#EF444440',
+    borderColor: '#FECACA',
   },
   relapseButtonText: {
     fontFamily: sfProDisplayBold,
@@ -911,22 +937,22 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: '#10B98120',
+    backgroundColor: '#DBEAFE',
     borderWidth: 1,
-    borderColor: '#10B98140',
+    borderColor: '#BFDBFE',
   },
   successButtonActive: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
   },
   successButtonText: {
     fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#2563EB',
   },
   successButtonTextActive: {
-    color: '#000',
+    color: '#FFF',
   },
   emptyState: {
     alignItems: 'center',
@@ -943,11 +969,11 @@ const styles = StyleSheet.create({
   emptyStateSubtext: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#52525B',
+    color: '#A1A1AA',
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2563EB',
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 12,
@@ -959,6 +985,6 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFF',
   },
 });

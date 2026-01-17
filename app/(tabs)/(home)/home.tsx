@@ -63,7 +63,7 @@ export default function HomeScreen() {
         style={styles.content}
         contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#37C126" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <View style={styles.header}>
@@ -93,7 +93,7 @@ export default function HomeScreen() {
             </View>
 
             <LinearGradient
-              colors={['#37C126', '#299F1A']}
+              colors={['#2563EB', '#1D4ED8']}
               style={styles.card}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -145,7 +145,7 @@ export default function HomeScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Upcoming</Text>
               <TouchableOpacity style={styles.addPlannedButton} onPress={() => setShowPlannedModal(true)}>
-                <CalendarClock size={16} color="#37C126" />
+                <CalendarClock size={16} color="#2563EB" />
                 <Text style={styles.addPlannedText}>Plan</Text>
               </TouchableOpacity>
             </View>
@@ -161,7 +161,7 @@ export default function HomeScreen() {
                     <Text style={styles.projectedValue}>{projectedBalance.currentBalance.toFixed(0)} USD</Text>
                   </View>
                   <View style={styles.projectedItem}>
-                    <TrendingUp size={14} color="#37C126" />
+                    <TrendingUp size={14} color="#2563EB" />
                     <Text style={styles.projectedIncomeValue}>+{projectedBalance.projectedIncome.toFixed(0)}</Text>
                   </View>
                   <View style={styles.projectedItem}>
@@ -205,7 +205,7 @@ export default function HomeScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Budgets</Text>
               <TouchableOpacity style={styles.addBudgetButton} onPress={() => setShowBudgetModal(true)}>
-                <Plus size={16} color="#37C126" />
+                <Plus size={16} color="#2563EB" />
                 <Text style={styles.addBudgetText}>Add</Text>
               </TouchableOpacity>
             </View>
@@ -239,7 +239,7 @@ export default function HomeScreen() {
             {budgetRules.length > 0 && (
               <View style={styles.rulesPreview}>
                 <View style={styles.rulesHeader}>
-                  <Shield size={16} color="#37C126" />
+                  <Shield size={16} color="#2563EB" />
                   <Text style={styles.rulesTitle}>{budgetRules.length} Active Rules</Text>
                 </View>
                 <View style={styles.rulesList}>
@@ -302,7 +302,7 @@ export default function HomeScreen() {
 function BudgetItem({ status }: { status: BudgetStatus }) {
   const getStatusColor = () => {
     switch (status.status) {
-      case 'safe': return '#37C126';
+      case 'safe': return '#2563EB';
       case 'warning': return '#F59E0B';
       case 'danger': return '#EF4444';
       case 'exceeded': return '#DC2626';
@@ -312,7 +312,7 @@ function BudgetItem({ status }: { status: BudgetStatus }) {
 
   const getStatusIcon = () => {
     switch (status.status) {
-      case 'safe': return <CheckCircle size={16} color="#37C126" />;
+      case 'safe': return <CheckCircle size={16} color="#2563EB" />;
       case 'warning': return <AlertTriangle size={16} color="#F59E0B" />;
       case 'danger':
       case 'exceeded': return <AlertTriangle size={16} color="#EF4444" />;
@@ -422,7 +422,7 @@ function PlannedTransactionItem({ planned, onProcess, onDelete }: PlannedTransac
           isIncome ? styles.plannedIconIncome : styles.plannedIconExpense
         ]}>
           {isIncome ? (
-            <TrendingUp size={18} color="#37C126" />
+            <TrendingUp size={18} color="#2563EB" />
           ) : (
             <TrendingDown size={18} color="#EF4444" />
           )}
@@ -452,7 +452,7 @@ function PlannedTransactionItem({ planned, onProcess, onDelete }: PlannedTransac
         <View style={styles.plannedActions}>
           {isToday && (
             <TouchableOpacity style={styles.processButton} onPress={onProcess}>
-              <Play size={14} color="#37C126" />
+              <Play size={14} color="#2563EB" />
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
@@ -507,10 +507,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#37C126',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#37C126',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     padding: 24,
     position: 'relative',
     overflow: 'hidden',
-    shadowColor: '#37C126',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16,
@@ -712,10 +712,10 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#37C126',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#37C126',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#E8F8E6',
+    backgroundColor: '#DBEAFE',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -738,7 +738,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 13,
     fontWeight: '600' as const,
-    color: '#37C126',
+    color: '#2563EB',
   },
   rewardsBar: {
     flexDirection: 'row',
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
   },
   rulesPreview: {
     marginTop: 16,
-    backgroundColor: '#E8F8E6',
+    backgroundColor: '#DBEAFE',
     borderRadius: 12,
     padding: 14,
   },
@@ -888,7 +888,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#37C126',
+    color: '#2563EB',
   },
   rulesList: {
     gap: 8,
@@ -910,12 +910,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F59E0B',
   },
   flexibleDot: {
-    backgroundColor: '#37C126',
+    backgroundColor: '#2563EB',
   },
   ruleName: {
     fontFamily,
     fontSize: 13,
-    color: '#52525B',
+    color: '#1D4ED8',
     flex: 1,
   },
   plannedSection: {
@@ -926,7 +926,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#E8F8E6',
+    backgroundColor: '#DBEAFE',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 13,
     fontWeight: '600' as const,
-    color: '#37C126',
+    color: '#2563EB',
   },
   projectedCard: {
     backgroundColor: '#FFFFFF',
@@ -984,7 +984,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#37C126',
+    color: '#2563EB',
   },
   projectedExpenseValue: {
     fontFamily,
@@ -1011,7 +1011,7 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
   },
   positiveBalance: {
-    color: '#37C126',
+    color: '#2563EB',
   },
   negativeBalance: {
     color: '#EF4444',
@@ -1048,7 +1048,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   plannedIconIncome: {
-    backgroundColor: '#E8F8E6',
+    backgroundColor: '#DBEAFE',
   },
   plannedIconExpense: {
     backgroundColor: '#FEE2E2',
@@ -1097,7 +1097,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   incomeAmount: {
-    color: '#37C126',
+    color: '#2563EB',
   },
   expenseAmount: {
     color: '#EF4444',
@@ -1110,7 +1110,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#E8F8E6',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
   },

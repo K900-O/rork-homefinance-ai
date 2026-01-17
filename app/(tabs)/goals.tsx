@@ -14,7 +14,7 @@ import type { SavingsGoal } from '@/constants/types';
 import AddGoalModal from '@/components/AddGoalModal';
 import AddContributionModal from '@/components/AddContributionModal';
 import { LinearGradient } from 'expo-linear-gradient';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 
 export default function GoalsScreen() {
@@ -42,7 +42,7 @@ export default function GoalsScreen() {
             activeOpacity={0.8}
           >
              <LinearGradient
-                colors={['#10B981', '#059669']}
+                colors={['#3B82F6', '#2563EB']}
                 style={styles.addButtonGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -54,15 +54,9 @@ export default function GoalsScreen() {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.summaryCard}>
-              <LinearGradient
-                  colors={['#18181B', '#09090B']}
-                  style={StyleSheet.absoluteFill}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-              />
             <View style={styles.summaryHeader}>
               <View style={styles.summaryIconContainer}>
-                <TrendingUp color="#10B981" size={24} />
+                <TrendingUp color="#2563EB" size={24} />
               </View>
               <View style={styles.summaryTextContainer}>
                 <Text style={styles.summaryLabel}>Overall Progress</Text>
@@ -71,7 +65,7 @@ export default function GoalsScreen() {
             </View>
             <View style={styles.progressBar}>
               <LinearGradient
-                colors={['#10B981', '#059669']}
+                colors={['#3B82F6', '#2563EB']}
                 style={[styles.progressBarFill, { width: `${Math.min(100, overallProgress)}%` }]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -104,7 +98,7 @@ export default function GoalsScreen() {
           {goals.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconContainer}>
-                <Target color="#FFF" size={48} />
+                <Target color="#2563EB" size={48} />
               </View>
               <Text style={styles.emptyStateTitle}>No goals yet</Text>
               <Text style={styles.emptyStateText}>
@@ -152,7 +146,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
     <TouchableOpacity style={styles.goalCard} activeOpacity={0.8}>
       <View style={styles.goalHeader}>
         <View style={[styles.goalIconContainer]}>
-          <Target color="#10B981" size={24} />
+          <Target color="#2563EB" size={24} />
         </View>
         <View style={styles.goalInfo}>
           <Text style={styles.goalTitle}>{goal.title}</Text>
@@ -160,7 +154,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
         </View>
         {daysRemaining !== null && (
           <View style={[styles.deadlineBadge, daysRemaining < 30 && styles.deadlineBadgeUrgent]}>
-            <Calendar size={12} color={daysRemaining < 30 ? AppColors.danger : '#A1A1AA'} />
+            <Calendar size={12} color={daysRemaining < 30 ? AppColors.danger : '#71717A'} />
             <Text style={[styles.deadlineText, daysRemaining < 30 && styles.deadlineTextUrgent]}>
               {daysRemaining}d
             </Text>
@@ -171,7 +165,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
       <View style={styles.goalProgress}>
         <View style={styles.goalProgressBar}>
           <LinearGradient
-            colors={['#10B981', '#059669']}
+            colors={['#3B82F6', '#2563EB']}
             style={[styles.goalProgressBarFill, { width: `${Math.min(100, progress)}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -195,7 +189,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
         </View>
         <View style={styles.goalAmount}>
           <Text style={styles.goalAmountLabel}>Remaining</Text>
-          <Text style={[styles.goalAmountValue, { color: '#A1A1AA' }]}>
+          <Text style={[styles.goalAmountValue, { color: '#71717A' }]}>
             JD {remaining.toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </Text>
         </View>
@@ -203,7 +197,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
 
       <TouchableOpacity style={[styles.contributeButton]} onPress={onContribute} activeOpacity={0.7}>
         <Text style={[styles.contributeButtonText]}>Add Contribution</Text>
-        <ArrowUpRight color="#000" size={16} />
+        <ArrowUpRight color="#FFF" size={16} />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -212,7 +206,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flex: 1,
@@ -225,19 +219,19 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   addButton: {
-    shadowColor: '#10B981',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -258,8 +252,13 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#333',
-    overflow: 'hidden',
+    borderColor: '#E5E5E5',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -270,7 +269,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -279,20 +278,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 4,
   },
   summaryValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#333',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 24,
@@ -310,21 +309,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryItemLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 4,
   },
   summaryItemValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   summaryDivider: {
     width: 1,
     height: 32,
-    backgroundColor: '#333',
+    backgroundColor: '#E5E5E5',
   },
   emptyState: {
     alignItems: 'center',
@@ -336,59 +335,62 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#18181B',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#333',
   },
   emptyStateTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 8,
   },
   emptyStateText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
   },
   emptyStateButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 30,
   },
   emptyStateButtonText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
+    color: '#FFFFFF',
   },
   goalsSection: {
     padding: 20,
   },
   sectionTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 16,
   },
   goalsList: {
     gap: 16,
   },
   goalCard: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   goalHeader: {
     flexDirection: 'row',
@@ -402,44 +404,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: '#DBEAFE',
   },
   goalInfo: {
     flex: 1,
   },
   goalTitle: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   goalCategory: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#71717A',
     textTransform: 'capitalize',
   },
   deadlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#27272A',
+    backgroundColor: '#F5F5F5',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     gap: 4,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E5E5',
   },
   deadlineBadgeUrgent: {
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderColor: 'rgba(239, 68, 68, 0.2)',
   },
   deadlineText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 12,
     fontWeight: '600',
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   deadlineTextUrgent: {
     color: AppColors.danger,
@@ -453,7 +455,7 @@ const styles = StyleSheet.create({
   goalProgressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: '#333',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -462,10 +464,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   goalProgressText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     minWidth: 42,
     textAlign: 'right',
   },
@@ -474,22 +476,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#27272A',
+    borderTopColor: '#E5E5E5',
   },
   goalAmount: {
     flex: 1,
   },
   goalAmountLabel: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#71717A',
     marginBottom: 4,
   },
   goalAmountValue: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   contributeButton: {
     flexDirection: 'row',
@@ -498,12 +500,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     gap: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2563EB',
   },
   contributeButtonText: {
-    fontFamily: fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 14,
     fontWeight: '600',
-    color: '#000000',
+    color: '#FFFFFF',
   },
 });
