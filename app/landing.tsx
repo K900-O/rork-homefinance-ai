@@ -6,419 +6,196 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Easing,
+  StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Leaf, ArrowRight, Target, Sparkles } from 'lucide-react-native';
+import { Leaf, Command, Sparkles, Wallet } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, Defs, LinearGradient as SvgGradient, Stop, Line, Text as SvgText } from 'react-native-svg';
-import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
+import { 
+  sfProDisplayBold, 
+  sfProDisplayMedium, 
+} from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-const GRAPH_DATA = [
-  { month: 'Jan', value: 2400 },
-  { month: 'Feb', value: 1800 },
-  { month: 'Mar', value: 3200 },
-  { month: 'Apr', value: 2800 },
-  { month: 'May', value: 3600 },
-  { month: 'Jun', value: 4200 },
-];
-
-const AnimatedGraph = ({ animProgress }: { animProgress: Animated.Value }) => {
-  const graphWidth = SCREEN_WIDTH - 80;
-  const graphHeight = 140;
-  const padding = { top: 20, right: 20, bottom: 30, left: 45 };
-  const chartWidth = graphWidth - padding.left - padding.right;
-  const chartHeight = graphHeight - padding.top - padding.bottom;
-  
-  const maxValue = Math.max(...GRAPH_DATA.map(d => d.value));
-  const minValue = Math.min(...GRAPH_DATA.map(d => d.value)) * 0.8;
-  const range = maxValue - minValue;
-  
-  const points = GRAPH_DATA.map((d, i) => {
-    const x = padding.left + (i / (GRAPH_DATA.length - 1)) * chartWidth;
-    const y = padding.top + chartHeight - ((d.value - minValue) / range) * chartHeight;
-    return { x, y, value: d.value, month: d.month };
-  });
-  
-  const linePath = points.reduce((path, point, i) => {
-    if (i === 0) return `M ${point.x} ${point.y}`;
-    const prev = points[i - 1];
-    const cpX1 = prev.x + (point.x - prev.x) / 3;
-    const cpX2 = prev.x + (point.x - prev.x) * 2 / 3;
-    return `${path} C ${cpX1} ${prev.y}, ${cpX2} ${point.y}, ${point.x} ${point.y}`;
-  }, '');
-  
-  const areaPath = `${linePath} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`;
-  
-  const yLabels = [minValue, (minValue + maxValue) / 2, maxValue].map(v => Math.round(v / 1000) + 'k');
-  
-  return (
-    <View style={graphStyles.container}>
-      <View style={graphStyles.header}>
-        <View>
-          <Text style={graphStyles.title}>Monthly Savings</Text>
-          <Text style={graphStyles.subtitle}>Last 6 months performance</Text>
-        </View>
-        <View style={graphStyles.badge}>
-          <Text style={graphStyles.badgeText}>+24%</Text>
-        </View>
-      </View>
-      <Svg width={graphWidth} height={graphHeight}>
-        <Defs>
-          <SvgGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor={AppColors.primary} stopOpacity="0.3" />
-            <Stop offset="100%" stopColor={AppColors.primary} stopOpacity="0.02" />
-          </SvgGradient>
-        </Defs>
-        
-        {[0, 1, 2].map((i) => (
-          <Line
-            key={`grid-${i}`}
-            x1={padding.left}
-            y1={padding.top + (chartHeight / 2) * i}
-            x2={graphWidth - padding.right}
-            y2={padding.top + (chartHeight / 2) * i}
-            stroke="#E5E7EB"
-            strokeWidth={1}
-            strokeDasharray="4,4"
-          />
-        ))}
-        
-        {yLabels.reverse().map((label, i) => (
-          <SvgText
-            key={`y-label-${i}`}
-            x={padding.left - 8}
-            y={padding.top + (chartHeight / 2) * i + 4}
-            fill="#9CA3AF"
-            fontSize={10}
-            textAnchor="end"
-            fontFamily={sfProDisplayRegular}
-          >
-            ${label}
-          </SvgText>
-        ))}
-        
-        <Path d={areaPath} fill="url(#areaGradient)" />
-        <Path d={linePath} stroke={AppColors.primary} strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        
-        {points.map((point, i) => (
-          <React.Fragment key={`point-${i}`}>
-            <Circle cx={point.x} cy={point.y} r={4} fill="#FFFFFF" stroke={AppColors.primary} strokeWidth={2} />
-            <SvgText
-              x={point.x}
-              y={graphHeight - 8}
-              fill="#6B7280"
-              fontSize={10}
-              textAnchor="middle"
-              fontFamily={sfProDisplayMedium}
-            >
-              {point.month}
-            </SvgText>
-          </React.Fragment>
-        ))}
-        
-        <Circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={6} fill={AppColors.primary} />
-        <Circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={10} fill={AppColors.primary} opacity={0.2} />
-      </Svg>
-    </View>
-  );
-};
-
-const graphStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  title: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 18,
-    color: '#1F2937',
-    fontWeight: '700',
-  },
-  subtitle: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 13,
-    color: '#9CA3AF',
-    marginTop: 2,
-  },
-  badge: {
-    backgroundColor: '#DCFCE7',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 13,
-    color: '#16A34A',
-    fontWeight: '600',
-  },
-});
-
-const MockUiBackground = () => {
-  const { width } = Dimensions.get('window');
-  
-  return (
-    <View style={styles.mockUiContainer}>
-      {/* Base Gradient */}
-      <LinearGradient
-        colors={['#F0F9FF', '#FFFFFF', '#EFF6FF']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
-      
-      {/* Decorative Grid Lines */}
-      <View style={styles.gridContainer}>
-        {[...Array(6)].map((_, i) => (
-          <View key={`v-${i}`} style={[styles.gridLineVertical, { left: (width / 5) * i }]} />
-        ))}
-        {[...Array(10)].map((_, i) => (
-          <View key={`h-${i}`} style={[styles.gridLineHorizontal, { top: 100 * i }]} />
-        ))}
-      </View>
-
-      {/* Floating UI Elements (Blurred/Faded) */}
-      
-      {/* Top Right - Investment Card */}
-      <View style={[styles.mockCard, styles.mockCardTopRight]}>
-        <View style={styles.mockCardHeader}>
-          <View style={styles.mockAvatar} />
-          <View style={styles.mockTextLine} />
-        </View>
-        <View style={styles.mockGraphLine} />
-        <View style={styles.mockGraphArea} />
-      </View>
-
-      {/* Center Left - Stats Row */}
-      <View style={[styles.mockCard, styles.mockCardLeft]}>
-        <View style={styles.mockRow}>
-          <View style={styles.mockIconCircle} />
-          <View style={{ gap: 4 }}>
-            <View style={[styles.mockTextLine, { width: 60 }]} />
-            <View style={[styles.mockTextLine, { width: 40, opacity: 0.5 }]} />
-          </View>
-        </View>
-        <View style={[styles.mockRow, { marginTop: 12 }]}>
-          <View style={[styles.mockIconCircle, { backgroundColor: '#FEF3C7' }]} />
-          <View style={{ gap: 4 }}>
-            <View style={[styles.mockTextLine, { width: 50 }]} />
-            <View style={[styles.mockTextLine, { width: 30, opacity: 0.5 }]} />
-          </View>
-        </View>
-      </View>
-
-      {/* Bottom Right - Progress Circle */}
-      <View style={[styles.mockCard, styles.mockCardBottomRight]}>
-         <View style={styles.mockCircleOuter}>
-            <View style={styles.mockCircleInner} />
-         </View>
-         <View style={[styles.mockTextLine, { width: 80, alignSelf: 'center', marginTop: 12 }]} />
-      </View>
-
-      {/* Subtle Gradient Overlay to fade them out */}
-      <LinearGradient
-        colors={['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.85)']}
-        style={StyleSheet.absoluteFill}
-      />
-    </View>
-  );
-};
+const { height } = Dimensions.get('window');
 
 export default function LandingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-  const cardAnim = useRef(new Animated.Value(0)).current;
-  const buttonAnim = useRef(new Animated.Value(50)).current;
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-  const floatAnim = useRef(new Animated.Value(0)).current;
+  
+  // Animation Values
+  // 0: Initial Splash State (Full Screen Blue)
+  // 1: Final Landing State (Split Screen)
+  const animValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.spring(slideAnim, {
-          toValue: 0,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.timing(cardAnim, {
+    // Start animation after a small delay to show the "splash"
+    const timeout = setTimeout(() => {
+      Animated.timing(animValue, {
         toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.parallel([
-        Animated.spring(buttonAnim, {
-          toValue: 0,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-        Animated.timing(buttonOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
+        duration: 1200,
+        useNativeDriver: false, // transforming layout properties (top, borderRadius)
+        easing: Easing.bezier(0.22, 1, 0.36, 1),
+      }).start();
+    }, 1500);
 
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(floatAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(floatAnim, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [fadeAnim, slideAnim, cardAnim, buttonAnim, buttonOpacity, floatAnim]);
+    return () => clearTimeout(timeout);
+  }, [animValue]);
 
-  const floatTranslate = floatAnim.interpolate({
+  // Interpolations
+  const bgTop = animValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -8],
+    outputRange: [0, height * 0.42], // Moves down to ~42% of screen height
+  });
+  
+  const bgBorderRadius = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 40],
+  });
+
+  // Splash Elements (Fade Out)
+  const splashOpacity = animValue.interpolate({
+    inputRange: [0, 0.4],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const splashTranslateY = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -50],
+  });
+
+  // Main Content (Fade In)
+  const contentOpacity = animValue.interpolate({
+    inputRange: [0.5, 1],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const contentTranslateY = animValue.interpolate({
+    inputRange: [0.4, 1],
+    outputRange: [40, 0],
+    extrapolate: 'clamp',
+  });
+
+  // Top Section (Menu) (Fade In)
+  const topContentOpacity = animValue.interpolate({
+    inputRange: [0.6, 1],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+  
+  const topContentTranslateY = animValue.interpolate({
+    inputRange: [0.4, 1],
+    outputRange: [-20, 0],
+    extrapolate: 'clamp',
   });
 
   return (
     <View style={styles.container}>
-      <View style={styles.backgroundContainer}>
-        <MockUiBackground />
-      </View>
-
-      <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}>
-        <Animated.View 
-          style={[
-            styles.header,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            }
-          ]}
-        >
-          <View style={styles.brandContainer}>
-            <LinearGradient
-              colors={[AppColors.primary, AppColors.primaryDark]}
-              style={styles.brandIcon}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <Leaf color="#FFFFFF" size={20} />
-            </LinearGradient>
-            <Text style={styles.brandName}>Hayati</Text>
+      <StatusBar barStyle="dark-content" />
+      
+      {/* Top Section (Revealed behind the blue card) */}
+      <View style={[styles.topSection, { paddingTop: insets.top + 40 }]}>
+        <Animated.View style={{ opacity: topContentOpacity, transform: [{ translateY: topContentTranslateY }] }}>
+          <View style={styles.menuContainer}>
+            <Text style={styles.menuItemInactive}>Earn</Text>
+            
+            <View style={styles.menuItemActiveContainer}>
+              <View style={styles.activeIconContainer}>
+                <Wallet color="#FFFFFF" size={20} fill="#FFFFFF" />
+              </View>
+              <Text style={styles.menuItemActive}>Spend</Text>
+            </View>
+            
+            <Text style={styles.menuItemInactive}>Invest</Text>
+            <Text style={styles.menuItemInactive}>Borrow</Text>
           </View>
         </Animated.View>
+      </View>
 
-        <View style={styles.heroSection}>
-          <Animated.View
-            style={[
-              styles.cardsContainer,
-              {
-                opacity: cardAnim,
-                transform: [{ translateY: floatTranslate }],
-              }
-            ]}
-          >
-            <AnimatedGraph animProgress={cardAnim} />
-
-            <View style={styles.smallCardsRow}>
-              <View style={styles.smallCard}>
-                <View style={[styles.smallCardIcon, { backgroundColor: AppColors.blue[100] }]}>
-                  <Target color={AppColors.primary} size={20} />
-                </View>
-                <Text style={styles.smallCardTitle}>Goals</Text>
-                <Text style={styles.smallCardValue}>5 Active</Text>
-              </View>
-              <View style={styles.smallCard}>
-                <View style={[styles.smallCardIcon, { backgroundColor: '#FEF3C7' }]}>
-                  <Sparkles color="#F59E0B" size={20} />
-                </View>
-                <Text style={styles.smallCardTitle}>Habits</Text>
-                <Text style={styles.smallCardValue}>12 Streak</Text>
-              </View>
-            </View>
-          </Animated.View>
-
-          <Animated.View
-            style={[
-              styles.textContainer,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              }
-            ]}
-          >
-            <Text style={styles.title}>Take Control of</Text>
-            <Text style={styles.titleHighlight}>Your Future</Text>
-            <Text style={styles.subtitle}>
-              Track spending, build habits, and achieve your goals with intelligent insights.
-            </Text>
-          </Animated.View>
-        </View>
-
+      {/* Blue Card / Background */}
+      <Animated.View 
+        style={[
+          styles.blueCard, 
+          { 
+            top: bgTop, 
+            borderTopLeftRadius: bgBorderRadius,
+            borderTopRightRadius: bgBorderRadius,
+          }
+        ]}
+      >
+        <LinearGradient
+          colors={[AppColors.primaryLight, AppColors.primary, AppColors.primaryDark]} // Bright Blue Gradient
+          locations={[0, 0.4, 1]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+        
+        {/* Splash State: Centered Logo */}
+        {/* We use pointerEvents="none" to let clicks pass through when it's invisible, 
+            but since it's inside the card, we just rely on opacity */}
         <Animated.View 
           style={[
-            styles.buttonsContainer, 
+            styles.splashContainer, 
             { 
-              opacity: buttonOpacity, 
-              transform: [{ translateY: buttonAnim }] 
+              opacity: splashOpacity,
+              transform: [{ translateY: splashTranslateY }]
+            }
+          ]}
+          pointerEvents="none"
+        >
+           <View style={styles.splashIconCircle}>
+             <Leaf color={AppColors.primary} size={48} fill={AppColors.primary} />
+           </View>
+           <Text style={styles.splashText}>Hayati</Text>
+        </Animated.View>
+
+        {/* Final State: Card Content */}
+        <Animated.View 
+          style={[
+            styles.cardContent, 
+            { 
+              opacity: contentOpacity, 
+              transform: [{ translateY: contentTranslateY }],
+              paddingBottom: insets.bottom + 20 
             }
           ]}
         >
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => router.push('/signup' as any)}
-            style={styles.buttonWrapper}
-          >
-            <LinearGradient
-              colors={[AppColors.primary, AppColors.primaryDark]}
-              style={styles.primaryButton}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.primaryButtonText}>Get Started</Text>
-              <View style={styles.buttonArrow}>
-                <ArrowRight color="#FFFFFF" size={20} />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={styles.contentHeader}>
+            <View style={styles.iconBadge}>
+               <Sparkles color="#1E40AF" size={24} fill="#1E40AF" />
+            </View>
+            
+            <Text style={styles.cardTitle}>Your money,{'\n'}upgraded</Text>
+            <Text style={styles.cardSubtitle}>
+              Save, earn and invest with stablecoins and digital assets.
+            </Text>
+          </View>
 
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/login' as any)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.secondaryButtonText}>I already have an account</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity 
+              style={styles.appleButton}
+              activeOpacity={0.9}
+              onPress={() => router.push('/signup' as any)}
+            >
+              <Command color="#000000" size={20} />
+              <Text style={styles.appleButtonText}>Continue with Apple</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.recoverButton}
+              activeOpacity={0.7}
+              onPress={() => router.push('/login' as any)}
+            >
+               <Text style={styles.recoverButtonText}>Recover existing wallet</Text>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -428,270 +205,153 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  backgroundContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  content: {
+  topSection: {
     flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+    backgroundColor: '#FFFFFF',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  menuContainer: {
+    gap: 24,
   },
-  brandContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  brandIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandName: {
+  menuItemInactive: {
     fontFamily: sfProDisplayBold,
-    fontSize: 22,
-    color: AppColors.textPrimary,
-    letterSpacing: -0.3,
+    fontSize: 34,
+    color: '#E5E7EB',
     fontWeight: '700',
   },
-  heroSection: {
-    flex: 1,
-    justifyContent: 'center',
-    gap: 32,
-  },
-  cardsContainer: {
+  menuItemActiveContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 16,
   },
-
-  smallCardsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  smallCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  smallCardIcon: {
+  activeIconContainer: {
     width: 44,
     height: 44,
-    borderRadius: 14,
+    borderRadius: 12,
+    backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  smallCardTitle: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 13,
-    color: AppColors.textSecondary,
-    fontWeight: '500',
-  },
-  smallCardValue: {
+  menuItemActive: {
     fontFamily: sfProDisplayBold,
-    fontSize: 18,
-    color: AppColors.textPrimary,
-    fontWeight: '700',
-    marginTop: 2,
-  },
-  textContainer: {
-    gap: 8,
-  },
-  title: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 36,
-    color: AppColors.textPrimary,
-    lineHeight: 42,
-    letterSpacing: -0.8,
+    fontSize: 34,
+    color: '#111827',
     fontWeight: '700',
   },
-  titleHighlight: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 36,
-    color: AppColors.primary,
-    lineHeight: 42,
-    letterSpacing: -0.8,
-    fontWeight: '700',
-  },
-  subtitle: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 16,
-    color: AppColors.textSecondary,
-    lineHeight: 24,
-    fontWeight: '400',
-    marginTop: 8,
-  },
-  mockUiContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  gridContainer: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.3,
-  },
-  gridLineVertical: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: '#E5E7EB',
-  },
-  gridLineHorizontal: {
+  
+  // Blue Card
+  blueCard: {
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 1,
-    backgroundColor: '#E5E7EB',
+    bottom: 0,
+    overflow: 'hidden',
   },
-  mockCard: {
-    position: 'absolute',
+  
+  // Splash
+  splashContainer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
+  },
+  splashIconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 32,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 16,
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  mockCardTopRight: {
-    top: '12%',
-    right: -40,
-    width: 180,
-    height: 140,
-    transform: [{ rotate: '-12deg' }],
-  },
-  mockCardLeft: {
-    top: '35%',
-    left: -30,
-    width: 160,
-    padding: 20,
-    transform: [{ rotate: '6deg' }],
-  },
-  mockCardBottomRight: {
-    bottom: '15%',
-    right: -20,
-    width: 150,
-    height: 150,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ rotate: '-6deg' }],
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  mockCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
+  splashText: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 32,
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
-  mockAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#DBEAFE',
-  },
-  mockTextLine: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#F3F4F6',
-    width: 80,
-  },
-  mockGraphLine: {
-    height: 40,
-    borderBottomWidth: 2,
-    borderBottomColor: '#3B82F6',
-    marginBottom: 8,
-    opacity: 0.5,
-  },
-  mockGraphArea: {
+  
+  // Content
+  cardContent: {
     flex: 1,
-    backgroundColor: '#EFF6FF',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    paddingHorizontal: 32,
+    paddingTop: 48,
+    justifyContent: 'space-between',
   },
-  mockRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  contentHeader: {
+    gap: 20,
   },
-  mockIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#DBEAFE',
-  },
-  mockCircleOuter: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 6,
-    borderColor: '#EFF6FF',
+  iconBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    borderTopColor: '#3B82F6',
-    borderRightColor: '#3B82F6',
+    marginBottom: 8,
   },
-  mockCircleInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#F9FAFB',
+  cardTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 40,
+    lineHeight: 44,
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
+  cardSubtitle: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 18,
+    lineHeight: 26,
+    color: 'rgba(255, 255, 255, 0.8)',
+    maxWidth: '90%',
+  },
+  
+  // Buttons
   buttonsContainer: {
-    gap: 14,
+    gap: 16,
   },
-  buttonWrapper: {
-    borderRadius: 16,
-    shadowColor: AppColors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  primaryButton: {
-    height: 58,
-    borderRadius: 16,
+  appleButton: {
+    height: 56,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  primaryButtonText: {
+  appleButtonText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 17,
+    color: '#000000',
+    fontWeight: '600',
+  },
+  recoverButton: {
+    height: 56,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  recoverButtonText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 17,
     color: '#FFFFFF',
     fontWeight: '600',
-  },
-  buttonArrow: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryButton: {
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryButtonText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 15,
-    color: AppColors.textSecondary,
-    fontWeight: '500',
   },
 });
