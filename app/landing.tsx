@@ -35,11 +35,11 @@ export default function LandingScreen() {
     const timeout = setTimeout(() => {
       Animated.timing(animValue, {
         toValue: 1,
-        duration: 1200,
+        duration: 1000, // Slightly faster for snappier feel
         useNativeDriver: false, // transforming layout properties (top, borderRadius)
-        easing: Easing.bezier(0.22, 1, 0.36, 1),
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Cubic Bezier for smooth "Apple-like" motion
       }).start();
-    }, 1500);
+    }, 1200);
 
     return () => clearTimeout(timeout);
   }, [animValue]);
@@ -47,49 +47,54 @@ export default function LandingScreen() {
   // Interpolations
   const bgTop = animValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, height * 0.42], // Moves down to ~42% of screen height
+    outputRange: [0, height * 0.45], // Moves down slightly more to give breathing room
   });
   
   const bgBorderRadius = animValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 40],
+    outputRange: [0, 48], // Slightly rounder
   });
 
-  // Splash Elements (Fade Out)
+  // Splash Elements (Fade Out & Scale)
   const splashOpacity = animValue.interpolate({
-    inputRange: [0, 0.4],
+    inputRange: [0, 0.5],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
-  const splashTranslateY = animValue.interpolate({
+  const splashScale = animValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -50],
+    outputRange: [1, 0.9], // Subtle scale down
   });
 
-  // Main Content (Fade In)
+  const splashTranslateY = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -100], // Move up faster
+  });
+
+  // Main Content (Fade In & Slide Up)
   const contentOpacity = animValue.interpolate({
-    inputRange: [0.5, 1],
+    inputRange: [0.4, 1],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
 
   const contentTranslateY = animValue.interpolate({
     inputRange: [0.4, 1],
-    outputRange: [40, 0],
+    outputRange: [50, 0],
     extrapolate: 'clamp',
   });
 
   // Top Section (Menu) (Fade In)
   const topContentOpacity = animValue.interpolate({
-    inputRange: [0.6, 1],
+    inputRange: [0.5, 1],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
   
   const topContentTranslateY = animValue.interpolate({
-    inputRange: [0.4, 1],
-    outputRange: [-20, 0],
+    inputRange: [0.5, 1],
+    outputRange: [-30, 0],
     extrapolate: 'clamp',
   });
 
@@ -101,17 +106,17 @@ export default function LandingScreen() {
       <View style={[styles.topSection, { paddingTop: insets.top + 40 }]}>
         <Animated.View style={{ opacity: topContentOpacity, transform: [{ translateY: topContentTranslateY }] }}>
           <View style={styles.menuContainer}>
-            <Text style={styles.menuItemInactive}>Earn</Text>
+            <Text style={styles.menuItemInactive}>Plan</Text>
             
             <View style={styles.menuItemActiveContainer}>
               <View style={styles.activeIconContainer}>
                 <Wallet color="#FFFFFF" size={20} fill="#FFFFFF" />
               </View>
-              <Text style={styles.menuItemActive}>Spend</Text>
+              <Text style={styles.menuItemActive}>Finance</Text>
             </View>
             
-            <Text style={styles.menuItemInactive}>Invest</Text>
-            <Text style={styles.menuItemInactive}>Borrow</Text>
+            <Text style={styles.menuItemInactive}>Habits</Text>
+            <Text style={styles.menuItemInactive}>Growth</Text>
           </View>
         </Animated.View>
       </View>
@@ -143,7 +148,10 @@ export default function LandingScreen() {
             styles.splashContainer, 
             { 
               opacity: splashOpacity,
-              transform: [{ translateY: splashTranslateY }]
+              transform: [
+                { translateY: splashTranslateY },
+                { scale: splashScale }
+              ]
             }
           ]}
           pointerEvents="none"
@@ -170,9 +178,9 @@ export default function LandingScreen() {
                <Sparkles color="#1E40AF" size={24} fill="#1E40AF" />
             </View>
             
-            <Text style={styles.cardTitle}>Your money,{'\n'}upgraded</Text>
+            <Text style={styles.cardTitle}>Your life,{'\n'}mastered</Text>
             <Text style={styles.cardSubtitle}>
-              Save, earn and invest with stablecoins and digital assets.
+              Control and track your financial and personal activity every day.
             </Text>
           </View>
 
@@ -191,7 +199,7 @@ export default function LandingScreen() {
               activeOpacity={0.7}
               onPress={() => router.push('/login' as any)}
             >
-               <Text style={styles.recoverButtonText}>Recover existing wallet</Text>
+               <Text style={styles.recoverButtonText}>Recover existing account</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
