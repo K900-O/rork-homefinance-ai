@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  ImageBackground,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,7 +16,7 @@ import Svg, { Path, Circle, Defs, LinearGradient as SvgGradient, Stop, Line, Tex
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
 
-const { width: SCREEN_WIDTH, height } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const GRAPH_DATA = [
   { month: 'Jan', value: 2400 },
@@ -239,16 +240,14 @@ export default function LandingScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#FFFFFF', '#F0F7FF', '#E8F2FF']}
+      <ImageBackground
+        source={{ uri: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&q=80' }}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-      />
-
-      <View style={styles.decorativeCircle1} />
-      <View style={styles.decorativeCircle2} />
-      <View style={styles.decorativeCircle3} />
+        resizeMode="cover"
+        imageStyle={styles.backgroundImage}
+      >
+        <View style={styles.backgroundOverlay} />
+      </ImageBackground>
 
       <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}>
         <Animated.View 
@@ -365,35 +364,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  decorativeCircle1: {
-    position: 'absolute',
-    top: -100,
-    right: -80,
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: AppColors.blue[100],
-    opacity: 0.5,
+  backgroundImage: {
+    opacity: 0.15,
   },
-  decorativeCircle2: {
-    position: 'absolute',
-    top: height * 0.3,
-    left: -120,
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: AppColors.blue[50],
-    opacity: 0.6,
-  },
-  decorativeCircle3: {
-    position: 'absolute',
-    bottom: 100,
-    right: -60,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: AppColors.blue[100],
-    opacity: 0.4,
+  backgroundOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
   },
   content: {
     flex: 1,
