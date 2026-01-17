@@ -139,7 +139,7 @@ export default function LandingScreen() {
             style={styles.buttonWrapper}
           >
             <LinearGradient
-              colors={['#5DDA4D', '#37C126']}
+              colors={['#37C126', '#299F1A']}
               style={styles.primaryButton}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -164,7 +164,7 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
@@ -183,14 +183,14 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(55, 193, 38, 0.15)',
+    backgroundColor: '#E8F8E6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   brandName: {
     fontFamily: sfProDisplayBold,
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     letterSpacing: 0.3,
     fontWeight: '600',
   },
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: sfProDisplayBold,
     fontSize: 48,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     lineHeight: 52,
     letterSpacing: -1,
     fontWeight: '700',
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 12,
     elevation: 8,
   },
@@ -243,11 +243,15 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 25,
+    borderWidth: 1.5,
+    borderColor: '#E5E5E5',
+    backgroundColor: '#FFFFFF',
   },
   secondaryButtonText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 16,
-    color: '#A1A1AA',
+    color: '#52525B',
     fontWeight: '500',
   },
 });

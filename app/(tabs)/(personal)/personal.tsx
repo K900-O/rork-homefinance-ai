@@ -66,7 +66,7 @@ const CircularProgress = ({
             stroke={color}
             strokeWidth={strokeWidth}
             fill="transparent"
-            opacity={0.2}
+            opacity={0.15}
           />
           <Circle
             cx={size / 2}
@@ -82,7 +82,7 @@ const CircularProgress = ({
         </Svg>
         <View style={[StyleSheet.absoluteFillObject, { alignItems: 'center', justifyContent: 'center' }]} pointerEvents="none">
           <Text style={{ 
-            color: '#FFF', 
+            color: '#1A1A1A', 
             fontFamily: sfProDisplayBold, 
             fontSize: size * 0.22,
             textAlign: 'center'
@@ -92,7 +92,7 @@ const CircularProgress = ({
         </View>
       </View>
       <Text style={{ 
-        color: '#A1A1AA', 
+        color: '#71717A', 
         fontFamily: sfProDisplayMedium, 
         fontSize: 11, 
         marginTop: 8,
@@ -254,7 +254,7 @@ export default function PersonalHomeScreen() {
             <View style={styles.divider} />
             
             <View style={styles.insightRow}>
-              <Sparkles size={14} color="#5DDA4D" />
+              <Sparkles size={14} color="#37C126" />
               <Text style={styles.insightText}>
                 {dailySummary.productivityScore >= 70 
                   ? "You're on fire today! Keep up the momentum."
@@ -267,21 +267,21 @@ export default function PersonalHomeScreen() {
 
           <View style={styles.statsRow}>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#37C12620' }]}>
+              <View style={[styles.statIcon, { backgroundColor: '#FEF3C7' }]}>
                 <Flame size={18} color="#F59E0B" />
               </View>
               <Text style={styles.statValue}>{totalStreak}</Text>
               <Text style={styles.statLabel}>Day Streak</Text>
             </View>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#5DDA4D20' }]}>
-                <ShieldCheck size={18} color="#5DDA4D" />
+              <View style={[styles.statIcon, { backgroundColor: '#E8F8E6' }]}>
+                <ShieldCheck size={18} color="#37C126" />
               </View>
               <Text style={styles.statValue}>{longestCleanStreak}</Text>
               <Text style={styles.statLabel}>Days Clean</Text>
             </View>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
+              <View style={[styles.statIcon, { backgroundColor: '#EDE9FE' }]}>
                 <Award size={18} color="#8B5CF6" />
               </View>
               <Text style={styles.statValue}>{goodHabits.length + badHabits.length}</Text>
@@ -298,7 +298,7 @@ export default function PersonalHomeScreen() {
                 </View>
                 <TouchableOpacity onPress={() => router.push('/habits')} style={styles.seeAllBtn}>
                   <Text style={styles.seeAllText}>See All</Text>
-                  <ChevronRight size={14} color="#5DDA4D" />
+                  <ChevronRight size={14} color="#37C126" />
                 </TouchableOpacity>
               </View>
               
@@ -324,7 +324,7 @@ export default function PersonalHomeScreen() {
                 </View>
                 <TouchableOpacity onPress={() => router.push('/habits')} style={styles.seeAllBtn}>
                   <Text style={styles.seeAllText}>See All</Text>
-                  <ChevronRight size={14} color="#5DDA4D" />
+                  <ChevronRight size={14} color="#37C126" />
                 </TouchableOpacity>
               </View>
               
@@ -344,7 +344,7 @@ export default function PersonalHomeScreen() {
               </View>
               <TouchableOpacity onPress={() => router.push('/schedule')} style={styles.seeAllBtn}>
                 <Text style={styles.seeAllText}>Schedule</Text>
-                <ChevronRight size={14} color="#5DDA4D" />
+                <ChevronRight size={14} color="#37C126" />
               </TouchableOpacity>
             </View>
 
@@ -360,7 +360,7 @@ export default function PersonalHomeScreen() {
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <Calendar size={32} color="#3F3F46" />
+                <Calendar size={32} color="#A1A1AA" />
                 <Text style={styles.emptyTitle}>No tasks for today</Text>
                 <Text style={styles.emptySubtitle}>Add activities to stay productive</Text>
               </View>
@@ -395,7 +395,7 @@ export default function PersonalHomeScreen() {
                 style={styles.actionBtn} 
                 onPress={() => setShowAddModal(true)}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#37C12620' }]}>
+                <View style={[styles.actionIcon, { backgroundColor: '#E8F8E6' }]}>
                   <Plus size={20} color="#37C126" />
                 </View>
                 <Text style={styles.actionLabel}>Add Task</Text>
@@ -405,8 +405,8 @@ export default function PersonalHomeScreen() {
                 style={styles.actionBtn}
                 onPress={() => router.push('/habits')}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#5DDA4D20' }]}>
-                  <Target size={20} color="#5DDA4D" />
+                <View style={[styles.actionIcon, { backgroundColor: '#E8F8E6' }]}>
+                  <Target size={20} color="#299F1A" />
                 </View>
                 <Text style={styles.actionLabel}>Habits</Text>
               </TouchableOpacity>
@@ -415,7 +415,7 @@ export default function PersonalHomeScreen() {
                 style={styles.actionBtn}
                 onPress={() => router.push('/schedule')}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#F59E0B20' }]}>
+                <View style={[styles.actionIcon, { backgroundColor: '#FEF3C7' }]}>
                   <Calendar size={20} color="#F59E0B" />
                 </View>
                 <Text style={styles.actionLabel}>Schedule</Text>
@@ -425,7 +425,7 @@ export default function PersonalHomeScreen() {
                 style={styles.actionBtn}
                 onPress={() => router.push('/coach')}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#8B5CF620' }]}>
+                <View style={[styles.actionIcon, { backgroundColor: '#EDE9FE' }]}>
                   <Heart size={20} color="#8B5CF6" />
                 </View>
                 <Text style={styles.actionLabel}>Coach</Text>
@@ -476,7 +476,7 @@ function BadHabitCard({ habit }: { habit: Habit & { daysClean: number } }) {
     <View style={styles.badHabitCard}>
       <View style={styles.badHabitHeader}>
         <View style={styles.badHabitLeft}>
-          <View style={[styles.habitIcon, { backgroundColor: '#EF444420' }]}>
+          <View style={[styles.habitIcon, { backgroundColor: '#FEE2E2' }]}>
             <AlertTriangle size={18} color="#EF4444" />
           </View>
           <View>
@@ -551,7 +551,7 @@ function UpcomingCard({ activity }: { activity: Activity }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   animatedContainer: {
     flex: 1,
@@ -573,17 +573,19 @@ const styles = StyleSheet.create({
   dateText: {
     fontFamily: sfProDisplayBold,
     fontSize: 20,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   avatarContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#37C126',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#37C126',
+    shadowColor: '#37C126',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
   },
   avatarFallback: {
     alignItems: 'center',
@@ -601,12 +603,17 @@ const styles = StyleSheet.create({
   },
   mainCard: {
     marginHorizontal: 20,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -623,18 +630,18 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: '#37C12620',
+    backgroundColor: '#E8F8E6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardTitle: {
     fontFamily: sfProDisplayBold,
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   scoreBox: {
     alignItems: 'center',
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#E8F8E6',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -647,7 +654,7 @@ const styles = StyleSheet.create({
   scoreLabel: {
     fontFamily: sfProDisplayRegular,
     fontSize: 10,
-    color: '#71717A',
+    color: '#299F1A',
   },
   ringsRow: {
     flexDirection: 'row',
@@ -657,14 +664,14 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#1F1F1F',
+    backgroundColor: '#E5E5E5',
     marginBottom: 16,
   },
   insightRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#E8F8E6',
     padding: 12,
     borderRadius: 12,
   },
@@ -672,7 +679,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#299F1A',
     lineHeight: 18,
   },
   statsRow: {
@@ -683,12 +690,17 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   statIcon: {
     width: 36,
@@ -701,7 +713,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontFamily: sfProDisplayBold,
     fontSize: 20,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   statLabel: {
     fontFamily: sfProDisplayRegular,
@@ -732,7 +744,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   seeAllBtn: {
     flexDirection: 'row',
@@ -742,7 +754,7 @@ const styles = StyleSheet.create({
   seeAllText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#5DDA4D',
+    color: '#37C126',
   },
   habitsList: {
     paddingHorizontal: 20,
@@ -752,15 +764,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     padding: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   habitCardCompleted: {
-    borderColor: '#37C12640',
-    backgroundColor: '#37C12608',
+    borderColor: '#C6EFC2',
+    backgroundColor: '#F2FDF0',
   },
   habitLeft: {
     flexDirection: 'row',
@@ -781,7 +798,7 @@ const styles = StyleSheet.create({
   habitTitle: {
     fontFamily: sfProDisplayMedium,
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   habitTitleCompleted: {
@@ -802,7 +819,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#3F3F46',
+    borderColor: '#D4D4D4',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -811,13 +828,18 @@ const styles = StyleSheet.create({
     borderColor: '#37C126',
   },
   badHabitCard: {
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
     marginHorizontal: 20,
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   badHabitHeader: {
     flexDirection: 'row',
@@ -838,7 +860,7 @@ const styles = StyleSheet.create({
   },
   daysCleanBadge: {
     alignItems: 'center',
-    backgroundColor: '#37C12620',
+    backgroundColor: '#E8F8E6',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 10,
@@ -851,11 +873,11 @@ const styles = StyleSheet.create({
   daysCleanLabel: {
     fontFamily: sfProDisplayRegular,
     fontSize: 10,
-    color: '#37C126',
+    color: '#299F1A',
   },
   progressBarBg: {
     height: 6,
-    backgroundColor: '#1F1F1F',
+    backgroundColor: '#F5F5F5',
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 8,
@@ -878,12 +900,17 @@ const styles = StyleSheet.create({
   activityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     padding: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
     gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   activityIcon: {
     width: 40,
@@ -898,12 +925,12 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontFamily: sfProDisplayMedium,
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 6,
   },
   completedText: {
     textDecorationLine: 'line-through',
-    color: '#52525B',
+    color: '#A1A1AA',
   },
   activityMetaRow: {
     flexDirection: 'row',
@@ -931,7 +958,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#3F3F46',
+    borderColor: '#D4D4D4',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -943,10 +970,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 32,
     marginHorizontal: 20,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FAFAFA',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
   },
   emptyTitle: {
     fontFamily: sfProDisplayMedium,
@@ -957,17 +984,22 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#52525B',
+    color: '#A1A1AA',
     marginTop: 4,
   },
   upcomingCard: {
     width: 140,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
     marginLeft: 20,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   upcomingDate: {
     flexDirection: 'row',
@@ -983,12 +1015,12 @@ const styles = StyleSheet.create({
   upcomingNum: {
     fontFamily: sfProDisplayBold,
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   upcomingTitle: {
     fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#E4E4E7',
+    color: '#52525B',
     marginBottom: 10,
     lineHeight: 18,
   },
@@ -1010,7 +1042,7 @@ const styles = StyleSheet.create({
   quickActionsTitle: {
     fontFamily: sfProDisplayBold,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 12,
   },
   actionsGrid: {
@@ -1031,6 +1063,6 @@ const styles = StyleSheet.create({
   actionLabel: {
     fontFamily: sfProDisplayMedium,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: '#52525B',
   },
 });

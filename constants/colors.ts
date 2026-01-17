@@ -1,21 +1,21 @@
-const tintColorLight = '#FFFFFF';
-const tintColorDark = '#FFFFFF';
+const tintColorLight = '#37C126';
+const tintColorDark = '#37C126';
 
 export default {
   light: {
-    text: '#FFFFFF',
-    background: '#000000',
+    text: '#1A1A1A',
+    background: '#FFFFFF',
     tint: tintColorLight,
-    icon: '#A1A1AA',
-    tabIconDefault: '#52525B',
+    icon: '#52525B',
+    tabIconDefault: '#A1A1AA',
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#FFFFFF',
-    background: '#000000',
+    text: '#1A1A1A',
+    background: '#FFFFFF',
     tint: tintColorDark,
-    icon: '#A1A1AA',
-    tabIconDefault: '#52525B',
+    icon: '#52525B',
+    tabIconDefault: '#A1A1AA',
     tabIconSelected: tintColorDark,
   },
 };
@@ -26,48 +26,48 @@ export const AppColors = {
   primaryLight: '#5DDA4D',
   
   accent: '#37C126',
-  accentLight: '#5DDA4D',
+  accentLight: '#E8F8E6',
   
   success: '#37C126',
-  successLight: '#1B5116',
+  successLight: '#E8F8E6',
   
   warning: '#F59E0B',
-  warningLight: '#78350F',
+  warningLight: '#FEF3C7',
   
   danger: '#EF4444',
-  dangerLight: '#7F1D1D',
+  dangerLight: '#FEE2E2',
   
-  background: '#000000',
-  backgroundLight: '#0A0A0A',
-  backgroundDark: '#000000',
+  background: '#FFFFFF',
+  backgroundLight: '#FAFAFA',
+  backgroundDark: '#F5F5F5',
   
-  surface: '#0F0F0F',
-  surfaceDark: '#050505',
-  surfaceLight: '#1A1A1A',
-  surfaceGreen: '#092D06',
+  surface: '#FFFFFF',
+  surfaceDark: '#F8F8F8',
+  surfaceLight: '#FAFAFA',
+  surfaceGreen: '#E8F8E6',
   
-  textPrimary: '#FFFFFF',
-  textSecondary: '#A1A1AA',
+  textPrimary: '#1A1A1A',
+  textSecondary: '#52525B',
   textLight: '#71717A',
-  textDark: '#000000',
-  textInverse: '#000000',
+  textDark: '#0A0A0A',
+  textInverse: '#FFFFFF',
   
-  border: '#1F1F1F',
-  borderDark: '#141414',
-  borderGreen: '#1B5116',
+  border: '#E5E5E5',
+  borderDark: '#D4D4D4',
+  borderGreen: '#C6EFC2',
   
-  shadow: 'rgba(55, 193, 38, 0.15)',
-  shadowDark: 'rgba(0, 0, 0, 0.5)',
+  shadow: 'rgba(55, 193, 38, 0.1)',
+  shadowDark: 'rgba(0, 0, 0, 0.08)',
   
   gradient: {
-    start: '#1B5116',
-    middle: '#092D06',
-    end: '#000000',
+    start: '#E8F8E6',
+    middle: '#F0FBF0',
+    end: '#FFFFFF',
   },
   
   cardGradient: {
-    start: '#1B5116',
-    end: '#092D06',
+    start: '#37C126',
+    end: '#299F1A',
   },
 
   green: {
@@ -95,6 +95,6 @@ export const AppColors = {
     investment: '#299F1A',
     savings: '#37C126',
     income: '#37C126',
-    other: '#A1A1AA',
+    other: '#71717A',
   },
 };

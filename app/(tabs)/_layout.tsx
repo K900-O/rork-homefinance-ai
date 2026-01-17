@@ -11,8 +11,8 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#FFFFFF',
-        tabBarInactiveTintColor: '#52525B',
+        tabBarActiveTintColor: '#37C126',
+        tabBarInactiveTintColor: '#A1A1AA',
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBar,
         tabBarBackground: () => (
@@ -48,7 +48,7 @@ export default function TabLayout() {
           href: isFinancialMode ? "/(tabs)/optimizer" : null,
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.optimizerButton]}>
-              <Sparkles color="#000" size={24} fill="#000" />
+              <Sparkles color="#FFF" size={24} fill="#FFF" />
             </View>
           ),
         }}
@@ -114,7 +114,7 @@ export default function TabLayout() {
           href: !isFinancialMode ? "/(tabs)/coach" : null,
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.coachButton]}>
-              <MessageCircle color="#000" size={24} fill="#000" />
+              <MessageCircle color="#FFF" size={24} fill="#FFF" />
             </View>
           ),
         }}
@@ -147,9 +147,9 @@ const styles = StyleSheet.create({
   },
   tabBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#1F1F1F',
+    borderTopColor: '#E5E5E5',
   },
   iconContainer: {
     alignItems: 'center',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   activeIconContainer: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#E8F8E6',
   },
   optimizerButton: {
     width: 50,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 5,
     shadowColor: '#37C126',
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 5,
     shadowColor: '#37C126',
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,

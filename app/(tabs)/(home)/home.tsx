@@ -63,7 +63,7 @@ export default function HomeScreen() {
         style={styles.content}
         contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#37C126" />}
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <View style={styles.header}>
@@ -79,10 +79,10 @@ export default function HomeScreen() {
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-                <User color="#000" size={20} />
+                <User color="#FFF" size={20} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconButton}>
-                <Bell color="#FFF" size={20} />
+                <Bell color="#52525B" size={20} />
               </TouchableOpacity>
             </View>
           </View>
@@ -93,13 +93,13 @@ export default function HomeScreen() {
             </View>
 
             <LinearGradient
-              colors={['#0F0F0F', '#050505']}
+              colors={['#37C126', '#299F1A']}
               style={styles.card}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
                <LinearGradient
-                  colors={['rgba(55, 193, 38, 0.2)', 'transparent', 'rgba(55, 193, 38, 0.05)']}
+                  colors={['rgba(255, 255, 255, 0.2)', 'transparent', 'rgba(255, 255, 255, 0.05)']}
                   style={styles.cardOverlay}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -119,7 +119,7 @@ export default function HomeScreen() {
               <View style={styles.cardBody}>
                  <View style={styles.holographicElement}>
                     <LinearGradient
-                      colors={['rgba(55, 193, 38, 0.4)', 'transparent']}
+                      colors={['rgba(255, 255, 255, 0.3)', 'transparent']}
                       style={{ flex: 1, borderRadius: 20 }}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
@@ -127,7 +127,7 @@ export default function HomeScreen() {
                  </View>
 
                  <View style={styles.cardChip}>
-                   <CreditCard color="#71717A" size={24} />
+                   <CreditCard color="rgba(255,255,255,0.7)" size={24} />
                  </View>
 
                  <View style={styles.cardDetails}>
@@ -194,7 +194,7 @@ export default function HomeScreen() {
               </View>
             ) : (
               <View style={styles.emptyPlanned}>
-                <CalendarClock size={32} color="#52525B" />
+                <CalendarClock size={32} color="#A1A1AA" />
                 <Text style={styles.emptyPlannedText}>No upcoming transactions</Text>
                 <Text style={styles.emptyPlannedSubtext}>Plan your income and expenses for better stability</Text>
               </View>
@@ -230,7 +230,7 @@ export default function HomeScreen() {
               </View>
             ) : (
               <View style={styles.emptyBudget}>
-                <Wallet size={32} color="#52525B" />
+                <Wallet size={32} color="#A1A1AA" />
                 <Text style={styles.emptyBudgetText}>No budgets set</Text>
                 <Text style={styles.emptyBudgetSubtext}>Create a budget to track household spending</Text>
               </View>
@@ -289,7 +289,7 @@ export default function HomeScreen() {
         onPress={() => setShowAddModal(true)}
         activeOpacity={0.8}
       >
-        <Plus color="#000" size={32} />
+        <Plus color="#FFF" size={32} />
       </TouchableOpacity>
 
       <AddTransactionModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
@@ -370,8 +370,8 @@ function TransactionItem({ transaction }: { transaction: Transaction }) {
   const isIncome = transaction.type === 'income';
   return (
     <TouchableOpacity style={styles.transactionItem}>
-      <View style={[styles.transactionIcon, { backgroundColor: '#1A1A1A' }]}>
-         <Text style={{ color: '#FFF', fontWeight: 'bold' as const }}>
+      <View style={[styles.transactionIcon, { backgroundColor: '#F5F5F5' }]}>
+         <Text style={{ color: '#1A1A1A', fontWeight: 'bold' as const }}>
             {transaction.category.charAt(0).toUpperCase()}
          </Text>
       </View>
@@ -467,7 +467,7 @@ function PlannedTransactionItem({ planned, onProcess, onDelete }: PlannedTransac
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -486,17 +486,17 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
   },
   greeting: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#71717A',
   },
   userName: {
     fontFamily: sfProDisplayBold,
     fontSize: 20,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     letterSpacing: 0.3,
   },
   headerActions: {
@@ -512,18 +512,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#37C126',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
   },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: '#E5E5E5',
   },
   content: {
     flex: 1,
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: sfProDisplayBold,
     fontSize: 24,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     letterSpacing: 0.2,
   },
 
@@ -551,8 +551,11 @@ const styles = StyleSheet.create({
     padding: 24,
     position: 'relative',
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(55, 193, 38, 0.2)',
+    shadowColor: '#37C126',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -566,7 +569,7 @@ const styles = StyleSheet.create({
   cardTypeBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.25)',
     borderRadius: 12,
   },
   cardTypeText: {
@@ -582,11 +585,11 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.4)',
   },
   activeDot: {
-    backgroundColor: '#37C126',
-    shadowColor: '#37C126',
+    backgroundColor: '#FFF',
+    shadowColor: '#FFF',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 6,
@@ -621,7 +624,7 @@ const styles = StyleSheet.create({
   cardNumber: {
     fontFamily: sfProDisplayMedium,
     fontSize: 16,
-    color: '#A1A1AA',
+    color: 'rgba(255,255,255,0.8)',
     marginBottom: 6,
   },
 
@@ -636,7 +639,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontFamily,
-    color: '#A1A1AA',
+    color: '#71717A',
     fontSize: 14,
   },
   transactionsList: {
@@ -663,7 +666,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   transactionType: {
@@ -678,7 +681,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   dateText: {
@@ -700,7 +703,7 @@ const styles = StyleSheet.create({
   emptyStateSubtext: {
     fontFamily,
     fontSize: 14,
-    color: '#52525B',
+    color: '#A1A1AA',
   },
   fab: {
     position: 'absolute',
@@ -714,7 +717,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#37C126',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.35,
     shadowRadius: 16,
     elevation: 8,
   },
@@ -726,7 +729,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(55, 193, 38, 0.15)',
+    backgroundColor: '#E8F8E6',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -740,7 +743,7 @@ const styles = StyleSheet.create({
   rewardsBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    backgroundColor: '#FEF3C7',
     padding: 12,
     borderRadius: 12,
     marginBottom: 16,
@@ -750,7 +753,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#F59E0B',
+    color: '#92400E',
     flex: 1,
   },
   rewardsBadge: {
@@ -763,17 +766,22 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 12,
     fontWeight: '600' as const,
-    color: '#F59E0B',
+    color: '#92400E',
   },
   budgetList: {
     gap: 12,
   },
   budgetItem: {
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   budgetHeader: {
     flexDirection: 'row',
@@ -795,14 +803,14 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#FFF',
+    color: '#1A1A1A',
   },
   budgetProgress: {
     marginBottom: 10,
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#1F1F1F',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 8,
@@ -819,7 +827,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 20,
     fontWeight: '700' as const,
-    color: '#FFF',
+    color: '#1A1A1A',
   },
   limitAmount: {
     fontFamily,
@@ -845,10 +853,10 @@ const styles = StyleSheet.create({
   emptyBudget: {
     alignItems: 'center',
     paddingVertical: 32,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FAFAFA',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
     borderStyle: 'dashed',
   },
   emptyBudgetText: {
@@ -861,12 +869,12 @@ const styles = StyleSheet.create({
   emptyBudgetSubtext: {
     fontFamily,
     fontSize: 13,
-    color: '#52525B',
+    color: '#A1A1AA',
     marginTop: 4,
   },
   rulesPreview: {
     marginTop: 16,
-    backgroundColor: 'rgba(55, 193, 38, 0.08)',
+    backgroundColor: '#E8F8E6',
     borderRadius: 12,
     padding: 14,
   },
@@ -907,7 +915,7 @@ const styles = StyleSheet.create({
   ruleName: {
     fontFamily,
     fontSize: 13,
-    color: '#A1A1AA',
+    color: '#52525B',
     flex: 1,
   },
   plannedSection: {
@@ -918,7 +926,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(55, 193, 38, 0.15)',
+    backgroundColor: '#E8F8E6',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -930,12 +938,17 @@ const styles = StyleSheet.create({
     color: '#37C126',
   },
   projectedCard: {
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   projectedHeader: {
     marginBottom: 12,
@@ -944,7 +957,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#A1A1AA',
+    color: '#52525B',
   },
   projectedGrid: {
     flexDirection: 'row',
@@ -965,7 +978,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
   },
   projectedIncomeValue: {
     fontFamily,
@@ -985,12 +998,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#1F1F1F',
+    borderTopColor: '#E5E5E5',
   },
   projectedResultLabel: {
     fontFamily,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: '#52525B',
   },
   projectedResultValue: {
     fontFamily,
@@ -1010,11 +1023,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   plannedItemLeft: {
     flexDirection: 'row',
@@ -1030,10 +1048,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   plannedIconIncome: {
-    backgroundColor: 'rgba(55, 193, 38, 0.15)',
+    backgroundColor: '#E8F8E6',
   },
   plannedIconExpense: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: '#FEE2E2',
   },
   plannedInfo: {
     flex: 1,
@@ -1042,7 +1060,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#FFFFFF',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   plannedMeta: {
@@ -1058,7 +1076,7 @@ const styles = StyleSheet.create({
   plannedDot: {
     fontFamily,
     fontSize: 12,
-    color: '#52525B',
+    color: '#A1A1AA',
   },
   plannedDate: {
     fontFamily,
@@ -1092,7 +1110,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(55, 193, 38, 0.15)',
+    backgroundColor: '#E8F8E6',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1100,17 +1118,17 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#1F1F1F',
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyPlanned: {
     alignItems: 'center',
     paddingVertical: 32,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#FAFAFA',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: '#E5E5E5',
     borderStyle: 'dashed',
   },
   emptyPlannedText: {
@@ -1123,7 +1141,7 @@ const styles = StyleSheet.create({
   emptyPlannedSubtext: {
     fontFamily,
     fontSize: 13,
-    color: '#52525B',
+    color: '#A1A1AA',
     marginTop: 4,
   },
 });
