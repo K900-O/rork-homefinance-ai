@@ -1,5 +1,5 @@
-const tintColorLight = '#166534';
-const tintColorDark = '#166534';
+const tintColorLight = '#2563EB';
+const tintColorDark = '#2563EB';
 
 export default {
   light: {
@@ -21,15 +21,15 @@ export default {
 };
 
 export const AppColors = {
-  primary: '#166534',
-  primaryDark: '#14532D',
-  primaryLight: '#22863A',
+  primary: '#2563EB',
+  primaryDark: '#1D4ED8',
+  primaryLight: '#3B82F6',
   
-  accent: '#166534',
-  accentLight: '#DCFCE7',
+  accent: '#2563EB',
+  accentLight: '#DBEAFE',
   
-  success: '#166534',
-  successLight: '#DCFCE7',
+  success: '#2563EB',
+  successLight: '#DBEAFE',
   
   warning: '#F59E0B',
   warningLight: '#FEF3C7',
@@ -44,7 +44,7 @@ export const AppColors = {
   surface: '#FFFFFF',
   surfaceDark: '#F8F8F8',
   surfaceLight: '#FAFAFA',
-  surfaceGreen: '#DCFCE7',
+  surfaceBlue: '#DBEAFE',
   
   textPrimary: '#1A1A1A',
   textSecondary: '#52525B',
@@ -54,47 +54,47 @@ export const AppColors = {
   
   border: '#E5E5E5',
   borderDark: '#D4D4D4',
-  borderGreen: '#BBF7D0',
+  borderBlue: '#BFDBFE',
   
-  shadow: 'rgba(22, 101, 52, 0.12)',
+  shadow: 'rgba(37, 99, 235, 0.12)',
   shadowDark: 'rgba(0, 0, 0, 0.08)',
   
   gradient: {
-    start: '#DCFCE7',
-    middle: '#F0FDF4',
+    start: '#DBEAFE',
+    middle: '#EFF6FF',
     end: '#FFFFFF',
   },
   
   cardGradient: {
-    start: '#166534',
-    end: '#14532D',
+    start: '#2563EB',
+    end: '#1D4ED8',
   },
 
-  green: {
-    50: '#F0FDF4',
-    100: '#DCFCE7',
-    200: '#BBF7D0',
-    300: '#86EFAC',
-    400: '#4ADE80',
-    500: '#22C55E',
-    600: '#16A34A',
-    700: '#166534',
-    800: '#14532D',
-    900: '#0F3D22',
-    950: '#052E16',
+  blue: {
+    50: '#EFF6FF',
+    100: '#DBEAFE',
+    200: '#BFDBFE',
+    300: '#93C5FD',
+    400: '#60A5FA',
+    500: '#3B82F6',
+    600: '#2563EB',
+    700: '#1D4ED8',
+    800: '#1E40AF',
+    900: '#1E3A8A',
+    950: '#172554',
   },
   
   categories: {
     food: '#F59E0B',
-    transport: '#166534',
+    transport: '#2563EB',
     entertainment: '#EC4899',
     shopping: '#8B5CF6',
     bills: '#EF4444',
-    healthcare: '#22863A',
+    healthcare: '#3B82F6',
     education: '#6366F1',
-    investment: '#14532D',
-    savings: '#166534',
-    income: '#166534',
+    investment: '#1D4ED8',
+    savings: '#2563EB',
+    income: '#2563EB',
     other: '#71717A',
   },
 };
