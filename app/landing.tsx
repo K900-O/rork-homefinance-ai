@@ -248,7 +248,7 @@ export default function LandingScreen() {
           imageStyle={styles.backgroundImage}
         />
         <LinearGradient
-          colors={['rgba(255,255,255,0.97)', 'rgba(255,255,255,0.85)', 'rgba(255,255,255,0.95)']}
+          colors={['rgba(255,255,255,0.75)', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.85)']}
           locations={[0, 0.5, 1]}
           style={styles.backgroundGradient}
         />
@@ -379,10 +379,11 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   backgroundImage: {
-    opacity: 0.12,
+    opacity: 0.35,
   },
   backgroundGradient: {
     ...StyleSheet.absoluteFillObject,
+    opacity: 0.7,
   },
   decorativeCircle1: {
     position: 'absolute',
