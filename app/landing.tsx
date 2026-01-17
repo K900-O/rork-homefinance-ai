@@ -9,12 +9,166 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Leaf, ArrowRight, TrendingUp, Target, Sparkles } from 'lucide-react-native';
+import { Leaf, ArrowRight, Target, Sparkles } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { sfProDisplayBold, sfProDisplayMedium } from '@/constants/Typography';
+import Svg, { Path, Circle, Defs, LinearGradient as SvgGradient, Stop, Line, Text as SvgText } from 'react-native-svg';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
 
-const { height } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height } = Dimensions.get('window');
+
+const GRAPH_DATA = [
+  { month: 'Jan', value: 2400 },
+  { month: 'Feb', value: 1800 },
+  { month: 'Mar', value: 3200 },
+  { month: 'Apr', value: 2800 },
+  { month: 'May', value: 3600 },
+  { month: 'Jun', value: 4200 },
+];
+
+const AnimatedGraph = ({ animProgress }: { animProgress: Animated.Value }) => {
+  const graphWidth = SCREEN_WIDTH - 80;
+  const graphHeight = 140;
+  const padding = { top: 20, right: 20, bottom: 30, left: 45 };
+  const chartWidth = graphWidth - padding.left - padding.right;
+  const chartHeight = graphHeight - padding.top - padding.bottom;
+  
+  const maxValue = Math.max(...GRAPH_DATA.map(d => d.value));
+  const minValue = Math.min(...GRAPH_DATA.map(d => d.value)) * 0.8;
+  const range = maxValue - minValue;
+  
+  const points = GRAPH_DATA.map((d, i) => {
+    const x = padding.left + (i / (GRAPH_DATA.length - 1)) * chartWidth;
+    const y = padding.top + chartHeight - ((d.value - minValue) / range) * chartHeight;
+    return { x, y, value: d.value, month: d.month };
+  });
+  
+  const linePath = points.reduce((path, point, i) => {
+    if (i === 0) return `M ${point.x} ${point.y}`;
+    const prev = points[i - 1];
+    const cpX1 = prev.x + (point.x - prev.x) / 3;
+    const cpX2 = prev.x + (point.x - prev.x) * 2 / 3;
+    return `${path} C ${cpX1} ${prev.y}, ${cpX2} ${point.y}, ${point.x} ${point.y}`;
+  }, '');
+  
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`;
+  
+  const yLabels = [minValue, (minValue + maxValue) / 2, maxValue].map(v => Math.round(v / 1000) + 'k');
+  
+  return (
+    <View style={graphStyles.container}>
+      <View style={graphStyles.header}>
+        <View>
+          <Text style={graphStyles.title}>Monthly Savings</Text>
+          <Text style={graphStyles.subtitle}>Last 6 months performance</Text>
+        </View>
+        <View style={graphStyles.badge}>
+          <Text style={graphStyles.badgeText}>+24%</Text>
+        </View>
+      </View>
+      <Svg width={graphWidth} height={graphHeight}>
+        <Defs>
+          <SvgGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor={AppColors.primary} stopOpacity="0.3" />
+            <Stop offset="100%" stopColor={AppColors.primary} stopOpacity="0.02" />
+          </SvgGradient>
+        </Defs>
+        
+        {[0, 1, 2].map((i) => (
+          <Line
+            key={`grid-${i}`}
+            x1={padding.left}
+            y1={padding.top + (chartHeight / 2) * i}
+            x2={graphWidth - padding.right}
+            y2={padding.top + (chartHeight / 2) * i}
+            stroke="#E5E7EB"
+            strokeWidth={1}
+            strokeDasharray="4,4"
+          />
+        ))}
+        
+        {yLabels.reverse().map((label, i) => (
+          <SvgText
+            key={`y-label-${i}`}
+            x={padding.left - 8}
+            y={padding.top + (chartHeight / 2) * i + 4}
+            fill="#9CA3AF"
+            fontSize={10}
+            textAnchor="end"
+            fontFamily={sfProDisplayRegular}
+          >
+            ${label}
+          </SvgText>
+        ))}
+        
+        <Path d={areaPath} fill="url(#areaGradient)" />
+        <Path d={linePath} stroke={AppColors.primary} strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        
+        {points.map((point, i) => (
+          <React.Fragment key={`point-${i}`}>
+            <Circle cx={point.x} cy={point.y} r={4} fill="#FFFFFF" stroke={AppColors.primary} strokeWidth={2} />
+            <SvgText
+              x={point.x}
+              y={graphHeight - 8}
+              fill="#6B7280"
+              fontSize={10}
+              textAnchor="middle"
+              fontFamily={sfProDisplayMedium}
+            >
+              {point.month}
+            </SvgText>
+          </React.Fragment>
+        ))}
+        
+        <Circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={6} fill={AppColors.primary} />
+        <Circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={10} fill={AppColors.primary} opacity={0.2} />
+      </Svg>
+    </View>
+  );
+};
+
+const graphStyles = StyleSheet.create({
+  container: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  title: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 18,
+    color: '#1F2937',
+    fontWeight: '700',
+  },
+  subtitle: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 13,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
+  badge: {
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#16A34A',
+    fontWeight: '600',
+  },
+});
 
 export default function LandingScreen() {
   const router = useRouter();
@@ -129,31 +283,7 @@ export default function LandingScreen() {
               }
             ]}
           >
-            <View style={styles.featureCard}>
-              <LinearGradient
-                colors={[AppColors.primary, AppColors.primaryDark]}
-                style={styles.cardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.cardIconContainer}>
-                  <TrendingUp color="#FFFFFF" size={28} />
-                </View>
-                <Text style={styles.cardTitle}>Track Finances</Text>
-                <Text style={styles.cardSubtitle}>Smart insights for your money</Text>
-                <View style={styles.cardStats}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statValue}>+24%</Text>
-                    <Text style={styles.statLabel}>Savings</Text>
-                  </View>
-                  <View style={styles.statDivider} />
-                  <View style={styles.statItem}>
-                    <Text style={styles.statValue}>$2.4k</Text>
-                    <Text style={styles.statLabel}>This Month</Text>
-                  </View>
-                </View>
-              </LinearGradient>
-            </View>
+            <AnimatedGraph animProgress={cardAnim} />
 
             <View style={styles.smallCardsRow}>
               <View style={styles.smallCard}>
@@ -302,71 +432,7 @@ const styles = StyleSheet.create({
   cardsContainer: {
     gap: 16,
   },
-  featureCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    shadowColor: AppColors.primary,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  cardGradient: {
-    padding: 24,
-    borderRadius: 24,
-  },
-  cardIconContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 24,
-    color: '#FFFFFF',
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  cardSubtitle: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '500',
-    marginBottom: 20,
-  },
-  cardStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 16,
-    padding: 16,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 20,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  statLabel: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
+
   smallCardsRow: {
     flexDirection: 'row',
     gap: 12,
