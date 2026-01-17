@@ -32,7 +32,6 @@ export default function HomeScreen() {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [showPlannedModal, setShowPlannedModal] = useState(false);
 
-  // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
@@ -94,14 +93,13 @@ export default function HomeScreen() {
             </View>
 
             <LinearGradient
-              colors={['#18181B', '#09090B']}
+              colors={['#0F0F0F', '#050505']}
               style={styles.card}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-               {/* Abstract card design */}
                <LinearGradient
-                  colors={['rgba(59, 130, 246, 0.2)', 'transparent', 'rgba(59, 130, 246, 0.05)']}
+                  colors={['rgba(55, 193, 38, 0.2)', 'transparent', 'rgba(55, 193, 38, 0.05)']}
                   style={styles.cardOverlay}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -119,10 +117,9 @@ export default function HomeScreen() {
               </View>
 
               <View style={styles.cardBody}>
-                 {/* Simulating the fluid/holographic element on the card in the design */}
                  <View style={styles.holographicElement}>
                     <LinearGradient
-                      colors={['rgba(59, 130, 246, 0.4)', 'transparent']}
+                      colors={['rgba(55, 193, 38, 0.4)', 'transparent']}
                       style={{ flex: 1, borderRadius: 20 }}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
@@ -144,12 +141,11 @@ export default function HomeScreen() {
             
           </View>
 
-          {/* Planned Transactions Section */}
           <View style={styles.plannedSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Upcoming</Text>
               <TouchableOpacity style={styles.addPlannedButton} onPress={() => setShowPlannedModal(true)}>
-                <CalendarClock size={16} color="#3B82F6" />
+                <CalendarClock size={16} color="#37C126" />
                 <Text style={styles.addPlannedText}>Plan</Text>
               </TouchableOpacity>
             </View>
@@ -165,7 +161,7 @@ export default function HomeScreen() {
                     <Text style={styles.projectedValue}>{projectedBalance.currentBalance.toFixed(0)} USD</Text>
                   </View>
                   <View style={styles.projectedItem}>
-                    <TrendingUp size={14} color="#10B981" />
+                    <TrendingUp size={14} color="#37C126" />
                     <Text style={styles.projectedIncomeValue}>+{projectedBalance.projectedIncome.toFixed(0)}</Text>
                   </View>
                   <View style={styles.projectedItem}>
@@ -205,12 +201,11 @@ export default function HomeScreen() {
             )}
           </View>
 
-          {/* Budget Section */}
           <View style={styles.budgetSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Budgets</Text>
               <TouchableOpacity style={styles.addBudgetButton} onPress={() => setShowBudgetModal(true)}>
-                <Plus size={16} color="#10B981" />
+                <Plus size={16} color="#37C126" />
                 <Text style={styles.addBudgetText}>Add</Text>
               </TouchableOpacity>
             </View>
@@ -244,7 +239,7 @@ export default function HomeScreen() {
             {budgetRules.length > 0 && (
               <View style={styles.rulesPreview}>
                 <View style={styles.rulesHeader}>
-                  <Shield size={16} color="#3B82F6" />
+                  <Shield size={16} color="#37C126" />
                   <Text style={styles.rulesTitle}>{budgetRules.length} Active Rules</Text>
                 </View>
                 <View style={styles.rulesList}>
@@ -307,7 +302,7 @@ export default function HomeScreen() {
 function BudgetItem({ status }: { status: BudgetStatus }) {
   const getStatusColor = () => {
     switch (status.status) {
-      case 'safe': return '#10B981';
+      case 'safe': return '#37C126';
       case 'warning': return '#F59E0B';
       case 'danger': return '#EF4444';
       case 'exceeded': return '#DC2626';
@@ -317,7 +312,7 @@ function BudgetItem({ status }: { status: BudgetStatus }) {
 
   const getStatusIcon = () => {
     switch (status.status) {
-      case 'safe': return <CheckCircle size={16} color="#10B981" />;
+      case 'safe': return <CheckCircle size={16} color="#37C126" />;
       case 'warning': return <AlertTriangle size={16} color="#F59E0B" />;
       case 'danger':
       case 'exceeded': return <AlertTriangle size={16} color="#EF4444" />;
@@ -375,7 +370,7 @@ function TransactionItem({ transaction }: { transaction: Transaction }) {
   const isIncome = transaction.type === 'income';
   return (
     <TouchableOpacity style={styles.transactionItem}>
-      <View style={[styles.transactionIcon, { backgroundColor: '#333' }]}>
+      <View style={[styles.transactionIcon, { backgroundColor: '#1A1A1A' }]}>
          <Text style={{ color: '#FFF', fontWeight: 'bold' as const }}>
             {transaction.category.charAt(0).toUpperCase()}
          </Text>
@@ -427,7 +422,7 @@ function PlannedTransactionItem({ planned, onProcess, onDelete }: PlannedTransac
           isIncome ? styles.plannedIconIncome : styles.plannedIconExpense
         ]}>
           {isIncome ? (
-            <TrendingUp size={18} color="#10B981" />
+            <TrendingUp size={18} color="#37C126" />
           ) : (
             <TrendingDown size={18} color="#EF4444" />
           )}
@@ -457,7 +452,7 @@ function PlannedTransactionItem({ planned, onProcess, onDelete }: PlannedTransac
         <View style={styles.plannedActions}>
           {isToday && (
             <TouchableOpacity style={styles.processButton} onPress={onProcess}>
-              <Play size={14} color="#10B981" />
+              <Play size={14} color="#37C126" />
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
@@ -491,7 +486,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
   },
   greeting: {
     fontFamily: sfProDisplayRegular,
@@ -512,10 +507,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#37C126',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3B82F6',
+    shadowColor: '#37C126',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -557,7 +552,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.2)',
+    borderColor: 'rgba(55, 193, 38, 0.2)',
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -590,8 +585,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.3)',
   },
   activeDot: {
-    backgroundColor: '#3B82F6',
-    shadowColor: '#3B82F6',
+    backgroundColor: '#37C126',
+    shadowColor: '#37C126',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 6,
@@ -714,10 +709,10 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#37C126',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3B82F6',
+    shadowColor: '#37C126',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 16,
@@ -731,7 +726,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: 'rgba(55, 193, 38, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -740,7 +735,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 13,
     fontWeight: '600' as const,
-    color: '#10B981',
+    color: '#37C126',
   },
   rewardsBar: {
     flexDirection: 'row',
@@ -774,11 +769,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   budgetItem: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
   },
   budgetHeader: {
     flexDirection: 'row',
@@ -807,7 +802,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#27272A',
+    backgroundColor: '#1F1F1F',
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 8,
@@ -850,10 +845,10 @@ const styles = StyleSheet.create({
   emptyBudget: {
     alignItems: 'center',
     paddingVertical: 32,
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
     borderStyle: 'dashed',
   },
   emptyBudgetText: {
@@ -871,7 +866,7 @@ const styles = StyleSheet.create({
   },
   rulesPreview: {
     marginTop: 16,
-    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    backgroundColor: 'rgba(55, 193, 38, 0.08)',
     borderRadius: 12,
     padding: 14,
   },
@@ -885,7 +880,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#3B82F6',
+    color: '#37C126',
   },
   rulesList: {
     gap: 8,
@@ -907,7 +902,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F59E0B',
   },
   flexibleDot: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#37C126',
   },
   ruleName: {
     fontFamily,
@@ -923,7 +918,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    backgroundColor: 'rgba(55, 193, 38, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -932,15 +927,15 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 13,
     fontWeight: '600' as const,
-    color: '#3B82F6',
+    color: '#37C126',
   },
   projectedCard: {
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
   },
   projectedHeader: {
     marginBottom: 12,
@@ -976,7 +971,7 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#10B981',
+    color: '#37C126',
   },
   projectedExpenseValue: {
     fontFamily,
@@ -990,7 +985,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#27272A',
+    borderTopColor: '#1F1F1F',
   },
   projectedResultLabel: {
     fontFamily,
@@ -1003,7 +998,7 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
   },
   positiveBalance: {
-    color: '#10B981',
+    color: '#37C126',
   },
   negativeBalance: {
     color: '#EF4444',
@@ -1015,11 +1010,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
   },
   plannedItemLeft: {
     flexDirection: 'row',
@@ -1035,7 +1030,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   plannedIconIncome: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: 'rgba(55, 193, 38, 0.15)',
   },
   plannedIconExpense: {
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
@@ -1084,7 +1079,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   incomeAmount: {
-    color: '#10B981',
+    color: '#37C126',
   },
   expenseAmount: {
     color: '#EF4444',
@@ -1097,7 +1092,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: 'rgba(55, 193, 38, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1105,17 +1100,17 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#27272A',
+    backgroundColor: '#1F1F1F',
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyPlanned: {
     alignItems: 'center',
     paddingVertical: 32,
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#1F1F1F',
     borderStyle: 'dashed',
   },
   emptyPlannedText: {

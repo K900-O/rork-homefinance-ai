@@ -30,7 +30,7 @@ import {
   Umbrella,
   Shield,
   BarChart3,
-  Zap
+  Leaf
 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { RiskTolerance } from '@/constants/types';
@@ -55,7 +55,7 @@ const AVAILABLE_GOALS = [
 const RISK_OPTIONS: { value: RiskTolerance; label: string; description: string; icon: any }[] = [
   { value: 'conservative', label: 'Conservative', description: 'Lower risk, stable returns', icon: Shield },
   { value: 'moderate', label: 'Moderate', description: 'Balanced risk and growth', icon: BarChart3 },
-  { value: 'aggressive', label: 'Aggressive', description: 'Higher risk, higher potential', icon: Zap },
+  { value: 'aggressive', label: 'Aggressive', description: 'Higher risk, higher potential', icon: Leaf },
 ];
 
 export default function OnboardingScreen() {
@@ -70,21 +70,17 @@ export default function OnboardingScreen() {
   const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('moderate');
   const [isLoading, setIsLoading] = useState(false);
   
-  // Refs for input focus
   const incomeInputRef = useRef<TextInput>(null);
   const householdInputRef = useRef<TextInput>(null);
 
-  // Step Animations
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
 
-  // Initial Entrance Animation
   const initialFade = useRef(new Animated.Value(0)).current;
   const initialSlide = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
-    // Initial entrance animation
     Animated.parallel([
       Animated.timing(initialFade, {
         toValue: 1,
@@ -107,7 +103,6 @@ export default function OnboardingScreen() {
       useNativeDriver: false,
     }).start();
 
-    // Focus input when step changes
     if (currentStep === 0) {
       setTimeout(() => incomeInputRef.current?.focus(), 300);
     }
@@ -171,7 +166,6 @@ export default function OnboardingScreen() {
 
     if (currentStep < 3) {
       animateSlide('forward');
-      // Small delay to allow fade out to happen before state change
       setTimeout(() => {
         setCurrentStep(currentStep + 1);
       }, 150);
@@ -488,7 +482,7 @@ export default function OnboardingScreen() {
                     >
                       <ArrowLeft color={AppColors.textPrimary} size={24} />
                     </TouchableOpacity>
-                  ) : <View style={{ width: 48 }} />} {/* Spacer */}
+                  ) : <View style={{ width: 48 }} />}
                   
                   <TouchableOpacity
                     style={[styles.nextButton, isLoading && styles.buttonDisabled]}
@@ -524,7 +518,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     height: 4,
-    backgroundColor: '#27272A',
+    backgroundColor: '#1F1F1F',
     marginHorizontal: 24,
     marginTop: 10,
     borderRadius: 2,
@@ -532,7 +526,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#37C126',
     borderRadius: 2,
   },
   mainContent: {
@@ -553,12 +547,12 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
   },
   stepTitle: {
     fontFamily: sfProDisplayBold,
@@ -576,12 +570,11 @@ const styles = StyleSheet.create({
     fontWeight: '400' as const,
   },
   
-  // Input Step
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 2,
-    borderBottomColor: '#27272A',
+    borderBottomColor: '#1F1F1F',
     paddingBottom: 12,
     marginTop: 20,
   },
@@ -602,7 +595,6 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 
-  // Household Step
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -613,15 +605,15 @@ const styles = StyleSheet.create({
     width: (width - 48 - 24) / 3,
     aspectRatio: 1,
     borderRadius: 16,
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
     alignItems: 'center',
     justifyContent: 'center',
   },
   gridOptionSelected: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: '#37C126',
+    borderColor: '#37C126',
   },
   gridOptionText: {
     fontFamily: sfProDisplayBold,
@@ -630,17 +622,17 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
   },
   gridOptionTextSelected: {
-    color: '#000000',
+    color: '#FFFFFF',
   },
   otherInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
   },
   otherLabel: {
     fontFamily: sfProDisplayMedium,
@@ -658,10 +650,9 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 
-  // Goals Step
   scrollContainer: {
     flex: 1,
-    marginHorizontal: -24, // Break out of padding
+    marginHorizontal: -24,
   },
   scrollContent: {
     paddingHorizontal: 24,
@@ -676,27 +667,27 @@ const styles = StyleSheet.create({
     width: (width - 48 - 12) / 2,
     padding: 16,
     borderRadius: 20,
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
     minHeight: 110,
     justifyContent: 'space-between',
   },
   goalCardSelected: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: '#37C126',
+    borderColor: '#37C126',
   },
   goalIconWrapper: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#27272A',
+    backgroundColor: '#1F1F1F',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   goalIconWrapperSelected: {
-    backgroundColor: '#E4E4E7',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   goalText: {
     fontFamily: sfProDisplayMedium,
@@ -705,18 +696,17 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
   },
   goalTextSelected: {
-    color: '#000000',
+    color: '#FFFFFF',
   },
   checkMark: {
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: '#E4E4E7',
+    backgroundColor: 'rgba(255,255,255,0.3)',
     borderRadius: 10,
     padding: 2,
   },
 
-  // Risk Step
   riskList: {
     gap: 12,
   },
@@ -725,25 +715,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 20,
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
   },
   riskCardSelected: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: '#37C126',
+    borderColor: '#37C126',
   },
   riskIconBox: {
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: '#27272A',
+    backgroundColor: '#1F1F1F',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
   },
   riskIconBoxSelected: {
-    backgroundColor: '#E4E4E7',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   riskInfo: {
     flex: 1,
@@ -756,7 +746,7 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
   },
   riskTitleSelected: {
-    color: '#000000',
+    color: '#FFFFFF',
   },
   riskDesc: {
     fontFamily: sfProDisplayRegular,
@@ -765,10 +755,9 @@ const styles = StyleSheet.create({
     fontWeight: '400' as const,
   },
   riskDescSelected: {
-    color: '#52525B',
+    color: 'rgba(255,255,255,0.8)',
   },
 
-  // Footer
   footer: {
     padding: 24,
     paddingBottom: Platform.OS === 'ios' ? 0 : 24,
@@ -782,23 +771,23 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
   },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#37C126',
     paddingVertical: 16,
     paddingHorizontal: 28,
     borderRadius: 100,
     gap: 8,
     minWidth: 140,
     justifyContent: 'center',
-    shadowColor: '#3B82F6',
+    shadowColor: '#37C126',
     shadowOffset: {
       width: 0,
       height: 4,

@@ -25,7 +25,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Animation Refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -198,10 +197,10 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(24, 24, 27, 0.8)',
+    backgroundColor: 'rgba(15, 15, 15, 0.8)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#1F1F1F',
     paddingHorizontal: 16,
     height: 60,
   },
@@ -220,12 +219,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#37C126',
     paddingVertical: 18,
     borderRadius: 30,
     marginTop: 16,
     gap: 8,
-    shadowColor: '#3B82F6',
+    shadowColor: '#37C126',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -259,7 +258,7 @@ const styles = StyleSheet.create({
   footerLink: {
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
-    color: '#3B82F6',
+    color: '#37C126',
     fontWeight: '600' as const,
   },
 });

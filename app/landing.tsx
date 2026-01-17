@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Zap } from 'lucide-react-native';
+import { Leaf } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { sfProDisplayBold, sfProDisplayMedium } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
@@ -17,7 +17,6 @@ export default function LandingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  // Animations
   const titleAnim = useRef(new Animated.Value(100)).current;
   const titleOpacity = useRef(new Animated.Value(0)).current;
   
@@ -72,7 +71,6 @@ export default function LandingScreen() {
       ]),
     ]).start();
 
-    // Subtle breathing animation for the text container
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, {
@@ -96,7 +94,7 @@ export default function LandingScreen() {
       <View style={[styles.content, { paddingBottom: insets.bottom + 40 }]}>
         <View style={styles.brandContainer}>
            <View style={styles.brandIcon}>
-            <Zap color="#3B82F6" size={18} />
+            <Leaf color="#37C126" size={18} />
           </View>
           <Text style={styles.brandName}>Hayati</Text>
         </View>
@@ -141,7 +139,7 @@ export default function LandingScreen() {
             style={styles.buttonWrapper}
           >
             <LinearGradient
-              colors={['#60A5FA', '#3B82F6']}
+              colors={['#5DDA4D', '#37C126']}
               style={styles.primaryButton}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -185,7 +183,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    backgroundColor: 'rgba(55, 193, 38, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -210,7 +208,7 @@ const styles = StyleSheet.create({
   highlight: {
     fontFamily: sfProDisplayBold,
     fontSize: 48,
-    color: '#3B82F6',
+    color: '#37C126',
     lineHeight: 52,
     letterSpacing: -1,
     fontWeight: '700',
@@ -220,7 +218,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     borderRadius: 30,
-    shadowColor: '#3B82F6',
+    shadowColor: '#37C126',
     shadowOffset: {
       width: 0,
       height: 4,

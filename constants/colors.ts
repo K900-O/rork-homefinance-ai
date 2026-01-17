@@ -21,15 +21,15 @@ export default {
 };
 
 export const AppColors = {
-  primary: '#FFFFFF',
-  primaryDark: '#E4E4E7',
-  primaryLight: '#27272A',
+  primary: '#37C126',
+  primaryDark: '#299F1A',
+  primaryLight: '#5DDA4D',
   
-  accent: '#27272A',
-  accentLight: '#3F3F46',
+  accent: '#37C126',
+  accentLight: '#5DDA4D',
   
-  success: '#10B981',
-  successLight: '#064E3B',
+  success: '#37C126',
+  successLight: '#1B5116',
   
   warning: '#F59E0B',
   warningLight: '#78350F',
@@ -38,13 +38,13 @@ export const AppColors = {
   dangerLight: '#7F1D1D',
   
   background: '#000000',
-  backgroundLight: '#121212',
+  backgroundLight: '#0A0A0A',
   backgroundDark: '#000000',
   
-  surface: '#121212',
-  surfaceDark: '#09090B',
-  surfaceLight: '#27272A',
-  surfaceBlue: '#18181B', // Kept name for compatibility but mapped to dark
+  surface: '#0F0F0F',
+  surfaceDark: '#050505',
+  surfaceLight: '#1A1A1A',
+  surfaceGreen: '#092D06',
   
   textPrimary: '#FFFFFF',
   textSecondary: '#A1A1AA',
@@ -52,34 +52,49 @@ export const AppColors = {
   textDark: '#000000',
   textInverse: '#000000',
   
-  border: '#27272A',
-  borderDark: '#18181B',
+  border: '#1F1F1F',
+  borderDark: '#141414',
+  borderGreen: '#1B5116',
   
-  shadow: 'rgba(255, 255, 255, 0.1)',
+  shadow: 'rgba(55, 193, 38, 0.15)',
   shadowDark: 'rgba(0, 0, 0, 0.5)',
   
   gradient: {
-    start: '#27272A',
-    middle: '#18181B',
+    start: '#1B5116',
+    middle: '#092D06',
     end: '#000000',
   },
   
   cardGradient: {
-    start: '#333333',
-    end: '#111111',
+    start: '#1B5116',
+    end: '#092D06',
+  },
+
+  green: {
+    50: '#F2FDF0',
+    100: '#E1FBDD',
+    200: '#C5F5BD',
+    300: '#94EC89',
+    400: '#5DDA4D',
+    500: '#37C126',
+    600: '#299F1A',
+    700: '#227D18',
+    800: '#206318',
+    900: '#1B5116',
+    950: '#092D06',
   },
   
   categories: {
     food: '#F59E0B',
-    transport: '#3B82F6',
+    transport: '#37C126',
     entertainment: '#EC4899',
     shopping: '#8B5CF6',
     bills: '#EF4444',
-    healthcare: '#10B981',
+    healthcare: '#5DDA4D',
     education: '#6366F1',
-    investment: '#14B8A6',
-    savings: '#059669',
-    income: '#10B981',
+    investment: '#299F1A',
+    savings: '#37C126',
+    income: '#37C126',
     other: '#A1A1AA',
   },
 };

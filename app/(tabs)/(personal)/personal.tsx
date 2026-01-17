@@ -40,7 +40,7 @@ const CircularProgress = ({
   size = 80, 
   strokeWidth = 8, 
   progress = 0, 
-  color = '#3B82F6',
+  color = '#37C126',
   label = '',
   value = ''
 }: { 
@@ -213,15 +213,14 @@ export default function PersonalHomeScreen() {
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3B82F6" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#37C126" />}
         >
           
-          {/* Daily Progress Card */}
           <View style={styles.mainCard}>
             <View style={styles.cardHeader}>
               <View style={styles.cardTitleRow}>
                 <View style={styles.iconBadge}>
-                  <BarChart3 size={16} color="#3B82F6" />
+                  <BarChart3 size={16} color="#37C126" />
                 </View>
                 <Text style={styles.cardTitle}>Daily Progress</Text>
               </View>
@@ -236,13 +235,13 @@ export default function PersonalHomeScreen() {
                 progress={tasksCompletion} 
                 value={`${dailySummary.completedActivities}/${dailySummary.totalActivities}`}
                 label="Tasks Done"
-                color="#3B82F6"
+                color="#37C126"
               />
               <CircularProgress 
                 progress={habitsCompletion} 
                 value={`${habitsCompletion}%`}
                 label="Habits"
-                color="#10B981"
+                color="#5DDA4D"
               />
               <CircularProgress 
                 progress={Math.min(totalStreak * 10, 100)} 
@@ -255,7 +254,7 @@ export default function PersonalHomeScreen() {
             <View style={styles.divider} />
             
             <View style={styles.insightRow}>
-              <Sparkles size={14} color="#60A5FA" />
+              <Sparkles size={14} color="#5DDA4D" />
               <Text style={styles.insightText}>
                 {dailySummary.productivityScore >= 70 
                   ? "You're on fire today! Keep up the momentum."
@@ -266,18 +265,17 @@ export default function PersonalHomeScreen() {
             </View>
           </View>
 
-          {/* Quick Stats Row */}
           <View style={styles.statsRow}>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#3B82F620' }]}>
+              <View style={[styles.statIcon, { backgroundColor: '#37C12620' }]}>
                 <Flame size={18} color="#F59E0B" />
               </View>
               <Text style={styles.statValue}>{totalStreak}</Text>
               <Text style={styles.statLabel}>Day Streak</Text>
             </View>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
-                <ShieldCheck size={18} color="#10B981" />
+              <View style={[styles.statIcon, { backgroundColor: '#5DDA4D20' }]}>
+                <ShieldCheck size={18} color="#5DDA4D" />
               </View>
               <Text style={styles.statValue}>{longestCleanStreak}</Text>
               <Text style={styles.statLabel}>Days Clean</Text>
@@ -291,17 +289,16 @@ export default function PersonalHomeScreen() {
             </View>
           </View>
 
-          {/* Good Habits Section */}
           {goodHabits.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <View style={styles.sectionTitleRow}>
-                  <View style={[styles.sectionDot, { backgroundColor: '#10B981' }]} />
+                  <View style={[styles.sectionDot, { backgroundColor: '#37C126' }]} />
                   <Text style={styles.sectionTitle}>Build Habits</Text>
                 </View>
                 <TouchableOpacity onPress={() => router.push('/habits')} style={styles.seeAllBtn}>
                   <Text style={styles.seeAllText}>See All</Text>
-                  <ChevronRight size={14} color="#60A5FA" />
+                  <ChevronRight size={14} color="#5DDA4D" />
                 </TouchableOpacity>
               </View>
               
@@ -318,7 +315,6 @@ export default function PersonalHomeScreen() {
             </View>
           )}
 
-          {/* Bad Habits Section */}
           {badHabits.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
@@ -328,7 +324,7 @@ export default function PersonalHomeScreen() {
                 </View>
                 <TouchableOpacity onPress={() => router.push('/habits')} style={styles.seeAllBtn}>
                   <Text style={styles.seeAllText}>See All</Text>
-                  <ChevronRight size={14} color="#60A5FA" />
+                  <ChevronRight size={14} color="#5DDA4D" />
                 </TouchableOpacity>
               </View>
               
@@ -340,16 +336,15 @@ export default function PersonalHomeScreen() {
             </View>
           )}
 
-          {/* Today's Activities */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
-                <View style={[styles.sectionDot, { backgroundColor: '#3B82F6' }]} />
+                <View style={[styles.sectionDot, { backgroundColor: '#37C126' }]} />
                 <Text style={styles.sectionTitle}>Today&apos;s Tasks</Text>
               </View>
               <TouchableOpacity onPress={() => router.push('/schedule')} style={styles.seeAllBtn}>
                 <Text style={styles.seeAllText}>Schedule</Text>
-                <ChevronRight size={14} color="#60A5FA" />
+                <ChevronRight size={14} color="#5DDA4D" />
               </TouchableOpacity>
             </View>
 
@@ -372,7 +367,6 @@ export default function PersonalHomeScreen() {
             )}
           </View>
 
-          {/* Upcoming Activities */}
           {upcomingActivities.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
@@ -394,7 +388,6 @@ export default function PersonalHomeScreen() {
             </View>
           )}
 
-          {/* Quick Actions */}
           <View style={styles.quickActions}>
             <Text style={styles.quickActionsTitle}>Quick Actions</Text>
             <View style={styles.actionsGrid}>
@@ -402,8 +395,8 @@ export default function PersonalHomeScreen() {
                 style={styles.actionBtn} 
                 onPress={() => setShowAddModal(true)}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#3B82F620' }]}>
-                  <Plus size={20} color="#3B82F6" />
+                <View style={[styles.actionIcon, { backgroundColor: '#37C12620' }]}>
+                  <Plus size={20} color="#37C126" />
                 </View>
                 <Text style={styles.actionLabel}>Add Task</Text>
               </TouchableOpacity>
@@ -412,8 +405,8 @@ export default function PersonalHomeScreen() {
                 style={styles.actionBtn}
                 onPress={() => router.push('/habits')}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#10B98120' }]}>
-                  <Target size={20} color="#10B981" />
+                <View style={[styles.actionIcon, { backgroundColor: '#5DDA4D20' }]}>
+                  <Target size={20} color="#5DDA4D" />
                 </View>
                 <Text style={styles.actionLabel}>Habits</Text>
               </TouchableOpacity>
@@ -586,11 +579,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#0F0F0F',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#3B82F6',
+    borderColor: '#37C126',
   },
   avatarFallback: {
     alignItems: 'center',
@@ -630,7 +623,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: '#3B82F620',
+    backgroundColor: '#37C12620',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -641,7 +634,7 @@ const styles = StyleSheet.create({
   },
   scoreBox: {
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -649,7 +642,7 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontFamily: sfProDisplayBold,
     fontSize: 20,
-    color: '#3B82F6',
+    color: '#37C126',
   },
   scoreLabel: {
     fontFamily: sfProDisplayRegular,
@@ -671,7 +664,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#18181B',
+    backgroundColor: '#0F0F0F',
     padding: 12,
     borderRadius: 12,
   },
@@ -749,7 +742,7 @@ const styles = StyleSheet.create({
   seeAllText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#60A5FA',
+    color: '#5DDA4D',
   },
   habitsList: {
     paddingHorizontal: 20,
@@ -766,8 +759,8 @@ const styles = StyleSheet.create({
     borderColor: '#1F1F1F',
   },
   habitCardCompleted: {
-    borderColor: '#10B98140',
-    backgroundColor: '#10B98108',
+    borderColor: '#37C12640',
+    backgroundColor: '#37C12608',
   },
   habitLeft: {
     flexDirection: 'row',
@@ -792,7 +785,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   habitTitleCompleted: {
-    color: '#10B981',
+    color: '#37C126',
   },
   habitMeta: {
     flexDirection: 'row',
@@ -814,8 +807,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   habitCheckDone: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
+    backgroundColor: '#37C126',
+    borderColor: '#37C126',
   },
   badHabitCard: {
     backgroundColor: '#0A0A0A',
@@ -845,7 +838,7 @@ const styles = StyleSheet.create({
   },
   daysCleanBadge: {
     alignItems: 'center',
-    backgroundColor: '#10B98120',
+    backgroundColor: '#37C12620',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 10,
@@ -853,12 +846,12 @@ const styles = StyleSheet.create({
   daysCleanValue: {
     fontFamily: sfProDisplayBold,
     fontSize: 18,
-    color: '#10B981',
+    color: '#37C126',
   },
   daysCleanLabel: {
     fontFamily: sfProDisplayRegular,
     fontSize: 10,
-    color: '#10B981',
+    color: '#37C126',
   },
   progressBarBg: {
     height: 6,
@@ -869,7 +862,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: '#37C126',
     borderRadius: 3,
   },
   progressText: {
@@ -943,8 +936,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkBoxChecked: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: '#37C126',
+    borderColor: '#37C126',
   },
   emptyState: {
     alignItems: 'center',

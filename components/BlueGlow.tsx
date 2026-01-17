@@ -27,7 +27,7 @@ export function BlueGlow({ scale = 1, opacity = 0.6 }: { scale?: number, opacity
   return (
     <Animated.View style={[styles.glowContainer, { opacity: pulseAnim }]}>
       <LinearGradient
-        colors={['#3B82F6', '#1E40AF', '#000000']}
+        colors={['#37C126', '#1B5116', '#000000']}
         style={styles.glowGradient}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -57,9 +57,9 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     height: width * 0.8,
     borderRadius: width * 0.4,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#37C126',
     opacity: 0.4,
-    shadowColor: "#3B82F6",
+    shadowColor: "#37C126",
     shadowOffset: {
       width: 0,
       height: 0,
