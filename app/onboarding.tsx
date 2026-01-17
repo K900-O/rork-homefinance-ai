@@ -14,6 +14,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   StatusBar,
+  Easing,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
@@ -78,6 +79,36 @@ export default function OnboardingScreen() {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const progressAnim = useRef(new Animated.Value(0.25)).current; // Start at 1/4
+
+  // Entrance Animations
+  const initialFadeAnim = useRef(new Animated.Value(0)).current;
+  const initialSlideAnim = useRef(new Animated.Value(100)).current; // For card
+  const headerSlideAnim = useRef(new Animated.Value(-50)).current; // For top section
+  const buttonScaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Entrance Animation
+    Animated.parallel([
+      Animated.timing(initialFadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+      Animated.spring(initialSlideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.spring(headerSlideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [initialFadeAnim, initialSlideAnim, headerSlideAnim]);
 
   useEffect(() => {
     Animated.timing(progressAnim, {
@@ -429,24 +460,38 @@ export default function OnboardingScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       
-      {/* Top Section - White */}
       <View style={[styles.topSection, { paddingTop: insets.top }]}>
-        {currentStep > 0 ? (
-          <TouchableOpacity 
-            onPress={handleBack} 
-            style={styles.backButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <ArrowLeft color="#000" size={24} />
-            <Text style={styles.backButtonText}>Back</Text>
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.backButtonPlaceholder} />
-        )}
+        <Animated.View 
+          style={{ 
+            opacity: initialFadeAnim, 
+            transform: [{ translateY: headerSlideAnim }] 
+          }}
+        >
+          {currentStep > 0 ? (
+            <TouchableOpacity 
+              onPress={handleBack} 
+              style={styles.backButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <ArrowLeft color="#000" size={24} />
+              <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.backButtonPlaceholder} />
+          )}
+        </Animated.View>
       </View>
 
       {/* Bottom Section - Blue Card */}
-      <View style={styles.bottomSection}>
+      <Animated.View 
+        style={[
+          styles.bottomSection,
+          {
+            opacity: initialFadeAnim,
+            transform: [{ translateY: initialSlideAnim }]
+          }
+        ]}
+      >
         <LinearGradient
           colors={[AppColors.primaryLight, AppColors.primary, AppColors.primaryDark]}
           style={styles.gradient}
@@ -492,24 +537,38 @@ export default function OnboardingScreen() {
                         </Animated.View>
 
                         <View style={styles.footer}>
-                            <TouchableOpacity
-                                style={[styles.nextButton, isLoading && styles.buttonDisabled]}
-                                onPress={currentStep === 3 ? handleComplete : handleNext}
-                                disabled={isLoading}
-                                activeOpacity={0.9}
-                            >
-                                <Text style={styles.nextButtonText}>
-                                {isLoading ? 'Processing...' : currentStep === 3 ? 'Get Started' : 'Continue'}
-                                </Text>
-                                {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
-                            </TouchableOpacity>
+                            <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
+                                <TouchableOpacity
+                                    style={[styles.nextButton, isLoading && styles.buttonDisabled]}
+                                    onPress={currentStep === 3 ? handleComplete : handleNext}
+                                    onPressIn={() => {
+                                        Animated.spring(buttonScaleAnim, {
+                                            toValue: 0.95,
+                                            useNativeDriver: true,
+                                        }).start();
+                                    }}
+                                    onPressOut={() => {
+                                        Animated.spring(buttonScaleAnim, {
+                                            toValue: 1,
+                                            useNativeDriver: true,
+                                        }).start();
+                                    }}
+                                    disabled={isLoading}
+                                    activeOpacity={0.9}
+                                >
+                                    <Text style={styles.nextButtonText}>
+                                    {isLoading ? 'Processing...' : currentStep === 3 ? 'Get Started' : 'Continue'}
+                                    </Text>
+                                    {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
+                                </TouchableOpacity>
+                            </Animated.View>
                         </View>
                     </ScrollView>
                 </View>
             </TouchableWithoutFeedback>
           </KeyboardAvoidingView>
         </LinearGradient>
-      </View>
+      </Animated.View>
     </View>
   );
 }
