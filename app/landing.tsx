@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
-  ImageBackground,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -171,6 +170,76 @@ const graphStyles = StyleSheet.create({
   },
 });
 
+const MockUiBackground = () => {
+  const { width } = Dimensions.get('window');
+  
+  return (
+    <View style={styles.mockUiContainer}>
+      {/* Base Gradient */}
+      <LinearGradient
+        colors={['#F0F9FF', '#FFFFFF', '#EFF6FF']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      
+      {/* Decorative Grid Lines */}
+      <View style={styles.gridContainer}>
+        {[...Array(6)].map((_, i) => (
+          <View key={`v-${i}`} style={[styles.gridLineVertical, { left: (width / 5) * i }]} />
+        ))}
+        {[...Array(10)].map((_, i) => (
+          <View key={`h-${i}`} style={[styles.gridLineHorizontal, { top: 100 * i }]} />
+        ))}
+      </View>
+
+      {/* Floating UI Elements (Blurred/Faded) */}
+      
+      {/* Top Right - Investment Card */}
+      <View style={[styles.mockCard, styles.mockCardTopRight]}>
+        <View style={styles.mockCardHeader}>
+          <View style={styles.mockAvatar} />
+          <View style={styles.mockTextLine} />
+        </View>
+        <View style={styles.mockGraphLine} />
+        <View style={styles.mockGraphArea} />
+      </View>
+
+      {/* Center Left - Stats Row */}
+      <View style={[styles.mockCard, styles.mockCardLeft]}>
+        <View style={styles.mockRow}>
+          <View style={styles.mockIconCircle} />
+          <View style={{ gap: 4 }}>
+            <View style={[styles.mockTextLine, { width: 60 }]} />
+            <View style={[styles.mockTextLine, { width: 40, opacity: 0.5 }]} />
+          </View>
+        </View>
+        <View style={[styles.mockRow, { marginTop: 12 }]}>
+          <View style={[styles.mockIconCircle, { backgroundColor: '#FEF3C7' }]} />
+          <View style={{ gap: 4 }}>
+            <View style={[styles.mockTextLine, { width: 50 }]} />
+            <View style={[styles.mockTextLine, { width: 30, opacity: 0.5 }]} />
+          </View>
+        </View>
+      </View>
+
+      {/* Bottom Right - Progress Circle */}
+      <View style={[styles.mockCard, styles.mockCardBottomRight]}>
+         <View style={styles.mockCircleOuter}>
+            <View style={styles.mockCircleInner} />
+         </View>
+         <View style={[styles.mockTextLine, { width: 80, alignSelf: 'center', marginTop: 12 }]} />
+      </View>
+
+      {/* Subtle Gradient Overlay to fade them out */}
+      <LinearGradient
+        colors={['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.85)']}
+        style={StyleSheet.absoluteFill}
+      />
+    </View>
+  );
+};
+
 export default function LandingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -241,19 +310,7 @@ export default function LandingScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.backgroundContainer}>
-        <ImageBackground
-          source={{ uri: 'https://images.unsplash.com/photo-1579547621113-e4bb2a19bdd6?w=1200&q=80' }}
-          style={styles.backgroundImageContainer}
-          resizeMode="cover"
-          imageStyle={styles.backgroundImage}
-        />
-        <LinearGradient
-          colors={['rgba(255,255,255,0.75)', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.85)']}
-          locations={[0, 0.5, 1]}
-          style={styles.backgroundGradient}
-        />
-        <View style={styles.decorativeCircle1} />
-        <View style={styles.decorativeCircle2} />
+        <MockUiBackground />
       </View>
 
       <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}>
@@ -375,36 +432,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
   },
-  backgroundImageContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  backgroundImage: {
-    opacity: 0.35,
-  },
-  backgroundGradient: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.7,
-  },
-  decorativeCircle1: {
-    position: 'absolute',
-    top: -100,
-    right: -80,
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: AppColors.primary,
-    opacity: 0.06,
-  },
-  decorativeCircle2: {
-    position: 'absolute',
-    bottom: -60,
-    left: -100,
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: AppColors.primary,
-    opacity: 0.04,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 24,
@@ -505,6 +532,123 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '400',
     marginTop: 8,
+  },
+  mockUiContainer: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  gridContainer: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.3,
+  },
+  gridLineVertical: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  gridLineHorizontal: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  mockCard: {
+    position: 'absolute',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  mockCardTopRight: {
+    top: '12%',
+    right: -40,
+    width: 180,
+    height: 140,
+    transform: [{ rotate: '-12deg' }],
+  },
+  mockCardLeft: {
+    top: '35%',
+    left: -30,
+    width: 160,
+    padding: 20,
+    transform: [{ rotate: '6deg' }],
+  },
+  mockCardBottomRight: {
+    bottom: '15%',
+    right: -20,
+    width: 150,
+    height: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-6deg' }],
+  },
+  mockCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+  },
+  mockAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#DBEAFE',
+  },
+  mockTextLine: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#F3F4F6',
+    width: 80,
+  },
+  mockGraphLine: {
+    height: 40,
+    borderBottomWidth: 2,
+    borderBottomColor: '#3B82F6',
+    marginBottom: 8,
+    opacity: 0.5,
+  },
+  mockGraphArea: {
+    flex: 1,
+    backgroundColor: '#EFF6FF',
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  mockRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  mockIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: '#DBEAFE',
+  },
+  mockCircleOuter: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 6,
+    borderColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopColor: '#3B82F6',
+    borderRightColor: '#3B82F6',
+  },
+  mockCircleInner: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#F9FAFB',
   },
   buttonsContainer: {
     gap: 14,
