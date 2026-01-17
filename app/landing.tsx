@@ -240,14 +240,21 @@ export default function LandingScreen() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&q=80' }}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-        imageStyle={styles.backgroundImage}
-      >
-        <View style={styles.backgroundOverlay} />
-      </ImageBackground>
+      <View style={styles.backgroundContainer}>
+        <ImageBackground
+          source={{ uri: 'https://images.unsplash.com/photo-1579547621113-e4bb2a19bdd6?w=1200&q=80' }}
+          style={styles.backgroundImageContainer}
+          resizeMode="cover"
+          imageStyle={styles.backgroundImage}
+        />
+        <LinearGradient
+          colors={['rgba(255,255,255,0.97)', 'rgba(255,255,255,0.85)', 'rgba(255,255,255,0.95)']}
+          locations={[0, 0.5, 1]}
+          style={styles.backgroundGradient}
+        />
+        <View style={styles.decorativeCircle1} />
+        <View style={styles.decorativeCircle2} />
+      </View>
 
       <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}>
         <Animated.View 
@@ -364,12 +371,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  backgroundImage: {
-    opacity: 0.15,
-  },
-  backgroundOverlay: {
+  backgroundContainer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    overflow: 'hidden',
+  },
+  backgroundImageContainer: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  backgroundImage: {
+    opacity: 0.12,
+  },
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  decorativeCircle1: {
+    position: 'absolute',
+    top: -100,
+    right: -80,
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: AppColors.primary,
+    opacity: 0.06,
+  },
+  decorativeCircle2: {
+    position: 'absolute',
+    bottom: -60,
+    left: -100,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: AppColors.primary,
+    opacity: 0.04,
   },
   content: {
     flex: 1,
