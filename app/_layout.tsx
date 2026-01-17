@@ -14,13 +14,49 @@ const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerBackTitle: "Back" }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="landing" options={{ headerShown: false }} />
-      <Stack.Screen name="login" options={{ headerShown: false }} />
-      <Stack.Screen name="signup" options={{ headerShown: false }} />
-      <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <Stack 
+      screenOptions={{ 
+        headerBackTitle: "Back",
+        animation: 'slide_from_right',
+        animationDuration: 350,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+      }}
+    >
+      <Stack.Screen name="index" options={{ headerShown: false, animation: 'fade' }} />
+      <Stack.Screen name="landing" options={{ headerShown: false, animation: 'fade' }} />
+      <Stack.Screen 
+        name="login" 
+        options={{ 
+          headerShown: false, 
+          animation: 'slide_from_bottom',
+          animationDuration: 400,
+        }} 
+      />
+      <Stack.Screen 
+        name="signup" 
+        options={{ 
+          headerShown: false, 
+          animation: 'slide_from_bottom',
+          animationDuration: 400,
+        }} 
+      />
+      <Stack.Screen 
+        name="onboarding" 
+        options={{ 
+          headerShown: false, 
+          animation: 'fade_from_bottom',
+          animationDuration: 500,
+        }} 
+      />
+      <Stack.Screen 
+        name="(tabs)" 
+        options={{ 
+          headerShown: false, 
+          animation: 'fade',
+          animationDuration: 300,
+        }} 
+      />
     </Stack>
   );
 }

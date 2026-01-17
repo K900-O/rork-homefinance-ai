@@ -191,7 +191,7 @@ export default function LandingScreen() {
               onPress={() => router.push('/signup' as any)}
             >
               <Command color="#000000" size={20} />
-              <Text style={styles.appleButtonText}>Continue with Apple</Text>
+              <Text style={styles.appleButtonText}>Initiate Your Journey</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -199,7 +199,7 @@ export default function LandingScreen() {
               activeOpacity={0.7}
               onPress={() => router.push('/login' as any)}
             >
-               <Text style={styles.recoverButtonText}>Recover existing account</Text>
+               <Text style={styles.recoverButtonText}>Access Your Account</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>

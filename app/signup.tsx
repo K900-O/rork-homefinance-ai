@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   ScrollView,
   Alert,
   StatusBar,
+  Animated,
+  Easing,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,6 +28,66 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(60)).current;
+  const cardSlideAnim = useRef(new Animated.Value(100)).current;
+  const cardFadeAnim = useRef(new Animated.Value(0)).current;
+  const inputAnimations = useRef([0, 1, 2, 3, 4, 5].map(() => new Animated.Value(0))).current;
+  const buttonScaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    Animated.parallel([
+      Animated.timing(cardFadeAnim, {
+        toValue: 1,
+        duration: 500,
+        delay: 150,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+      Animated.spring(cardSlideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 35,
+        delay: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    const inputDelay = 300;
+    inputAnimations.forEach((anim, index) => {
+      Animated.spring(anim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        delay: inputDelay + index * 80,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    Animated.spring(buttonScaleAnim, {
+      toValue: 1,
+      friction: 8,
+      tension: 40,
+      delay: 750,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim, slideAnim, cardFadeAnim, cardSlideAnim, inputAnimations, buttonScaleAnim]);
 
   const handleSignup = async () => {
     if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
@@ -63,7 +125,16 @@ export default function SignupScreen() {
       <StatusBar barStyle="dark-content" />
       
       {/* Top Section - White Background */}
-      <View style={[styles.topSection, { paddingTop: insets.top }]}>
+      <Animated.View 
+        style={[
+          styles.topSection, 
+          { 
+            paddingTop: insets.top,
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }
+        ]}
+      >
         <TouchableOpacity 
           onPress={() => router.back()} 
           style={styles.backButton}
@@ -72,10 +143,18 @@ export default function SignupScreen() {
           <ArrowLeft color="#000" size={24} />
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* Bottom Section - Blue Card */}
-      <View style={styles.bottomSection}>
+      <Animated.View 
+        style={[
+          styles.bottomSection,
+          {
+            opacity: cardFadeAnim,
+            transform: [{ translateY: cardSlideAnim }],
+          }
+        ]}
+      >
         <LinearGradient
           colors={[AppColors.primaryLight, AppColors.primary, AppColors.primaryDark]}
           style={styles.gradient}
@@ -92,13 +171,39 @@ export default function SignupScreen() {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              <View style={styles.header}>
+              <Animated.View 
+                style={[
+                  styles.header,
+                  {
+                    opacity: inputAnimations[0],
+                    transform: [{
+                      translateY: inputAnimations[0].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      })
+                    }],
+                  }
+                ]}
+              >
                 <Text style={styles.title}>Initiate</Text>
                 <Text style={styles.subtitle}>Begin your path to mastery</Text>
-              </View>
+              </Animated.View>
 
               <View style={styles.form}>
-                <View style={styles.inputContainer}>
+                <Animated.View 
+                  style={[
+                    styles.inputContainer,
+                    {
+                      opacity: inputAnimations[1],
+                      transform: [{
+                        translateX: inputAnimations[1].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-30, 0],
+                        })
+                      }],
+                    }
+                  ]}
+                >
                   <View style={styles.inputIcon}>
                     <User color="rgba(255,255,255,0.7)" size={20} />
                   </View>
@@ -111,9 +216,22 @@ export default function SignupScreen() {
                     autoCapitalize="words"
                     autoCorrect={false}
                   />
-                </View>
+                </Animated.View>
 
-                <View style={styles.inputContainer}>
+                <Animated.View 
+                  style={[
+                    styles.inputContainer,
+                    {
+                      opacity: inputAnimations[2],
+                      transform: [{
+                        translateX: inputAnimations[2].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-30, 0],
+                        })
+                      }],
+                    }
+                  ]}
+                >
                   <View style={styles.inputIcon}>
                     <Mail color="rgba(255,255,255,0.7)" size={20} />
                   </View>
@@ -127,9 +245,22 @@ export default function SignupScreen() {
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                </View>
+                </Animated.View>
 
-                <View style={styles.inputContainer}>
+                <Animated.View 
+                  style={[
+                    styles.inputContainer,
+                    {
+                      opacity: inputAnimations[3],
+                      transform: [{
+                        translateX: inputAnimations[3].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-30, 0],
+                        })
+                      }],
+                    }
+                  ]}
+                >
                   <View style={styles.inputIcon}>
                     <Lock color="rgba(255,255,255,0.7)" size={20} />
                   </View>
@@ -142,9 +273,22 @@ export default function SignupScreen() {
                     secureTextEntry
                     autoCapitalize="none"
                   />
-                </View>
+                </Animated.View>
 
-                <View style={styles.inputContainer}>
+                <Animated.View 
+                  style={[
+                    styles.inputContainer,
+                    {
+                      opacity: inputAnimations[4],
+                      transform: [{
+                        translateX: inputAnimations[4].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-30, 0],
+                        })
+                      }],
+                    }
+                  ]}
+                >
                   <View style={styles.inputIcon}>
                     <Lock color="rgba(255,255,255,0.7)" size={20} />
                   </View>
@@ -157,19 +301,21 @@ export default function SignupScreen() {
                     secureTextEntry
                     autoCapitalize="none"
                   />
-                </View>
+                </Animated.View>
 
-                <TouchableOpacity
-                  style={[styles.button, isLoading && styles.buttonDisabled]}
-                  onPress={handleSignup}
-                  disabled={isLoading}
-                  activeOpacity={0.9}
-                >
-                  <Text style={styles.buttonText}>
-                    {isLoading ? 'Initiating...' : 'Begin Journey'}
-                  </Text>
-                  {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
-                </TouchableOpacity>
+                <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
+                  <TouchableOpacity
+                    style={[styles.button, isLoading && styles.buttonDisabled]}
+                    onPress={handleSignup}
+                    disabled={isLoading}
+                    activeOpacity={0.9}
+                  >
+                    <Text style={styles.buttonText}>
+                      {isLoading ? 'Initiating...' : 'Begin Journey'}
+                    </Text>
+                    {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
+                  </TouchableOpacity>
+                </Animated.View>
               </View>
 
               <View style={styles.footer}>
@@ -181,7 +327,7 @@ export default function SignupScreen() {
             </ScrollView>
           </KeyboardAvoidingView>
         </LinearGradient>
-      </View>
+      </Animated.View>
     </View>
   );
 }

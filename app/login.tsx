@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   ScrollView,
   Alert,
   StatusBar,
+  Animated,
+  Easing,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,6 +28,66 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(60)).current;
+  const cardSlideAnim = useRef(new Animated.Value(100)).current;
+  const cardFadeAnim = useRef(new Animated.Value(0)).current;
+  const inputAnimations = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
+  const buttonScaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    Animated.parallel([
+      Animated.timing(cardFadeAnim, {
+        toValue: 1,
+        duration: 500,
+        delay: 150,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+      Animated.spring(cardSlideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 35,
+        delay: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    const inputDelay = 300;
+    inputAnimations.forEach((anim, index) => {
+      Animated.spring(anim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        delay: inputDelay + index * 100,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    Animated.spring(buttonScaleAnim, {
+      toValue: 1,
+      friction: 8,
+      tension: 40,
+      delay: 600,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim, slideAnim, cardFadeAnim, cardSlideAnim, inputAnimations, buttonScaleAnim]);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -54,7 +116,16 @@ export default function LoginScreen() {
       <StatusBar barStyle="dark-content" />
       
       {/* Top Section - White Background */}
-      <View style={[styles.topSection, { paddingTop: insets.top }]}>
+      <Animated.View 
+        style={[
+          styles.topSection, 
+          { 
+            paddingTop: insets.top,
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }
+        ]}
+      >
         <TouchableOpacity 
           onPress={() => router.back()} 
           style={styles.backButton}
@@ -63,10 +134,18 @@ export default function LoginScreen() {
           <ArrowLeft color="#000" size={24} />
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* Bottom Section - Blue Card */}
-      <View style={styles.bottomSection}>
+      <Animated.View 
+        style={[
+          styles.bottomSection,
+          {
+            opacity: cardFadeAnim,
+            transform: [{ translateY: cardSlideAnim }],
+          }
+        ]}
+      >
         <LinearGradient
           colors={[AppColors.primaryLight, AppColors.primary, AppColors.primaryDark]}
           style={styles.gradient}
@@ -83,13 +162,39 @@ export default function LoginScreen() {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              <View style={styles.header}>
+              <Animated.View 
+                style={[
+                  styles.header,
+                  {
+                    opacity: inputAnimations[0],
+                    transform: [{
+                      translateY: inputAnimations[0].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      })
+                    }],
+                  }
+                ]}
+              >
                 <Text style={styles.title}>Access</Text>
                 <Text style={styles.subtitle}>Resume your financial mastery</Text>
-              </View>
+              </Animated.View>
 
               <View style={styles.form}>
-                <View style={styles.inputContainer}>
+                <Animated.View 
+                  style={[
+                    styles.inputContainer,
+                    {
+                      opacity: inputAnimations[1],
+                      transform: [{
+                        translateX: inputAnimations[1].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-30, 0],
+                        })
+                      }],
+                    }
+                  ]}
+                >
                   <View style={styles.inputIcon}>
                     <Mail color="rgba(255,255,255,0.7)" size={20} />
                   </View>
@@ -103,9 +208,22 @@ export default function LoginScreen() {
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                </View>
+                </Animated.View>
 
-                <View style={styles.inputContainer}>
+                <Animated.View 
+                  style={[
+                    styles.inputContainer,
+                    {
+                      opacity: inputAnimations[2],
+                      transform: [{
+                        translateX: inputAnimations[2].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-30, 0],
+                        })
+                      }],
+                    }
+                  ]}
+                >
                   <View style={styles.inputIcon}>
                     <Lock color="rgba(255,255,255,0.7)" size={20} />
                   </View>
@@ -118,19 +236,21 @@ export default function LoginScreen() {
                     secureTextEntry
                     autoCapitalize="none"
                   />
-                </View>
+                </Animated.View>
 
-                <TouchableOpacity
-                  style={[styles.button, isLoading && styles.buttonDisabled]}
-                  onPress={handleLogin}
-                  disabled={isLoading}
-                  activeOpacity={0.9}
-                >
-                  <Text style={styles.buttonText}>
-                    {isLoading ? 'Accessing...' : 'Resume'}
-                  </Text>
-                  {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
-                </TouchableOpacity>
+                <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
+                  <TouchableOpacity
+                    style={[styles.button, isLoading && styles.buttonDisabled]}
+                    onPress={handleLogin}
+                    disabled={isLoading}
+                    activeOpacity={0.9}
+                  >
+                    <Text style={styles.buttonText}>
+                      {isLoading ? 'Accessing...' : 'Resume'}
+                    </Text>
+                    {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
+                  </TouchableOpacity>
+                </Animated.View>
               </View>
 
               <View style={styles.footer}>
@@ -142,7 +262,7 @@ export default function LoginScreen() {
             </ScrollView>
           </KeyboardAvoidingView>
         </LinearGradient>
-      </View>
+      </Animated.View>
     </View>
   );
 }
