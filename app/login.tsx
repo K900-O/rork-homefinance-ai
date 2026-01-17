@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,40 +9,23 @@ import {
   Platform,
   ScrollView,
   Alert,
-  Animated,
+  StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Lock, Mail, ArrowRight } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Lock, Mail, ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
-import { BlueGlow } from '@/components/BlueGlow';
+import { AppColors } from '@/constants/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useFinance();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -62,133 +45,162 @@ export default function LoginScreen() {
     if (success) {
       router.replace('/(tabs)/(home)/home' as any);
     } else {
-      Alert.alert('Error', 'Invalid email or password. Please sign up if you don\'t have an account.');
+      Alert.alert('Error', 'Invalid credentials. Please check your inputs.');
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <BlueGlow />
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      
+      {/* Top Section - White Background */}
+      <View style={[styles.topSection, { paddingTop: insets.top }]}>
+        <TouchableOpacity 
+          onPress={() => router.back()} 
+          style={styles.backButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Animated.View 
-            style={{ 
-              flex: 1, 
-              opacity: fadeAnim, 
-              transform: [{ translateY: slideAnim }] 
-            }}
+          <ArrowLeft color="#000" size={24} />
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom Section - Blue Card */}
+      <View style={styles.bottomSection}>
+        <LinearGradient
+          colors={[AppColors.primaryLight, AppColors.primary, AppColors.primaryDark]}
+          style={styles.gradient}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        >
+          <KeyboardAvoidingView
+            style={styles.keyboardView}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
           >
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                   <Text style={styles.backButtonText}>← Back</Text>
-              </TouchableOpacity>
-              <Text style={styles.title}>Welcome Back</Text>
-              <Text style={styles.subtitle}>Sign in to continue to Hayati</Text>
-            </View>
-
-            <View style={styles.form}>
-              <View style={styles.inputContainer}>
-                <View style={styles.inputIcon}>
-                  <Mail color="#A1A1AA" size={20} />
-                </View>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  placeholderTextColor="#52525B"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
+            <ScrollView
+              contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.header}>
+                <Text style={styles.title}>Access</Text>
+                <Text style={styles.subtitle}>Resume your financial mastery</Text>
               </View>
 
-              <View style={styles.inputContainer}>
-                <View style={styles.inputIcon}>
-                  <Lock color="#A1A1AA" size={20} />
+              <View style={styles.form}>
+                <View style={styles.inputContainer}>
+                  <View style={styles.inputIcon}>
+                    <Mail color="rgba(255,255,255,0.7)" size={20} />
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
                 </View>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#52525B"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  autoCapitalize="none"
-                />
+
+                <View style={styles.inputContainer}>
+                  <View style={styles.inputIcon}>
+                    <Lock color="rgba(255,255,255,0.7)" size={20} />
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                  />
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.button, isLoading && styles.buttonDisabled]}
+                  onPress={handleLogin}
+                  disabled={isLoading}
+                  activeOpacity={0.9}
+                >
+                  <Text style={styles.buttonText}>
+                    {isLoading ? 'Accessing...' : 'Resume'}
+                  </Text>
+                  {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
+                </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                style={[styles.button, isLoading && styles.buttonDisabled]}
-                onPress={handleLogin}
-                disabled={isLoading}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Signing In...' : 'Sign In'}
-                </Text>
-                {!isLoading && <ArrowRight color="#FFFFFF" size={20} />}
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Don&apos;t have an account?</Text>
-              <TouchableOpacity onPress={() => router.push('/signup' as any)}>
-                <Text style={styles.footerLink}>Sign Up</Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>New here?</Text>
+                <TouchableOpacity onPress={() => router.push('/signup' as any)}>
+                  <Text style={styles.footerLink}>Initiate</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </LinearGradient>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
-  safeArea: {
+  topSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    backgroundColor: '#FFFFFF',
+    zIndex: 1,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 10,
+  },
+  backButtonText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 16,
+    color: '#000000',
+  },
+  bottomSection: {
+    flex: 1,
+    borderTopLeftRadius: 48,
+    borderTopRightRadius: 48,
+    overflow: 'hidden',
+    marginTop: -20, // Negative margin to overlap slightly or just sit tight
+  },
+  gradient: {
+    flex: 1,
+  },
+  keyboardView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 32,
+    paddingTop: 48,
   },
   header: {
-    marginBottom: 48,
-  },
-  backButton: {
-      marginBottom: 30,
-  },
-  backButtonText: {
-      fontFamily: sfProDisplayRegular,
-      color: '#A1A1AA',
-      fontSize: 16,
-      fontWeight: '400' as const,
+    marginBottom: 40,
   },
   title: {
     fontFamily: sfProDisplayBold,
-    fontSize: 32,
+    fontSize: 40,
     color: '#FFFFFF',
     marginBottom: 12,
-    fontWeight: '700' as const,
   },
   subtitle: {
     fontFamily: sfProDisplayRegular,
-    fontSize: 16,
-    color: '#A1A1AA',
-    fontWeight: '400' as const,
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 24,
   },
   form: {
     gap: 16,
@@ -197,10 +209,10 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 15, 15, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
     paddingHorizontal: 16,
     height: 60,
   },
@@ -213,34 +225,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     height: '100%',
-    fontWeight: '400' as const,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#37C126',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 18,
     borderRadius: 30,
     marginTop: 16,
     gap: 8,
-    shadowColor: '#37C126',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   buttonText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 18,
-    color: '#FFFFFF',
-    fontWeight: '600' as const,
+    color: AppColors.primary,
   },
   footer: {
     flexDirection: 'row',
@@ -252,13 +262,11 @@ const styles = StyleSheet.create({
   footerText: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#A1A1AA',
-    fontWeight: '400' as const,
+    color: 'rgba(255, 255, 255, 0.7)',
   },
   footerLink: {
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
-    color: '#37C126',
-    fontWeight: '600' as const,
+    color: '#FFFFFF',
   },
 });
