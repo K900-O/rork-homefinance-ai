@@ -1,8 +1,18 @@
 import { Tabs } from "expo-router";
-import { Home, TrendingUp, Target, PieChart, Sparkles, Calendar, CheckSquare, MessageCircle, User } from "lucide-react-native";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppMode } from "@/contexts/AppModeContext";
+import {
+  GlassHomeIcon,
+  GlassTransactionsIcon,
+  GlassOptimizerIcon,
+  GlassGoalsIcon,
+  GlassInsightsIcon,
+  GlassScheduleIcon,
+  GlassHabitsIcon,
+  GlassCoachIcon,
+  GlassProfileIcon,
+} from "@/components/GlassmorphicIcons";
 
 export default function TabLayout() {
   const { isFinancialMode } = useAppMode();
@@ -24,9 +34,9 @@ export default function TabLayout() {
         name="(home)"
         options={{
           href: isFinancialMode ? "/(tabs)/(home)/home" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Home color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassHomeIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -35,9 +45,9 @@ export default function TabLayout() {
         name="transactions"
         options={{
           href: isFinancialMode ? "/(tabs)/transactions" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <TrendingUp color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassTransactionsIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -46,9 +56,9 @@ export default function TabLayout() {
         name="optimizer"
         options={{
           href: isFinancialMode ? "/(tabs)/optimizer" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: () => (
             <View style={[styles.optimizerButton]}>
-              <Sparkles color="#FFF" size={24} fill="#FFF" />
+              <GlassOptimizerIcon size={28} focused={true} />
             </View>
           ),
         }}
@@ -57,9 +67,9 @@ export default function TabLayout() {
         name="goals"
         options={{
           href: isFinancialMode ? "/(tabs)/goals" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Target color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassGoalsIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -68,9 +78,9 @@ export default function TabLayout() {
         name="insights"
         options={{
           href: isFinancialMode ? "/(tabs)/insights" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <PieChart color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassInsightsIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -79,9 +89,9 @@ export default function TabLayout() {
         name="(personal)"
         options={{
           href: !isFinancialMode ? "/(tabs)/(personal)/personal" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Home color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassHomeIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -90,9 +100,9 @@ export default function TabLayout() {
         name="schedule"
         options={{
           href: !isFinancialMode ? "/(tabs)/schedule" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Calendar color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassScheduleIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -101,9 +111,9 @@ export default function TabLayout() {
         name="habits"
         options={{
           href: !isFinancialMode ? "/(tabs)/habits" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <CheckSquare color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassHabitsIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -112,9 +122,9 @@ export default function TabLayout() {
         name="coach"
         options={{
           href: !isFinancialMode ? "/(tabs)/coach" : null,
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: () => (
             <View style={[styles.coachButton]}>
-              <MessageCircle color="#FFF" size={24} fill="#FFF" />
+              <GlassCoachIcon size={28} focused={true} />
             </View>
           ),
         }}
@@ -122,9 +132,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <User color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+              <GlassProfileIcon size={28} focused={focused} />
             </View>
           ),
         }}
@@ -154,12 +164,12 @@ const styles = StyleSheet.create({
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   activeIconContainer: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: 'rgba(219, 234, 254, 0.5)',
   },
   optimizerButton: {
     width: 50,
