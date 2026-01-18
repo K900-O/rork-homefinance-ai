@@ -11,8 +11,17 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus, ArrowDownLeft, CreditCard, User, Shield, Trophy, AlertTriangle, CheckCircle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2 } from 'lucide-react-native';
-import { GlassBellIcon, GlassWalletIcon, GlassClockIcon } from '@/components/GlassmorphicIcons';
+import { Plus, ArrowDownLeft, AlertTriangle, CheckCircle, RefreshCw, Play, Trash2 } from 'lucide-react-native';
+import { 
+  GlassBellIcon, 
+  GlassWalletIcon, 
+  GlassClockIcon, 
+  GlassProfileIcon, 
+  GlassTransactionsIcon, 
+  GlassTrendUpIcon,
+  GlassCoachIcon,
+  GlassDocumentIcon
+} from '@/components/GlassmorphicIcons';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { AppColors } from '@/constants/colors';
@@ -80,7 +89,7 @@ export default function HomeScreen() {
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-                <User color="#FFF" size={20} />
+                <GlassProfileIcon size={24} focused={true} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconButton}>
                 <GlassBellIcon size={24} focused={true} />
@@ -128,7 +137,7 @@ export default function HomeScreen() {
                  </View>
 
                  <View style={styles.cardChip}>
-                   <CreditCard color="rgba(255,255,255,0.7)" size={24} />
+                   <GlassTransactionsIcon size={32} focused={true} />
                  </View>
 
                  <View style={styles.cardDetails}>
@@ -146,7 +155,7 @@ export default function HomeScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Upcoming</Text>
               <TouchableOpacity style={styles.addPlannedButton} onPress={() => setShowPlannedModal(true)}>
-                <CalendarClock size={16} color="#2563EB" />
+                <GlassClockIcon size={20} focused={true} />
                 <Text style={styles.addPlannedText}>Plan</Text>
               </TouchableOpacity>
             </View>
@@ -162,11 +171,13 @@ export default function HomeScreen() {
                     <Text style={styles.projectedValue}>{projectedBalance.currentBalance.toFixed(0)} USD</Text>
                   </View>
                   <View style={styles.projectedItem}>
-                    <TrendingUp size={14} color="#2563EB" />
+                    <GlassTrendUpIcon size={18} focused={true} />
                     <Text style={styles.projectedIncomeValue}>+{projectedBalance.projectedIncome.toFixed(0)}</Text>
                   </View>
                   <View style={styles.projectedItem}>
-                    <TrendingDown size={14} color="#EF4444" />
+                    <View style={{ transform: [{ scaleY: -1 }] }}>
+                      <GlassTrendUpIcon size={18} focused={true} />
+                    </View>
                     <Text style={styles.projectedExpenseValue}>-{projectedBalance.projectedExpenses.toFixed(0)}</Text>
                   </View>
                 </View>
@@ -213,7 +224,7 @@ export default function HomeScreen() {
 
             {totalRewardPoints > 0 && (
               <View style={styles.rewardsBar}>
-                <Trophy size={18} color="#F59E0B" />
+                <GlassCoachIcon size={24} focused={true} />
                 <Text style={styles.rewardsText}>{totalRewardPoints} Points Earned</Text>
                 <View style={styles.rewardsBadge}>
                   <Text style={styles.rewardsBadgeText}>
@@ -240,7 +251,7 @@ export default function HomeScreen() {
             {budgetRules.length > 0 && (
               <View style={styles.rulesPreview}>
                 <View style={styles.rulesHeader}>
-                  <Shield size={16} color="#2563EB" />
+                  <GlassDocumentIcon size={20} focused={true} />
                   <Text style={styles.rulesTitle}>{budgetRules.length} Active Rules</Text>
                 </View>
                 <View style={styles.rulesList}>
@@ -423,9 +434,11 @@ function PlannedTransactionItem({ planned, onProcess, onDelete }: PlannedTransac
           isIncome ? styles.plannedIconIncome : styles.plannedIconExpense
         ]}>
           {isIncome ? (
-            <TrendingUp size={18} color="#2563EB" />
+            <GlassTrendUpIcon size={24} focused={true} />
           ) : (
-            <TrendingDown size={18} color="#EF4444" />
+            <View style={{ transform: [{ scaleY: -1 }] }}>
+              <GlassTrendUpIcon size={24} focused={true} />
+            </View>
           )}
         </View>
         <View style={styles.plannedInfo}>

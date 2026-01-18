@@ -8,19 +8,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
-  TrendingUp, 
-  TrendingDown, 
   ArrowUpRight,
   ArrowDownRight,
-  Activity,
-  Target,
-  Wallet,
-  PiggyBank,
-  CreditCard,
   ChevronRight,
-  Sparkles,
-  BarChart2,
-  Clock,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFinance } from '@/contexts/FinanceContext';
@@ -31,6 +21,16 @@ import {
   AnimatedLineChart, 
   AnimatedProgressRing,
 } from '@/components/AnimatedCharts';
+import {
+  GlassFlameIcon,
+  GlassTrendUpIcon,
+  GlassWalletIcon,
+  GlassGoalsIcon,
+  GlassChartIcon,
+  GlassInsightsIcon,
+  GlassTransactionsIcon,
+  GlassClockIcon,
+} from '@/components/GlassmorphicIcons';
 
 
 
@@ -188,7 +188,7 @@ export default function InsightsScreen() {
             <View style={styles.heroContent}>
               <View style={styles.heroTop}>
                 <View style={styles.heroLabelRow}>
-                  <Sparkles size={14} color="#FFFFFF" />
+                  <GlassFlameIcon size={24} focused={true} />
                   <Text style={styles.heroLabel}>Financial Health</Text>
                 </View>
                 <View style={styles.heroScoreContainer}>
@@ -233,7 +233,7 @@ export default function InsightsScreen() {
 
           <View style={styles.quickStatsRow}>
             <QuickStatCard
-              icon={<TrendingUp size={18} color="#10B981" />}
+              icon={<GlassTrendUpIcon size={24} focused={true} />}
               label="Income"
               value={`${formatCurrency(financialSummary.totalIncome)}`}
               trend="up"
@@ -242,7 +242,7 @@ export default function InsightsScreen() {
               delay={100}
             />
             <QuickStatCard
-              icon={<TrendingDown size={18} color="#EF4444" />}
+              icon={<View style={{ transform: [{ scaleY: -1 }] }}><GlassTrendUpIcon size={24} focused={true} /></View>}
               label="Expenses"
               value={`${formatCurrency(financialSummary.totalExpenses)}`}
               trend="down"
@@ -254,7 +254,7 @@ export default function InsightsScreen() {
 
           <View style={styles.quickStatsRow}>
             <QuickStatCard
-              icon={<Wallet size={18} color={AppColors.primary} />}
+              icon={<GlassWalletIcon size={24} focused={true} />}
               label="Balance"
               value={`${formatCurrency(financialSummary.balance)}`}
               trend={financialSummary.balance >= 0 ? 'up' : 'down'}
@@ -263,7 +263,7 @@ export default function InsightsScreen() {
               delay={300}
             />
             <QuickStatCard
-              icon={<Target size={18} color="#F59E0B" />}
+              icon={<GlassGoalsIcon size={24} focused={true} />}
               label="Goals Progress"
               value={`${insights.goalsProgress.toFixed(0)}%`}
               trend={insights.goalsProgress >= 50 ? 'up' : 'neutral'}
@@ -274,7 +274,7 @@ export default function InsightsScreen() {
           </View>
 
           <SectionHeader 
-            icon={<BarChart2 size={18} color="#1A1A1A" />}
+            icon={<GlassChartIcon size={24} focused={true} />}
             title="Income vs Expenses"
             delay={500}
           />
@@ -297,7 +297,7 @@ export default function InsightsScreen() {
           </AnimatedChartCard>
 
           <SectionHeader 
-            icon={<Activity size={18} color="#1A1A1A" />}
+            icon={<GlassInsightsIcon size={24} focused={true} />}
             title="7-Day Spending Trend"
             delay={800}
           />
@@ -333,7 +333,7 @@ export default function InsightsScreen() {
           </AnimatedChartCard>
 
           <SectionHeader 
-            icon={<CreditCard size={18} color="#1A1A1A" />}
+            icon={<GlassTransactionsIcon size={24} focused={true} />}
             title="Spending by Category"
             delay={1100}
           />
@@ -364,7 +364,7 @@ export default function InsightsScreen() {
           {budgetStatuses.length > 0 && (
             <>
               <SectionHeader 
-                icon={<PiggyBank size={18} color="#1A1A1A" />}
+                icon={<GlassWalletIcon size={24} focused={true} />}
                 title="Budget Health"
                 delay={1600}
               />
@@ -420,7 +420,7 @@ export default function InsightsScreen() {
           {goals.length > 0 && (
             <>
               <SectionHeader 
-                icon={<Target size={18} color="#1A1A1A" />}
+                icon={<GlassGoalsIcon size={24} focused={true} />}
                 title="Goals Overview"
                 delay={2100}
               />
@@ -447,7 +447,7 @@ export default function InsightsScreen() {
           )}
 
           <SectionHeader 
-            icon={<Clock size={18} color="#1A1A1A" />}
+            icon={<GlassClockIcon size={24} focused={true} />}
             title="30-Day Projection"
             delay={2500}
           />
