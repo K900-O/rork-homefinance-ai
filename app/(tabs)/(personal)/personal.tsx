@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   RefreshControl,
   Animated,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -35,6 +38,12 @@ import type { Activity, Habit } from '@/constants/personalTypes';
 import AddActivityModal from '@/components/AddActivityModal';
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 const CircularProgress = ({ 
   size = 80, 
@@ -125,6 +134,12 @@ export default function PersonalHomeScreen() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+  }, [dailySummary, goodHabits, badHabits, upcomingActivities, getTodayActivities]);
 
   useEffect(() => {
     Animated.parallel([

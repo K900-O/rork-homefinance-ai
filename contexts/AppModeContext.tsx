@@ -2,7 +2,7 @@ import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { router } from 'expo-router';
-import { Animated } from 'react-native';
+import { Animated, Easing } from 'react-native';
 
 export type AppMode = 'financial' | 'personal';
 
@@ -49,14 +49,24 @@ export const [AppModeProvider, useAppMode] = createContextHook(() => {
     Animated.parallel([
       Animated.timing(transitionProgress, {
         toValue: 1,
-        duration: 300,
+        duration: 800,
         useNativeDriver: true,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Cubic bezier for smooth ease-in-out
       }),
-      Animated.timing(transitionScale, {
-        toValue: 0.95,
-        duration: 300,
-        useNativeDriver: true,
-      }),
+      Animated.sequence([
+        Animated.timing(transitionScale, {
+          toValue: 0.95,
+          duration: 400,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.cubic),
+        }),
+        Animated.timing(transitionScale, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+          easing: Easing.in(Easing.cubic),
+        }),
+      ])
     ]).start(async () => {
       await setMode(newMode);
       
@@ -67,21 +77,14 @@ export const [AppModeProvider, useAppMode] = createContextHook(() => {
       }
       
       setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(transitionProgress, {
-            toValue: 0,
-            duration: 350,
-            useNativeDriver: true,
-          }),
-          Animated.timing(transitionScale, {
-            toValue: 1,
-            duration: 350,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
+        Animated.timing(transitionProgress, {
+          toValue: 0,
+          duration: 0, // Reset instantly after navigation, overlay handles fade out if needed or we animate it back
+          useNativeDriver: true,
+        }).start(() => {
           setIsTransitioning(false);
         });
-      }, 100);
+      }, 50); // Small delay to ensure render
     });
   }, [mode, setMode, transitionProgress, transitionScale]);
 

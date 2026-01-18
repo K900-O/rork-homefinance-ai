@@ -8,6 +8,9 @@ import {
   RefreshControl,
   Image,
   Animated,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -32,6 +35,12 @@ import AddPlannedTransactionModal from '@/components/AddPlannedTransactionModal'
 import { fontFamily, sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
+
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -44,6 +53,12 @@ export default function HomeScreen() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+  }, [transactions, budgetStatuses, upcomingPlannedTransactions, projectedBalance]);
 
   useEffect(() => {
     Animated.parallel([
