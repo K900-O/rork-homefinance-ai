@@ -14,6 +14,8 @@ import { X, Wallet, Shield, ChevronDown } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { BudgetCategory, BudgetPeriod, RuleStrictness } from '@/constants/types';
 import { fontFamily } from '@/constants/Typography';
+import { AppColors } from '@/constants/colors';
+import SuccessAnimation from './SuccessAnimation';
 
 interface BudgetModalProps {
   visible: boolean;
@@ -21,7 +23,7 @@ interface BudgetModalProps {
 }
 
 const BUDGET_CATEGORIES: { value: BudgetCategory; label: string; color: string }[] = [
-  { value: 'household', label: 'Household', color: '#3B82F6' },
+  { value: 'household', label: 'Household', color: AppColors.primary },
   { value: 'groceries', label: 'Groceries', color: '#10B981' },
   { value: 'utilities', label: 'Utilities', color: '#F59E0B' },
   { value: 'entertainment', label: 'Entertainment', color: '#8B5CF6' },
@@ -42,6 +44,8 @@ type TabType = 'budget' | 'rule';
 export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
   const { addBudget, addBudgetRule } = useFinance();
   const [activeTab, setActiveTab] = useState<TabType>('budget');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successType, setSuccessType] = useState<'budget' | 'general'>('budget');
   
   const [budgetName, setBudgetName] = useState('');
   const [budgetLimit, setBudgetLimit] = useState('');
@@ -68,6 +72,17 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
     setRuleMaxAmount('');
     setRuleMaxPercentage('');
     setRuleStrictness('moderate');
+    setShowSuccess(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    handleClose();
   };
 
   const handleAddBudget = () => {
@@ -81,12 +96,12 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
       category: budgetCategory,
       period: budgetPeriod,
       startDate: new Date().toISOString(),
-      color: categoryInfo?.color || '#3B82F6',
+      color: categoryInfo?.color || AppColors.primary,
       rules: [],
     });
     
-    resetForm();
-    onClose();
+    setSuccessType('budget');
+    setShowSuccess(true);
   };
 
   const handleAddRule = () => {
@@ -102,8 +117,8 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
       isActive: true,
     });
     
-    resetForm();
-    onClose();
+    setSuccessType('general');
+    setShowSuccess(true);
   };
 
   const selectedCategory = BUDGET_CATEGORIES.find(c => c.value === budgetCategory);
@@ -120,8 +135,8 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
             <Text style={styles.title}>
               {activeTab === 'budget' ? 'New Budget' : 'New Rule'}
             </Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X color="#FFF" size={24} />
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+              <X color={AppColors.textSecondary} size={24} />
             </TouchableOpacity>
           </View>
 
@@ -130,7 +145,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
               style={[styles.tab, activeTab === 'budget' && styles.activeTab]}
               onPress={() => setActiveTab('budget')}
             >
-              <Wallet size={18} color={activeTab === 'budget' ? '#10B981' : '#71717A'} />
+              <Wallet size={18} color={activeTab === 'budget' ? AppColors.primary : AppColors.textLight} />
               <Text style={[styles.tabText, activeTab === 'budget' && styles.activeTabText]}>
                 Budget
               </Text>
@@ -139,7 +154,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
               style={[styles.tab, activeTab === 'rule' && styles.activeTab]}
               onPress={() => setActiveTab('rule')}
             >
-              <Shield size={18} color={activeTab === 'rule' ? '#10B981' : '#71717A'} />
+              <Shield size={18} color={activeTab === 'rule' ? AppColors.primary : AppColors.textLight} />
               <Text style={[styles.tabText, activeTab === 'rule' && styles.activeTabText]}>
                 Rule
               </Text>
@@ -156,7 +171,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                     value={budgetName}
                     onChangeText={setBudgetName}
                     placeholder="e.g., Monthly Groceries"
-                    placeholderTextColor="#52525B"
+                    placeholderTextColor={AppColors.textLight}
                   />
                 </View>
 
@@ -167,7 +182,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                     value={budgetLimit}
                     onChangeText={setBudgetLimit}
                     placeholder="0.00"
-                    placeholderTextColor="#52525B"
+                    placeholderTextColor={AppColors.textLight}
                     keyboardType="decimal-pad"
                   />
                 </View>
@@ -180,7 +195,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                   >
                     <View style={[styles.categoryDot, { backgroundColor: selectedCategory?.color }]} />
                     <Text style={styles.pickerText}>{selectedCategory?.label}</Text>
-                    <ChevronDown size={20} color="#71717A" />
+                    <ChevronDown size={20} color={AppColors.textLight} />
                   </TouchableOpacity>
                   
                   {showCategoryPicker && (
@@ -232,7 +247,9 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                   onPress={handleAddBudget}
                   disabled={!budgetName.trim() || !budgetLimit}
                 >
-                  <Text style={styles.submitButtonText}>Create Budget</Text>
+                  <Text style={[styles.submitButtonText, (!budgetName.trim() || !budgetLimit) && styles.disabledButtonText]}>
+                    Create Budget
+                  </Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -244,7 +261,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                     value={ruleName}
                     onChangeText={setRuleName}
                     placeholder="e.g., No impulse purchases"
-                    placeholderTextColor="#52525B"
+                    placeholderTextColor={AppColors.textLight}
                   />
                 </View>
 
@@ -255,7 +272,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                     value={ruleDescription}
                     onChangeText={setRuleDescription}
                     placeholder="Describe this rule..."
-                    placeholderTextColor="#52525B"
+                    placeholderTextColor={AppColors.textLight}
                     multiline
                     numberOfLines={3}
                   />
@@ -275,7 +292,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                     ) : (
                       <Text style={styles.pickerPlaceholder}>All Categories</Text>
                     )}
-                    <ChevronDown size={20} color="#71717A" />
+                    <ChevronDown size={20} color={AppColors.textLight} />
                   </TouchableOpacity>
                   
                   {showRuleCategoryPicker && (
@@ -317,7 +334,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                       value={ruleMaxAmount}
                       onChangeText={setRuleMaxAmount}
                       placeholder="0.00"
-                      placeholderTextColor="#52525B"
+                      placeholderTextColor={AppColors.textLight}
                       keyboardType="decimal-pad"
                     />
                   </View>
@@ -328,7 +345,7 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                       value={ruleMaxPercentage}
                       onChangeText={setRuleMaxPercentage}
                       placeholder="0"
-                      placeholderTextColor="#52525B"
+                      placeholderTextColor={AppColors.textLight}
                       keyboardType="decimal-pad"
                     />
                   </View>
@@ -363,11 +380,23 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
                   onPress={handleAddRule}
                   disabled={!ruleName.trim()}
                 >
-                  <Text style={styles.submitButtonText}>Create Rule</Text>
+                  <Text style={[styles.submitButtonText, !ruleName.trim() && styles.disabledButtonText]}>
+                    Create Rule
+                  </Text>
                 </TouchableOpacity>
               </>
             )}
           </ScrollView>
+
+          <SuccessAnimation
+            visible={showSuccess}
+            type={successType}
+            title={successType === 'budget' ? 'Budget Created!' : 'Rule Created!'}
+            subtitle={successType === 'budget' ? 'Start tracking your spending' : 'Your rule is now active'}
+            onComplete={handleSuccessComplete}
+            autoHide={true}
+            autoHideDelay={2000}
+          />
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -377,11 +406,11 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '90%',
@@ -393,19 +422,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#27272A',
+    borderBottomColor: AppColors.border,
   },
   title: {
     fontFamily,
     fontSize: 20,
-    fontWeight: '700',
-    color: '#FFF',
+    fontWeight: '700' as const,
+    color: AppColors.textPrimary,
   },
   closeButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -423,21 +452,22 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   activeTab: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderWidth: 1,
-    borderColor: '#10B981',
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.primary,
   },
   tabText: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#71717A',
+    fontWeight: '600' as const,
+    color: AppColors.textLight,
   },
   activeTabText: {
-    color: '#10B981',
+    color: AppColors.primary,
   },
   content: {
     padding: 20,
@@ -448,43 +478,43 @@ const styles = StyleSheet.create({
   label: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#A1A1AA',
+    fontWeight: '600' as const,
+    color: AppColors.textSecondary,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#FFF',
+    color: AppColors.textPrimary,
     fontFamily,
-    borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   textArea: {
     minHeight: 80,
     textAlignVertical: 'top',
   },
   picker: {
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   pickerText: {
     fontFamily,
     fontSize: 16,
-    color: '#FFF',
+    color: AppColors.textPrimary,
     flex: 1,
   },
   pickerPlaceholder: {
     fontFamily,
     fontSize: 16,
-    color: '#71717A',
+    color: AppColors.textLight,
     flex: 1,
   },
   categoryDot: {
@@ -494,11 +524,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   pickerDropdown: {
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     overflow: 'hidden',
   },
   pickerOption: {
@@ -506,21 +536,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#3F3F46',
+    borderBottomColor: AppColors.border,
   },
   selectedOption: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: AppColors.blue[50],
   },
   pickerOptionText: {
     fontFamily,
     fontSize: 15,
-    color: '#FFF',
+    color: AppColors.textPrimary,
   },
   periodToggle: {
     flexDirection: 'row',
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     padding: 4,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   periodOption: {
     flex: 1,
@@ -529,16 +561,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   activePeriod: {
-    backgroundColor: '#10B981',
+    backgroundColor: AppColors.primary,
   },
   periodText: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#71717A',
+    fontWeight: '600' as const,
+    color: AppColors.textLight,
   },
   activePeriodText: {
-    color: '#000',
+    color: '#FFFFFF',
   },
   row: {
     flexDirection: 'row',
@@ -547,46 +579,55 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   strictnessOption: {
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     padding: 14,
-    borderWidth: 1,
-    borderColor: '#3F3F46',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   activeStrictness: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderColor: '#10B981',
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.primary,
   },
   strictnessLabel: {
     fontFamily,
     fontSize: 15,
-    fontWeight: '600',
-    color: '#FFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
     marginBottom: 4,
   },
   activeStrictnessLabel: {
-    color: '#10B981',
+    color: AppColors.primary,
   },
   strictnessDesc: {
     fontFamily,
     fontSize: 13,
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   submitButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: AppColors.primary,
     borderRadius: 14,
     padding: 18,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   disabledButton: {
-    backgroundColor: '#27272A',
-    opacity: 0.6,
+    backgroundColor: AppColors.border,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   submitButtonText: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: '700' as const,
+    color: '#FFFFFF',
+  },
+  disabledButtonText: {
+    color: AppColors.textLight,
   },
 });

@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { usePersonal } from '@/contexts/PersonalContext';
-import { ACTIVITY_COLORS, type ActivityCategory, type HabitType } from '@/constants/personalTypes';
+import { type ActivityCategory, type HabitType } from '@/constants/personalTypes';
 import { fontFamily } from '@/constants/Typography';
+import { AppColors } from '@/constants/colors';
+import SuccessAnimation from './SuccessAnimation';
 
 interface AddHabitModalProps {
   visible: boolean;
@@ -37,8 +39,8 @@ const HABIT_TYPES: { value: HabitType; label: string; description: string }[] = 
 ];
 
 const COLORS = [
-  '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
-  '#EC4899', '#14B8A6', '#F97316', '#06B6D4', '#6366F1'
+  AppColors.primary, AppColors.blue[400], '#10B981', '#14B8A6', '#06B6D4',
+  '#8B5CF6', '#6366F1', '#EC4899', '#F59E0B', '#F97316'
 ];
 
 export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) {
@@ -50,6 +52,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
   const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [targetCount, setTargetCount] = useState('1');
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = () => {
     if (!title.trim()) return;
@@ -66,8 +69,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
       isActive: true,
     });
 
-    resetForm();
-    onClose();
+    setShowSuccess(true);
   };
 
   const resetForm = () => {
@@ -78,11 +80,17 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
     setFrequency('daily');
     setTargetCount('1');
     setSelectedColor(COLORS[0]);
+    setShowSuccess(false);
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    handleClose();
   };
 
   return (
@@ -98,7 +106,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <X color="#FFF" size={24} />
+            <X color={AppColors.textSecondary} size={24} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>New Habit</Text>
           <TouchableOpacity 
@@ -120,7 +128,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
               value={title}
               onChangeText={setTitle}
               placeholder="e.g., Drink 8 glasses of water"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
             />
           </View>
 
@@ -131,7 +139,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
               value={description}
               onChangeText={setDescription}
               placeholder="Why is this habit important to you?"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
               multiline
               numberOfLines={3}
             />
@@ -179,7 +187,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
                     key={cat}
                     style={[
                       styles.categoryChip,
-                      category === cat && { backgroundColor: ACTIVITY_COLORS[cat], borderColor: ACTIVITY_COLORS[cat] }
+                      category === cat && styles.categoryChipActive
                     ]}
                     onPress={() => setCategory(cat)}
                   >
@@ -225,7 +233,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
               value={targetCount}
               onChangeText={setTargetCount}
               placeholder="1"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
               keyboardType="number-pad"
             />
           </View>
@@ -252,7 +260,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
           <View style={styles.previewSection}>
             <Text style={styles.label}>Preview</Text>
             <View style={[styles.previewCard, { borderLeftColor: habitType === 'good' ? selectedColor : '#EF4444' }]}>
-              <View style={[styles.previewIcon, { backgroundColor: (habitType === 'good' ? selectedColor : '#EF4444') + '20' }]}>
+              <View style={[styles.previewIcon, { backgroundColor: (habitType === 'good' ? selectedColor : '#EF4444') + '15' }]}>
                 <View style={[styles.previewDot, { backgroundColor: habitType === 'good' ? selectedColor : '#EF4444' }]} />
               </View>
               <View style={styles.previewInfo}>
@@ -264,6 +272,14 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
             </View>
           </View>
         </ScrollView>
+
+        <SuccessAnimation
+          visible={showSuccess}
+          type="habit"
+          onComplete={handleSuccessComplete}
+          autoHide={true}
+          autoHideDelay={2000}
+        />
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -272,7 +288,7 @@ export default function AddHabitModal({ visible, onClose }: AddHabitModalProps) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: AppColors.background,
   },
   header: {
     flexDirection: 'row',
@@ -281,13 +297,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#27272A',
+    borderBottomColor: AppColors.border,
   },
   closeButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -295,25 +311,25 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 18,
     fontWeight: '600' as const,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   saveButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.primary,
   },
   saveButtonDisabled: {
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.border,
   },
   saveButtonText: {
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#000000',
+    color: '#FFFFFF',
   },
   saveButtonTextDisabled: {
-    color: '#52525B',
+    color: AppColors.textLight,
   },
   content: {
     flex: 1,
@@ -325,19 +341,19 @@ const styles = StyleSheet.create({
   label: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '500' as const,
-    color: '#A1A1AA',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     padding: 16,
     fontFamily,
     fontSize: 16,
-    color: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#27272A',
+    color: AppColors.textPrimary,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   inputSmall: {
     width: 100,
@@ -355,19 +371,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
+  },
+  categoryChipActive: {
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.primary,
   },
   categoryChipText: {
     fontFamily,
     fontSize: 14,
     fontWeight: '500' as const,
-    color: '#A1A1AA',
+    color: AppColors.textSecondary,
     textTransform: 'capitalize',
   },
   categoryChipTextActive: {
-    color: '#000000',
+    color: AppColors.primary,
   },
   frequencyRow: {
     flexDirection: 'row',
@@ -377,23 +397,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#27272A',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   frequencyChipActive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: AppColors.primary,
+    borderColor: AppColors.primary,
   },
   frequencyChipText: {
     fontFamily,
     fontSize: 14,
     fontWeight: '500' as const,
-    color: '#A1A1AA',
+    color: AppColors.textSecondary,
   },
   frequencyChipTextActive: {
-    color: '#000000',
+    color: '#FFFFFF',
   },
   colorGrid: {
     flexDirection: 'row',
@@ -407,7 +427,7 @@ const styles = StyleSheet.create({
   },
   colorChipSelected: {
     borderWidth: 3,
-    borderColor: '#FFFFFF',
+    borderColor: AppColors.textPrimary,
   },
   habitTypeRow: {
     flexDirection: 'row',
@@ -417,35 +437,35 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderWidth: 2,
-    borderColor: '#27272A',
+    borderColor: AppColors.border,
   },
   habitTypeCardGoodActive: {
-    backgroundColor: '#10B98120',
-    borderColor: '#10B981',
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.primary,
   },
   habitTypeCardBadActive: {
-    backgroundColor: '#EF444420',
-    borderColor: '#EF4444',
+    backgroundColor: AppColors.dangerLight,
+    borderColor: AppColors.danger,
   },
   habitTypeLabel: {
     fontFamily,
     fontSize: 15,
     fontWeight: '600' as const,
-    color: '#A1A1AA',
+    color: AppColors.textSecondary,
     marginBottom: 4,
   },
   habitTypeLabelActive: {
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   habitTypeDesc: {
     fontFamily,
     fontSize: 12,
-    color: '#52525B',
+    color: AppColors.textLight,
   },
   habitTypeDescActive: {
-    color: '#A1A1AA',
+    color: AppColors.textSecondary,
   },
   previewSection: {
     marginBottom: 40,
@@ -453,10 +473,12 @@ const styles = StyleSheet.create({
   previewCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 16,
     padding: 16,
     borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: AppColors.border,
   },
   previewIcon: {
     width: 48,
@@ -478,13 +500,13 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
     marginBottom: 4,
   },
   previewCategory: {
     fontFamily,
     fontSize: 13,
-    color: '#71717A',
+    color: AppColors.textLight,
     textTransform: 'capitalize',
   },
 });

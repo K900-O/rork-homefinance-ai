@@ -13,6 +13,8 @@ import {
 import { X } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import { fontFamily } from '@/constants/Typography';
+import { AppColors } from '@/constants/colors';
+import SuccessAnimation from './SuccessAnimation';
 
 const GOAL_CATEGORIES = [
   'Emergency Fund',
@@ -28,16 +30,16 @@ const GOAL_CATEGORIES = [
 ];
 
 const GOAL_COLORS = [
-  '#FFFFFF',
-  '#A1A1AA',
+  AppColors.primary,
+  AppColors.blue[400],
+  AppColors.blue[300],
   '#10B981',
-  '#F59E0B',
-  '#EF4444',
-  '#6366F1',
-  '#8B5CF6',
-  '#EC4899',
-  '#3B82F6',
   '#14B8A6',
+  '#06B6D4',
+  '#8B5CF6',
+  '#6366F1',
+  '#EC4899',
+  '#F59E0B',
 ];
 
 interface AddGoalModalProps {
@@ -54,6 +56,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
   const [deadline, setDeadline] = useState('');
   const [selectedColor, setSelectedColor] = useState(GOAL_COLORS[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const resetForm = () => {
     setTitle('');
@@ -63,11 +66,17 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
     setDeadline('');
     setSelectedColor(GOAL_COLORS[0]);
     setIsSubmitting(false);
+    setShowSuccess(false);
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    handleClose();
   };
 
   const handleSubmit = async () => {
@@ -106,11 +115,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
         deadline: deadline || undefined,
       });
 
-      Alert.alert(
-        'Success',
-        'Goal created successfully',
-        [{ text: 'OK', onPress: handleClose }]
-      );
+      setShowSuccess(true);
     } catch (error) {
       console.error('Error adding goal:', error);
       Alert.alert('Error', 'Failed to create goal. Please try again.');
@@ -129,7 +134,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Create Goal</Text>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7}>
-            <X color="#FFFFFF" size={24} />
+            <X color={AppColors.textSecondary} size={24} />
           </TouchableOpacity>
         </View>
 
@@ -141,7 +146,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
               value={title}
               onChangeText={setTitle}
               placeholder="e.g., Summer Vacation"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
               maxLength={50}
             />
           </View>
@@ -180,7 +185,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
               onChangeText={setTargetAmount}
               keyboardType="decimal-pad"
               placeholder="0.00"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
             />
           </View>
 
@@ -192,7 +197,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
               onChangeText={setCurrentAmount}
               keyboardType="decimal-pad"
               placeholder="0.00"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
             />
           </View>
 
@@ -203,7 +208,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
               value={deadline}
               onChangeText={setDeadline}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
             />
             <Text style={styles.helpText}>Format: YYYY-MM-DD (e.g., 2025-12-31)</Text>
           </View>
@@ -246,6 +251,14 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
             </Text>
           </TouchableOpacity>
         </View>
+
+        <SuccessAnimation
+          visible={showSuccess}
+          type="goal"
+          onComplete={handleSuccessComplete}
+          autoHide={true}
+          autoHideDelay={2000}
+        />
       </View>
     </Modal>
   );
@@ -254,7 +267,7 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: AppColors.background,
   },
   header: {
     flexDirection: 'row',
@@ -264,19 +277,21 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 20 : 20,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#18181B',
+    borderBottomColor: AppColors.border,
   },
   headerTitle: {
     fontFamily,
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: 'bold' as const,
+    color: AppColors.textPrimary,
   },
   closeButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: AppColors.surfaceLight,
   },
   content: {
     flex: 1,
@@ -288,25 +303,25 @@ const styles = StyleSheet.create({
   label: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
     marginBottom: 12,
   },
   input: {
     fontFamily,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   helpText: {
     fontFamily,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: AppColors.textLight,
     marginTop: 6,
   },
   categoryGrid: {
@@ -318,22 +333,22 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   categoryButtonActive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.primary,
   },
   categoryButtonText: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#A1A1AA',
+    fontWeight: '600' as const,
+    color: AppColors.textSecondary,
   },
   categoryButtonTextActive: {
-    color: '#000000',
+    color: AppColors.primary,
   },
   colorGrid: {
     flexDirection: 'row',
@@ -348,7 +363,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   colorButtonActive: {
-    borderColor: '#FFFFFF',
+    borderColor: AppColors.textPrimary,
   },
   footer: {
     flexDirection: 'row',
@@ -356,32 +371,38 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingBottom: Platform.OS === 'ios' ? 40 : 20,
     borderTopWidth: 1,
-    borderTopColor: '#18181B',
+    borderTopColor: AppColors.border,
     gap: 12,
+    backgroundColor: AppColors.background,
   },
   cancelButton: {
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
   },
   submitButton: {
     flex: 2,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonDisabled: {
     opacity: 0.6,
@@ -389,7 +410,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: '600' as const,
+    color: '#FFFFFF',
   },
 });

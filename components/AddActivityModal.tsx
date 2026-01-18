@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { X, Clock, MapPin, Flag } from 'lucide-react-native';
 import { usePersonal } from '@/contexts/PersonalContext';
-import { ACTIVITY_COLORS, type ActivityCategory, type ActivityPriority } from '@/constants/personalTypes';
+import { type ActivityCategory, type ActivityPriority } from '@/constants/personalTypes';
 import { fontFamily } from '@/constants/Typography';
+import { AppColors } from '@/constants/colors';
+import SuccessAnimation from './SuccessAnimation';
 
 interface AddActivityModalProps {
   visible: boolean;
@@ -27,9 +29,9 @@ const CATEGORIES: ActivityCategory[] = [
 ];
 
 const PRIORITIES: { value: ActivityPriority; label: string; color: string }[] = [
-  { value: 'high', label: 'High', color: '#EF4444' },
-  { value: 'medium', label: 'Medium', color: '#F59E0B' },
-  { value: 'low', label: 'Low', color: '#10B981' },
+  { value: 'high', label: 'High', color: AppColors.danger },
+  { value: 'medium', label: 'Medium', color: AppColors.warning },
+  { value: 'low', label: 'Low', color: AppColors.primary },
 ];
 
 export default function AddActivityModal({ visible, onClose, initialDate }: AddActivityModalProps) {
@@ -41,6 +43,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
   const [duration, setDuration] = useState('');
   const [location, setLocation] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = () => {
     if (!title.trim()) return;
@@ -59,8 +62,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
       isAllDay,
     });
 
-    resetForm();
-    onClose();
+    setShowSuccess(true);
   };
 
   const resetForm = () => {
@@ -71,11 +73,17 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
     setDuration('');
     setLocation('');
     setIsAllDay(false);
+    setShowSuccess(false);
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    handleClose();
   };
 
   return (
@@ -91,7 +99,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <X color="#FFF" size={24} />
+            <X color={AppColors.textSecondary} size={24} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>New Activity</Text>
           <TouchableOpacity 
@@ -113,7 +121,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
               value={title}
               onChangeText={setTitle}
               placeholder="What do you need to do?"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
             />
           </View>
 
@@ -124,7 +132,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
               value={description}
               onChangeText={setDescription}
               placeholder="Add more details..."
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
               multiline
               numberOfLines={3}
             />
@@ -139,7 +147,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
                     key={cat}
                     style={[
                       styles.categoryChip,
-                      category === cat && { backgroundColor: ACTIVITY_COLORS[cat], borderColor: ACTIVITY_COLORS[cat] }
+                      category === cat && styles.categoryChipActive
                     ]}
                     onPress={() => setCategory(cat)}
                   >
@@ -167,7 +175,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
                   ]}
                   onPress={() => setPriority(p.value)}
                 >
-                  <Flag size={14} color={priority === p.value ? '#000' : p.color} />
+                  <Flag size={14} color={priority === p.value ? '#FFFFFF' : p.color} />
                   <Text style={[
                     styles.priorityChipText,
                     priority === p.value && styles.priorityChipTextActive
@@ -183,13 +191,13 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
             <View style={[styles.inputGroup, { flex: 1, marginRight: 12 }]}>
               <Text style={styles.label}>Duration (min)</Text>
               <View style={styles.inputWithIcon}>
-                <Clock size={18} color="#71717A" />
+                <Clock size={18} color={AppColors.textLight} />
                 <TextInput
                   style={styles.inputSmall}
                   value={duration}
                   onChangeText={setDuration}
                   placeholder="30"
-                  placeholderTextColor="#52525B"
+                  placeholderTextColor={AppColors.textLight}
                   keyboardType="number-pad"
                 />
               </View>
@@ -198,13 +206,13 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
             <View style={[styles.inputGroup, { flex: 1.5 }]}>
               <Text style={styles.label}>Location (optional)</Text>
               <View style={styles.inputWithIcon}>
-                <MapPin size={18} color="#71717A" />
+                <MapPin size={18} color={AppColors.textLight} />
                 <TextInput
                   style={styles.inputSmall}
                   value={location}
                   onChangeText={setLocation}
                   placeholder="Where?"
-                  placeholderTextColor="#52525B"
+                  placeholderTextColor={AppColors.textLight}
                 />
               </View>
             </View>
@@ -220,6 +228,14 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
             <Text style={styles.allDayText}>All day activity</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        <SuccessAnimation
+          visible={showSuccess}
+          type="activity"
+          onComplete={handleSuccessComplete}
+          autoHide={true}
+          autoHideDelay={2000}
+        />
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -228,7 +244,7 @@ export default function AddActivityModal({ visible, onClose, initialDate }: AddA
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: AppColors.background,
   },
   header: {
     flexDirection: 'row',
@@ -237,13 +253,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#27272A',
+    borderBottomColor: AppColors.border,
   },
   closeButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -251,25 +267,25 @@ const styles = StyleSheet.create({
     fontFamily,
     fontSize: 18,
     fontWeight: '600' as const,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   saveButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.primary,
   },
   saveButtonDisabled: {
-    backgroundColor: '#27272A',
+    backgroundColor: AppColors.border,
   },
   saveButtonText: {
     fontFamily,
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#000000',
+    color: '#FFFFFF',
   },
   saveButtonTextDisabled: {
-    color: '#52525B',
+    color: AppColors.textLight,
   },
   content: {
     flex: 1,
@@ -281,19 +297,19 @@ const styles = StyleSheet.create({
   label: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '500' as const,
-    color: '#A1A1AA',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     padding: 16,
     fontFamily,
     fontSize: 16,
-    color: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#27272A',
+    color: AppColors.textPrimary,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   textArea: {
     height: 100,
@@ -307,19 +323,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
+  },
+  categoryChipActive: {
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.primary,
   },
   categoryChipText: {
     fontFamily,
     fontSize: 14,
     fontWeight: '500' as const,
-    color: '#A1A1AA',
+    color: AppColors.textSecondary,
     textTransform: 'capitalize',
   },
   categoryChipTextActive: {
-    color: '#000000',
+    color: AppColors.primary,
   },
   priorityRow: {
     flexDirection: 'row',
@@ -333,18 +353,18 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#27272A',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   priorityChipText: {
     fontFamily,
     fontSize: 14,
     fontWeight: '500' as const,
-    color: '#A1A1AA',
+    color: AppColors.textSecondary,
   },
   priorityChipTextActive: {
-    color: '#000000',
+    color: '#FFFFFF',
   },
   row: {
     flexDirection: 'row',
@@ -352,11 +372,11 @@ const styles = StyleSheet.create({
   inputWithIcon: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
     paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: '#27272A',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     gap: 10,
   },
   inputSmall: {
@@ -364,7 +384,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontFamily,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   allDayToggle: {
     flexDirection: 'row',
@@ -377,22 +397,22 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#52525B',
+    borderColor: AppColors.textLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   toggleCircleActive: {
-    borderColor: '#10B981',
+    borderColor: AppColors.primary,
   },
   toggleInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#10B981',
+    backgroundColor: AppColors.primary,
   },
   allDayText: {
     fontFamily,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
 });

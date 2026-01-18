@@ -13,6 +13,8 @@ import { X } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { SavingsGoal } from '@/constants/types';
 import { fontFamily } from '@/constants/Typography';
+import { AppColors } from '@/constants/colors';
+import SuccessAnimation from './SuccessAnimation';
 
 interface AddContributionModalProps {
   visible: boolean;
@@ -24,15 +26,26 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
   const { updateGoal } = useFinance();
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successTitle, setSuccessTitle] = useState('');
+  const [successSubtitle, setSuccessSubtitle] = useState('');
 
   const resetForm = () => {
     setAmount('');
     setIsSubmitting(false);
+    setShowSuccess(false);
+    setSuccessTitle('');
+    setSuccessSubtitle('');
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    handleClose();
   };
 
   const handleSubmit = async () => {
@@ -62,13 +75,15 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
       const remaining = goal.targetAmount - newCurrentAmount;
       const isCompleted = remaining === 0;
 
-      Alert.alert(
-        isCompleted ? 'Goal Completed! 🎉' : 'Contribution Added',
-        isCompleted
-          ? `Congratulations! You've reached your "${goal.title}" goal!`
-          : `You added JD ${contributionAmount.toFixed(2)} to "${goal.title}". Keep going!`,
-        [{ text: 'OK', onPress: handleClose }]
-      );
+      if (isCompleted) {
+        setSuccessTitle('Goal Completed! 🎉');
+        setSuccessSubtitle(`Congratulations! You've reached your "${goal.title}" goal!`);
+      } else {
+        setSuccessTitle('Contribution Added!');
+        setSuccessSubtitle(`You added JD ${contributionAmount.toFixed(2)} to "${goal.title}". Keep going!`);
+      }
+
+      setShowSuccess(true);
     } catch (error) {
       console.error('Error adding contribution:', error);
       Alert.alert('Error', 'Failed to add contribution. Please try again.');
@@ -90,14 +105,14 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Add Contribution</Text>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7}>
-            <X color="#FFFFFF" size={24} />
+            <X color={AppColors.textSecondary} size={24} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
           <View style={styles.goalInfo}>
-            <View style={[styles.goalIcon, { backgroundColor: '#18181B' }]}>
-              <Text style={[styles.goalIconText, { color: '#FFFFFF' }]}>
+            <View style={[styles.goalIcon, { backgroundColor: AppColors.blue[50] }]}>
+              <Text style={[styles.goalIconText, { color: AppColors.primary }]}>
                 {goal.title.charAt(0).toUpperCase()}
               </Text>
             </View>
@@ -110,7 +125,7 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
           <View style={styles.progressSection}>
             <View style={styles.progressInfo}>
               <Text style={styles.progressLabel}>Current Progress</Text>
-              <Text style={[styles.progressValue, { color: '#FFFFFF' }]}>
+              <Text style={[styles.progressValue, { color: AppColors.primary }]}>
                 {progress.toFixed(0)}%
               </Text>
             </View>
@@ -118,7 +133,7 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
               <View
                 style={[
                   styles.progressBarFill,
-                  { width: `${Math.min(100, progress)}%`, backgroundColor: '#FFFFFF' },
+                  { width: `${Math.min(100, progress)}%`, backgroundColor: AppColors.primary },
                 ]}
               />
             </View>
@@ -137,7 +152,7 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
               </View>
               <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>Remaining</Text>
-                <Text style={[styles.amountValue, { color: '#A1A1AA' }]}>
+                <Text style={[styles.amountValue, { color: AppColors.textLight }]}>
                   JD {remaining.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </Text>
               </View>
@@ -152,7 +167,7 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
               onChangeText={setAmount}
               keyboardType="decimal-pad"
               placeholder="0.00"
-              placeholderTextColor="#52525B"
+              placeholderTextColor={AppColors.textLight}
               autoFocus
             />
             <Text style={styles.helpText}>
@@ -213,6 +228,16 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
             </Text>
           </TouchableOpacity>
         </View>
+
+        <SuccessAnimation
+          visible={showSuccess}
+          type="contribution"
+          title={successTitle}
+          subtitle={successSubtitle}
+          onComplete={handleSuccessComplete}
+          autoHide={true}
+          autoHideDelay={2500}
+        />
       </View>
     </Modal>
   );
@@ -221,7 +246,7 @@ export default function AddContributionModal({ visible, onClose, goal }: AddCont
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: AppColors.background,
   },
   header: {
     flexDirection: 'row',
@@ -231,19 +256,21 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 20 : 20,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#18181B',
+    borderBottomColor: AppColors.border,
   },
   headerTitle: {
     fontFamily,
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: 'bold' as const,
+    color: AppColors.textPrimary,
   },
   closeButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: AppColors.surfaceLight,
   },
   content: {
     flex: 1,
@@ -253,10 +280,12 @@ const styles = StyleSheet.create({
   goalInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: AppColors.border,
   },
   goalIcon: {
     width: 56,
@@ -269,7 +298,7 @@ const styles = StyleSheet.create({
   goalIconText: {
     fontFamily,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
   },
   goalDetails: {
     flex: 1,
@@ -277,20 +306,22 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontFamily,
     fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: '700' as const,
+    color: AppColors.textPrimary,
     marginBottom: 4,
   },
   goalCategory: {
     fontFamily,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: AppColors.textLight,
   },
   progressSection: {
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: AppColors.border,
   },
   progressInfo: {
     flexDirection: 'row',
@@ -301,16 +332,16 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontFamily,
     fontSize: 14,
-    color: '#A1A1AA',
+    color: AppColors.textLight,
   },
   progressValue: {
     fontFamily,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
   },
   progressBar: {
     height: 12,
-    backgroundColor: '#333',
+    backgroundColor: AppColors.border,
     borderRadius: 6,
     overflow: 'hidden',
     marginBottom: 16,
@@ -330,14 +361,14 @@ const styles = StyleSheet.create({
   amountLabel: {
     fontFamily,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: AppColors.textLight,
     marginBottom: 4,
   },
   amountValue: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: '700' as const,
+    color: AppColors.textPrimary,
   },
   inputSection: {
     marginBottom: 24,
@@ -345,26 +376,26 @@ const styles = StyleSheet.create({
   label: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
     marginBottom: 12,
   },
   input: {
     fontFamily,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 20,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
   },
   helpText: {
     fontFamily,
     fontSize: 12,
-    color: '#A1A1AA',
+    color: AppColors.textLight,
     marginTop: 8,
   },
   quickAmounts: {
@@ -373,8 +404,8 @@ const styles = StyleSheet.create({
   quickAmountsLabel: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#A1A1AA',
+    fontWeight: '600' as const,
+    color: AppColors.textLight,
     marginBottom: 12,
   },
   quickAmountsRow: {
@@ -385,9 +416,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     alignItems: 'center',
   },
   quickAmountButtonDisabled: {
@@ -396,11 +427,11 @@ const styles = StyleSheet.create({
   quickAmountText: {
     fontFamily,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
   },
   quickAmountTextDisabled: {
-    color: '#52525B',
+    color: AppColors.textLight,
   },
   footer: {
     flexDirection: 'row',
@@ -408,32 +439,38 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingBottom: Platform.OS === 'ios' ? 40 : 20,
     borderTopWidth: 1,
-    borderTopColor: '#18181B',
+    borderTopColor: AppColors.border,
     gap: 12,
+    backgroundColor: AppColors.background,
   },
   cancelButton: {
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: AppColors.surfaceLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: '600' as const,
+    color: AppColors.textPrimary,
   },
   submitButton: {
     flex: 2,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonDisabled: {
     opacity: 0.6,
@@ -441,7 +478,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontFamily,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: '600' as const,
+    color: '#FFFFFF',
   },
 });
