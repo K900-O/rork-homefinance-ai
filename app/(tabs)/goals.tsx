@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, Target, Calendar, ArrowUpRight, TrendingUp } from 'lucide-react-native';
@@ -23,6 +24,25 @@ export default function GoalsScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<SavingsGoal | null>(null);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
   const totalTargetAmount = goals.reduce((sum, g) => sum + g.targetAmount, 0);
   const totalCurrentAmount = goals.reduce((sum, g) => sum + g.currentAmount, 0);
   const overallProgress = totalTargetAmount > 0 ? (totalCurrentAmount / totalTargetAmount) * 100 : 0;
@@ -30,7 +50,14 @@ export default function GoalsScreen() {
   return (
     <View style={styles.container}>
       <BlueGlow />
-      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+      <Animated.View style={[
+        styles.contentContainer, 
+        { 
+          paddingTop: insets.top,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }
+      ]}>
         <View style={styles.header}>
           <View>
             <Text style={styles.headerTitle}>Savings Goals</Text>
@@ -129,7 +156,7 @@ export default function GoalsScreen() {
             goal={selectedGoal}
           />
         )}
-      </View>
+      </Animated.View>
     </View>
   );
 }

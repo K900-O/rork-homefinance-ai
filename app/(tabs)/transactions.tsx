@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, Plus, Filter, Wallet, AlertTriangle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react-native';
@@ -50,6 +51,25 @@ export default function TransactionsScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPlannedModal, setShowPlannedModal] = useState(false);
   const [showPlannedSection, setShowPlannedSection] = useState(true);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   const filteredTransactions = useMemo(() => {
     let filtered = transactions;
@@ -115,7 +135,14 @@ export default function TransactionsScreen() {
   return (
     <View style={styles.container}>
       <BlueGlow />
-      <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
+      <Animated.View style={[
+        styles.contentContainer, 
+        { 
+          paddingTop: insets.top,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }
+      ]}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Transactions</Text>
           <TouchableOpacity 
@@ -277,7 +304,7 @@ export default function TransactionsScreen() {
 
         <AddTransactionModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
         <AddPlannedTransactionModal visible={showPlannedModal} onClose={() => setShowPlannedModal(false)} />
-      </View>
+      </Animated.View>
     </View>
   );
 }
