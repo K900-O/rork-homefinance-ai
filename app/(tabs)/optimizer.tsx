@@ -13,7 +13,8 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Sparkles, TrendingDown, TrendingUp, Target, CheckCircle, Circle, Zap, Clock, AlertCircle } from 'lucide-react-native';
+import { Sparkles, TrendingDown, TrendingUp, CheckCircle, Circle, Zap, Clock, AlertCircle } from 'lucide-react-native';
+import { GlassOptimizerIcon, GlassGoalsIcon, GlassTrendUpIcon } from '@/components/GlassmorphicIcons';
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import type { OptimizationSuggestion } from '@/constants/types';
@@ -238,7 +239,7 @@ export default function OptimizerScreen() {
           {optimizations.length === 0 && !isOptimizing ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconContainer}>
-                <Sparkles color="#2563EB" size={48} />
+                <GlassOptimizerIcon size={56} focused={true} />
               </View>
               <Text style={styles.emptyTitle}>Ready to Optimize?</Text>
               <Text style={styles.emptyText}>
@@ -253,7 +254,7 @@ export default function OptimizerScreen() {
           {expenseReductions.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <TrendingDown color="#2563EB" size={24} />
+                <GlassTrendUpIcon size={28} focused={true} />
                 <Text style={styles.sectionTitle}>Expense Reduction</Text>
               </View>
               {expenseReductions.map(suggestion => (
@@ -271,7 +272,7 @@ export default function OptimizerScreen() {
           {incomeIncreases.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <TrendingUp color="#1D4ED8" size={24} />
+                <GlassTrendUpIcon size={28} focused={true} />
                 <Text style={styles.sectionTitle}>Income Opportunities</Text>
               </View>
               {incomeIncreases.map(suggestion => (
@@ -289,7 +290,7 @@ export default function OptimizerScreen() {
           {savingsBoosts.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Target color="#71717A" size={24} />
+                <GlassGoalsIcon size={28} focused={false} />
                 <Text style={styles.sectionTitle}>Savings Boost</Text>
               </View>
               {savingsBoosts.map(suggestion => (

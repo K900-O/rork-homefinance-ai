@@ -12,7 +12,8 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, Plus, Filter, Wallet, AlertTriangle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react-native';
+import { Search, Plus, Filter, Wallet, AlertTriangle, TrendingUp, TrendingDown, RefreshCw, Play, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react-native';
+import { GlassWalletIcon, GlassClockIcon } from '@/components/GlassmorphicIcons';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { Transaction, TransactionType, TransactionCategory, BudgetCategory, PlannedTransaction, RecurrenceType } from '@/constants/types';
 import AddTransactionModal from '@/components/AddTransactionModal';
@@ -236,7 +237,7 @@ export default function TransactionsScreen() {
               >
                 <View style={styles.plannedHeaderLeft}>
                   <View style={styles.plannedIconBg}>
-                    <CalendarClock size={16} color="#2563EB" />
+                    <GlassClockIcon size={20} focused={true} />
                   </View>
                   <Text style={styles.plannedTitle}>Planned</Text>
                   <View style={styles.plannedBadge}>
@@ -271,7 +272,7 @@ export default function TransactionsScreen() {
           {groupedTransactions.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconContainer}>
-                <Wallet color="#2563EB" size={48} />
+                <GlassWalletIcon size={56} focused={true} />
               </View>
               <Text style={styles.emptyStateTitle}>No transactions found</Text>
               <Text style={styles.emptyStateText}>

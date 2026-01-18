@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus, Bell, ArrowDownLeft, CreditCard, User, Wallet, Shield, Trophy, AlertTriangle, CheckCircle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2 } from 'lucide-react-native';
+import { Plus, ArrowDownLeft, CreditCard, User, Shield, Trophy, AlertTriangle, CheckCircle, CalendarClock, TrendingUp, TrendingDown, RefreshCw, Play, Trash2 } from 'lucide-react-native';
+import { GlassBellIcon, GlassWalletIcon, GlassClockIcon } from '@/components/GlassmorphicIcons';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { AppColors } from '@/constants/colors';
@@ -82,7 +83,7 @@ export default function HomeScreen() {
                 <User color="#FFF" size={20} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconButton}>
-                <Bell color="#52525B" size={20} />
+                <GlassBellIcon size={24} focused={true} />
               </TouchableOpacity>
             </View>
           </View>
@@ -194,7 +195,7 @@ export default function HomeScreen() {
               </View>
             ) : (
               <View style={styles.emptyPlanned}>
-                <CalendarClock size={32} color="#A1A1AA" />
+                <GlassClockIcon size={48} focused={false} />
                 <Text style={styles.emptyPlannedText}>No upcoming transactions</Text>
                 <Text style={styles.emptyPlannedSubtext}>Plan your income and expenses for better stability</Text>
               </View>
@@ -230,7 +231,7 @@ export default function HomeScreen() {
               </View>
             ) : (
               <View style={styles.emptyBudget}>
-                <Wallet size={32} color="#A1A1AA" />
+                <GlassWalletIcon size={48} focused={false} />
                 <Text style={styles.emptyBudgetText}>No budgets set</Text>
                 <Text style={styles.emptyBudgetSubtext}>Create a budget to track household spending</Text>
               </View>

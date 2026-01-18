@@ -8,7 +8,8 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Plus, Target, Calendar, ArrowUpRight, TrendingUp } from 'lucide-react-native';
+import { Plus, Calendar, ArrowUpRight } from 'lucide-react-native';
+import { GlassGoalsIcon, GlassTrendUpIcon } from '@/components/GlassmorphicIcons';
 import { useFinance } from '@/contexts/FinanceContext';
 import { AppColors } from '@/constants/colors';
 import type { SavingsGoal } from '@/constants/types';
@@ -83,7 +84,7 @@ export default function GoalsScreen() {
           <View style={styles.summaryCard}>
             <View style={styles.summaryHeader}>
               <View style={styles.summaryIconContainer}>
-                <TrendingUp color="#2563EB" size={24} />
+                <GlassTrendUpIcon size={32} focused={true} />
               </View>
               <View style={styles.summaryTextContainer}>
                 <Text style={styles.summaryLabel}>Overall Progress</Text>
@@ -125,7 +126,7 @@ export default function GoalsScreen() {
           {goals.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconContainer}>
-                <Target color="#2563EB" size={48} />
+                <GlassGoalsIcon size={56} focused={true} />
               </View>
               <Text style={styles.emptyStateTitle}>No goals yet</Text>
               <Text style={styles.emptyStateText}>
@@ -173,7 +174,7 @@ function GoalCard({ goal, onContribute }: { goal: SavingsGoal; onContribute: () 
     <TouchableOpacity style={styles.goalCard} activeOpacity={0.8}>
       <View style={styles.goalHeader}>
         <View style={[styles.goalIconContainer]}>
-          <Target color="#2563EB" size={24} />
+          <GlassGoalsIcon size={32} focused={true} />
         </View>
         <View style={styles.goalInfo}>
           <Text style={styles.goalTitle}>{goal.title}</Text>
