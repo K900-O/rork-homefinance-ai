@@ -289,11 +289,12 @@ export default function TransactionsScreen() {
                   </Text>
                 </View>
                 <View style={styles.transactionsList}>
-                  {items.map(transaction => (
+                  {items.map((transaction, index) => (
                     <TransactionItem 
                       key={transaction.id} 
                       transaction={transaction} 
                       budgetStatus={getBudgetStatusForTransaction(transaction)}
+                      index={index}
                     />
                   ))}
                 </View>
@@ -408,8 +409,37 @@ function PlannedItem({ planned, onProcess, onDelete }: PlannedItemProps) {
   );
 }
 
-function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
+function TransactionItem({ transaction, budgetStatus, index }: TransactionItemProps & { index: number }) {
   const isIncome = transaction.type === 'income';
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    const delay = index * 50;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, scaleAnim, index]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -422,6 +452,10 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
   };
 
   return (
+    <Animated.View style={{
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }}>
     <TouchableOpacity style={styles.transactionItem} activeOpacity={0.7}>
       <View style={[styles.transactionIcon]}>
         {isIncome ? (
@@ -461,6 +495,7 @@ function TransactionItem({ transaction, budgetStatus }: TransactionItemProps) {
         </Text>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
 

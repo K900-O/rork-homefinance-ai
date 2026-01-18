@@ -318,12 +318,13 @@ export default function PersonalHomeScreen() {
               </View>
               
               <View style={styles.habitsList}>
-                {goodHabits.slice(0, 3).map((habit) => (
+                {goodHabits.slice(0, 3).map((habit, index) => (
                   <HabitCard 
                     key={habit.id} 
                     habit={habit} 
                     isCompleted={isHabitCompletedToday(habit.id)}
                     onComplete={() => completeHabitForToday(habit.id)}
+                    index={index}
                   />
                 ))}
               </View>
@@ -365,11 +366,12 @@ export default function PersonalHomeScreen() {
 
             {getTodayActivities.length > 0 ? (
               <View style={styles.activitiesList}>
-                {getTodayActivities.slice(0, 4).map((activity) => (
+                {getTodayActivities.slice(0, 4).map((activity, index) => (
                   <ActivityRow 
                     key={activity.id} 
                     activity={activity} 
-                    onComplete={() => completeActivity(activity.id)} 
+                    onComplete={() => completeActivity(activity.id)}
+                    index={index}
                   />
                 ))}
               </View>
@@ -456,8 +458,56 @@ export default function PersonalHomeScreen() {
   );
 }
 
-function HabitCard({ habit, isCompleted, onComplete }: { habit: Habit; isCompleted: boolean; onComplete: () => void }) {
+function HabitCard({ habit, isCompleted, onComplete, index }: { habit: Habit; isCompleted: boolean; onComplete: () => void; index: number }) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(15)).current;
+  const prevCompleted = useRef(isCompleted);
+
+  useEffect(() => {
+    const delay = index * 60;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, index]);
+
+  useEffect(() => {
+    if (isCompleted && !prevCompleted.current) {
+      Animated.sequence([
+        Animated.spring(scaleAnim, {
+          toValue: 1.04,
+          friction: 3,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+    prevCompleted.current = isCompleted;
+  }, [isCompleted, scaleAnim]);
+
   return (
+    <Animated.View style={{
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }}>
     <TouchableOpacity 
       style={[styles.habitCard, isCompleted && styles.habitCardCompleted]} 
       onPress={onComplete}
@@ -481,6 +531,7 @@ function HabitCard({ habit, isCompleted, onComplete }: { habit: Habit; isComplet
         {isCompleted && <CheckCircle2 size={16} color="#FFF" />}
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
 
@@ -514,9 +565,57 @@ function BadHabitCard({ habit }: { habit: Habit & { daysClean: number } }) {
   );
 }
 
-function ActivityRow({ activity, onComplete }: { activity: Activity; onComplete: () => void }) {
+function ActivityRow({ activity, onComplete, index }: { activity: Activity; onComplete: () => void; index: number }) {
   const isCompleted = activity.status === 'completed';
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(15)).current;
+  const prevCompleted = useRef(isCompleted);
+
+  useEffect(() => {
+    const delay = index * 50;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 250,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, index]);
+
+  useEffect(() => {
+    if (isCompleted && !prevCompleted.current) {
+      Animated.sequence([
+        Animated.spring(scaleAnim, {
+          toValue: 1.03,
+          friction: 3,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+    prevCompleted.current = isCompleted;
+  }, [isCompleted, scaleAnim]);
+
   return (
+    <Animated.View style={{
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }}>
     <TouchableOpacity style={styles.activityRow} onPress={onComplete} activeOpacity={0.7}>
       <View style={[styles.activityIcon, { backgroundColor: ACTIVITY_COLORS[activity.category] + '20' }]}>
         <ListTodo size={16} color={ACTIVITY_COLORS[activity.category]} />
@@ -539,6 +638,7 @@ function ActivityRow({ activity, onComplete }: { activity: Activity; onComplete:
         {isCompleted && <CheckCircle2 size={16} color="#FFF" />}
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
 

@@ -236,13 +236,14 @@ export default function HabitsScreen() {
 
               <View style={styles.habitsList}>
                 {goodHabits.length > 0 ? (
-                  goodHabits.map((habit) => (
+                  goodHabits.map((habit, index) => (
                     <GoodHabitCard
                       key={habit.id}
                       habit={habit}
                       isCompleted={isHabitCompletedToday(habit.id)}
                       onComplete={() => completeHabitForToday(habit.id)}
                       onDelete={() => handleDeleteHabit(habit)}
+                      index={index}
                     />
                   ))
                 ) : (
@@ -296,7 +297,7 @@ export default function HabitsScreen() {
 
               <View style={styles.habitsList}>
                 {badHabits.length > 0 ? (
-                  badHabits.map((habit) => (
+                  badHabits.map((habit, index) => (
                     <BadHabitCard
                       key={habit.id}
                       habit={habit}
@@ -304,6 +305,7 @@ export default function HabitsScreen() {
                       onLogSuccess={() => handleLogSuccess(habit)}
                       onRelapse={() => handleRelapse(habit)}
                       onDelete={() => handleDeleteHabit(habit)}
+                      index={index}
                     />
                   ))
                 ) : (
@@ -336,13 +338,58 @@ function GoodHabitCard({
   isCompleted, 
   onComplete,
   onDelete,
+  index,
 }: { 
   habit: Habit;
   isCompleted: boolean;
   onComplete: () => void;
   onDelete: () => void;
+  index: number;
 }) {
   const categoryColor = ACTIVITY_COLORS[habit.category] || habit.color || '#A1A1AA';
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const prevCompleted = useRef(isCompleted);
+
+  useEffect(() => {
+    const delay = index * 80;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 350,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, index]);
+
+  useEffect(() => {
+    if (isCompleted && !prevCompleted.current) {
+      Animated.sequence([
+        Animated.spring(scaleAnim, {
+          toValue: 1.04,
+          friction: 3,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+    prevCompleted.current = isCompleted;
+  }, [isCompleted, scaleAnim]);
 
   const getWeekProgress = () => {
     const today = new Date();
@@ -361,7 +408,10 @@ function GoodHabitCard({
   const weekProgress = getWeekProgress();
 
   return (
-    <View style={[styles.habitCard, { borderLeftColor: categoryColor }]}>
+    <Animated.View style={[styles.habitCard, { borderLeftColor: categoryColor }, {
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }]}>
       <View style={styles.habitMain}>
         <TouchableOpacity 
           style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
@@ -397,19 +447,19 @@ function GoodHabitCard({
       </View>
 
       <View style={styles.weekProgress}>
-        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, index) => (
-          <View key={index} style={styles.weekDay}>
+        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, idx) => (
+          <View key={idx} style={styles.weekDay}>
             <Text style={styles.weekDayLabel}>{day}</Text>
             <View 
               style={[
                 styles.weekDot, 
-                weekProgress[index] && { backgroundColor: categoryColor }
+                weekProgress[idx] && { backgroundColor: categoryColor }
               ]} 
             />
           </View>
         ))}
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -419,14 +469,59 @@ function BadHabitCard({
   onLogSuccess,
   onRelapse,
   onDelete,
+  index,
 }: { 
   habit: Habit;
   isSuccessToday: boolean;
   onLogSuccess: () => void;
   onRelapse: () => void;
   onDelete: () => void;
+  index: number;
 }) {
   const daysClean = habit.daysClean;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const prevSuccess = useRef(isSuccessToday);
+
+  useEffect(() => {
+    const delay = index * 80;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 350,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, index]);
+
+  useEffect(() => {
+    if (isSuccessToday && !prevSuccess.current) {
+      Animated.sequence([
+        Animated.spring(scaleAnim, {
+          toValue: 1.03,
+          friction: 3,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+    prevSuccess.current = isSuccessToday;
+  }, [isSuccessToday, scaleAnim]);
   const milestone = daysClean >= 30 ? 30 : daysClean >= 7 ? 7 : daysClean >= 3 ? 3 : 1;
   const nextMilestone = milestone === 30 ? 60 : milestone === 7 ? 30 : milestone === 3 ? 7 : 3;
   const progress = Math.min((daysClean / nextMilestone) * 100, 100);
@@ -440,7 +535,10 @@ function BadHabitCard({
   };
 
   return (
-    <View style={styles.badHabitCard}>
+    <Animated.View style={[styles.badHabitCard, {
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }]}>
       <View style={styles.badHabitHeader}>
         <View style={styles.badHabitLeft}>
           <View style={styles.badHabitIconWrap}>
@@ -505,7 +603,7 @@ function BadHabitCard({
           <Text style={styles.relapseButtonText}>Log Relapse</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

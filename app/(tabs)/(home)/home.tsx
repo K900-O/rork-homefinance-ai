@@ -251,8 +251,8 @@ export default function HomeScreen() {
 
             {budgetStatuses.length > 0 ? (
               <View style={styles.budgetList}>
-                {budgetStatuses.map((status) => (
-                  <BudgetItem key={status.budget.id} status={status} />
+                {budgetStatuses.map((status, index) => (
+                  <BudgetItem key={status.budget.id} status={status} index={index} />
                 ))}
               </View>
             ) : (
@@ -297,8 +297,8 @@ export default function HomeScreen() {
 
             <View style={styles.transactionsList}>
               {transactions.length > 0 ? (
-                transactions.slice(0, 5).map((t) => (
-                  <TransactionItem key={t.id} transaction={t} />
+                transactions.slice(0, 5).map((t, index) => (
+                  <TransactionItem key={t.id} transaction={t} index={index} />
                 ))
               ) : (
                 <View style={styles.emptyState}>
@@ -326,7 +326,36 @@ export default function HomeScreen() {
   );
 }
 
-function BudgetItem({ status }: { status: BudgetStatus }) {
+function BudgetItem({ status, index }: { status: BudgetStatus; index: number }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(15)).current;
+  const scaleAnim = useRef(new Animated.Value(0.97)).current;
+
+  useEffect(() => {
+    const delay = index * 80;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 350,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 45,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 45,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, scaleAnim, index]);
   const getStatusColor = () => {
     switch (status.status) {
       case 'safe': return '#2563EB';
@@ -348,9 +377,22 @@ function BudgetItem({ status }: { status: BudgetStatus }) {
   };
 
   const progressWidth = Math.min(status.percentageUsed, 100);
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: progressWidth,
+      duration: 800,
+      delay: index * 80 + 200,
+      useNativeDriver: false,
+    }).start();
+  }, [progressAnim, progressWidth, index]);
 
   return (
-    <View style={styles.budgetItem}>
+    <Animated.View style={[styles.budgetItem, {
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }]}>
       <View style={styles.budgetHeader}>
         <View style={styles.budgetInfo}>
           <View style={[styles.budgetDot, { backgroundColor: status.budget.color }]} />
@@ -389,13 +431,47 @@ function BudgetItem({ status }: { status: BudgetStatus }) {
           {status.daysRemaining} days left
         </Text>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
-function TransactionItem({ transaction }: { transaction: Transaction }) {
+function TransactionItem({ transaction, index }: { transaction: Transaction; index: number }) {
   const isIncome = transaction.type === 'income';
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    const delay = index * 60;
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 50,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, scaleAnim, index]);
+
   return (
+    <Animated.View style={{
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+    }}>
     <TouchableOpacity style={styles.transactionItem}>
       <View style={[styles.transactionIcon, { backgroundColor: '#F5F5F5' }]}>
          <Text style={{ color: '#1A1A1A', fontWeight: 'bold' as const }}>
@@ -413,6 +489,7 @@ function TransactionItem({ transaction }: { transaction: Transaction }) {
           <Text style={styles.dateText}>{new Date(transaction.date).toLocaleDateString()}</Text>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
 
