@@ -7,6 +7,7 @@ import { FinanceProvider } from "@/contexts/FinanceContext";
 import { PersonalProvider } from "@/contexts/PersonalContext";
 import { AppModeProvider } from "@/contexts/AppModeContext";
 import { trpc, trpcClient } from "@/lib/trpc";
+import ModeTransitionOverlay from "@/components/ModeTransitionOverlay";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -74,6 +75,7 @@ export default function RootLayout() {
             <PersonalProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
                 <RootLayoutNav />
+                <ModeTransitionOverlay />
               </GestureHandlerRootView>
             </PersonalProvider>
           </FinanceProvider>
