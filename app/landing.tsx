@@ -187,19 +187,19 @@ export default function LandingScreen() {
           <View style={styles.buttonsContainer}>
             <TouchableOpacity 
               style={styles.appleButton}
-              activeOpacity={0.9}
+              activeOpacity={0.85}
               onPress={() => router.push('/signup' as any)}
             >
-              <Command color="#000000" size={20} />
+              <Command color="#000000" size={18} />
               <Text style={styles.appleButtonText}>Initiate Your Journey</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={styles.recoverButton}
-              activeOpacity={0.7}
+              activeOpacity={0.75}
               onPress={() => router.push('/login' as any)}
             >
-               <Text style={styles.recoverButtonText}>Access Your Account</Text>
+              <Text style={styles.recoverButtonText}>Access Your Account</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -325,41 +325,42 @@ const styles = StyleSheet.create({
   
   // Buttons
   buttonsContainer: {
-    gap: 16,
+    gap: 14,
+    marginBottom: 8,
   },
   appleButton: {
-    height: 56,
+    height: 54,
     backgroundColor: '#FFFFFF',
-    borderRadius: 30,
+    borderRadius: 27,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 14,
+    elevation: 6,
   },
   appleButtonText: {
     fontFamily: sfProDisplayMedium,
-    fontSize: 17,
+    fontSize: 16,
     color: '#000000',
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   recoverButton: {
-    height: 56,
-    borderRadius: 30,
+    height: 54,
+    borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   recoverButtonText: {
     fontFamily: sfProDisplayMedium,
-    fontSize: 17,
+    fontSize: 16,
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
 });
