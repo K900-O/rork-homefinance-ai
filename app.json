@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "HomeFinance AI",
-    "slug": "homefinance-ai",
+    "name": "NAZM AI",
+    "slug": "nazm-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.homefinance-ai"
+      "bundleIdentifier": "app.nazm-ai"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.homefinance_ai",
+      "package": "app.rork.nazm.ai",
       "permissions": [
         "android.permission.VIBRATE"
       ]
