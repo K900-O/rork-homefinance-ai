@@ -87,6 +87,17 @@ export default function LandingScreen() {
     }
   }, [logoLoaded, logoOpacity, logoScale]);
 
+  // Fallback: show logo after timeout if onLoad doesn't fire
+  useEffect(() => {
+    const fallbackTimeout = setTimeout(() => {
+      if (!logoLoaded) {
+        console.log('Logo fallback triggered');
+        setLogoLoaded(true);
+      }
+    }, 500);
+    return () => clearTimeout(fallbackTimeout);
+  }, [logoLoaded]);
+
   const handleLogoLoad = () => {
     setLogoLoaded(true);
   };
@@ -211,7 +222,6 @@ export default function LandingScreen() {
             <Animated.Image 
               source={{ 
                 uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn',
-                cache: 'force-cache',
               }}
               style={[
                 styles.logoImage,
@@ -222,6 +232,10 @@ export default function LandingScreen() {
               ]}
               resizeMode="contain"
               onLoad={handleLogoLoad}
+              onError={(e) => {
+                console.log('Logo load error:', e.nativeEvent.error);
+                setLogoLoaded(true);
+              }}
             />
           </View>
         </Animated.View>
