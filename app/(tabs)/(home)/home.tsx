@@ -576,19 +576,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    width: 420,
-    height: 140,
+    width: 500,
+    height: 170,
+    marginLeft: -20,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 20,
     marginBottom: 20,
   },
   headerActions: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 10,
   },
   modeButton: {
     width: 40,
