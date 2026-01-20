@@ -1,5 +1,5 @@
 import createContextHook from '@nkzw/create-context-hook';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
@@ -25,7 +25,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = useCallback(async (email: string, password: string, name: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -47,9 +47,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       console.error('Sign up error:', error);
       return { data: null, error };
     }
-  };
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -66,9 +66,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       console.error('Sign in error:', error);
       return { data: null, error };
     }
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
@@ -79,9 +79,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       console.error('Sign out error:', error);
       throw error;
     }
-  };
+  }, []);
 
-  return {
+  return useMemo(() => ({
     session,
     user,
     isLoading,
@@ -89,5 +89,5 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     signUp,
     signIn,
     signOut,
-  };
+  }), [session, user, isLoading, signUp, signIn, signOut]);
 });
