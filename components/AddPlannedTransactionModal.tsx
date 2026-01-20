@@ -14,8 +14,9 @@ import {
 import { X, Calendar, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { TransactionType, TransactionCategory, RecurrenceType } from '@/constants/types';
-import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
+import { fontFamily } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
+import SuccessAnimation from './SuccessAnimation';
 
 const CATEGORIES: { value: TransactionCategory; label: string }[] = [
   { value: 'food', label: 'Food & Dining' },
@@ -59,6 +60,7 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
     return tomorrow.toISOString().split('T')[0];
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const filteredCategories = useMemo(() => {
     return CATEGORIES.filter(cat => {
@@ -78,11 +80,17 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
     tomorrow.setDate(tomorrow.getDate() + 1);
     setScheduledDate(tomorrow.toISOString().split('T')[0]);
     setIsSubmitting(false);
+    setShowSuccess(false);
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    handleClose();
   };
 
   const handleSubmit = () => {
@@ -117,11 +125,7 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
         notes: notes.trim() || undefined,
       });
 
-      Alert.alert(
-        'Success',
-        'Planned transaction added successfully',
-        [{ text: 'OK', onPress: handleClose }]
-      );
+      setShowSuccess(true);
     } catch (error) {
       console.error('Error adding planned transaction:', error);
       Alert.alert('Error', 'Failed to add planned transaction. Please try again.');
@@ -373,6 +377,16 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
             </Text>
           </TouchableOpacity>
         </View>
+
+        <SuccessAnimation
+          visible={showSuccess}
+          type="transaction"
+          title="Planned Transaction"
+          subtitle="Transaction scheduled successfully"
+          onComplete={handleSuccessComplete}
+          autoHide={true}
+          autoHideDelay={2000}
+        />
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -394,7 +408,7 @@ const styles = StyleSheet.create({
     borderBottomColor: AppColors.border,
   },
   headerTitle: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     fontSize: 24,
     fontWeight: '700',
     color: AppColors.textPrimary,
@@ -415,11 +429,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   label: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 15,
+    fontFamily: fontFamily,
+    fontSize: 16,
     fontWeight: '600',
     color: AppColors.textPrimary,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   typeContainer: {
     flexDirection: 'row',
@@ -431,11 +445,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 12,
     backgroundColor: AppColors.surfaceLight,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: AppColors.border,
   },
   typeButtonActiveExpense: {
@@ -447,10 +461,10 @@ const styles = StyleSheet.create({
     borderColor: AppColors.blue[100],
   },
   typeButtonText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 15,
+    fontFamily: fontFamily,
+    fontSize: 16,
     fontWeight: '600',
-    color: AppColors.textLight,
+    color: AppColors.textSecondary,
   },
   typeButtonTextActiveExpense: {
     color: AppColors.danger,
@@ -462,34 +476,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: AppColors.surfaceLight,
-    borderRadius: 16,
-    borderWidth: 1,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: AppColors.border,
     paddingHorizontal: 16,
     height: 56,
   },
   inputWrapper: {
     backgroundColor: AppColors.surfaceLight,
-    borderRadius: 16,
-    borderWidth: 1,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: AppColors.border,
     overflow: 'hidden',
   },
   currencySymbol: {
-    fontFamily: sfProDisplayMedium,
+    fontFamily: fontFamily,
     fontSize: 20,
     color: AppColors.textPrimary,
     marginRight: 8,
+    fontWeight: '500',
   },
   amountInput: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     flex: 1,
     fontSize: 24,
     color: AppColors.textPrimary,
     paddingVertical: 10,
+    fontWeight: '700',
   },
   input: {
-    fontFamily: sfProDisplayRegular,
+    fontFamily: fontFamily,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
@@ -503,26 +519,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: AppColors.surfaceLight,
-    borderRadius: 16,
-    borderWidth: 1,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: AppColors.border,
     paddingHorizontal: 16,
     gap: 12,
     height: 52,
   },
   dateInput: {
-    fontFamily: sfProDisplayRegular,
+    fontFamily: fontFamily,
     flex: 1,
     paddingVertical: 14,
     fontSize: 16,
     color: AppColors.textPrimary,
   },
   datePreview: {
-    fontFamily: sfProDisplayMedium,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: AppColors.primary,
     marginTop: 8,
     marginLeft: 4,
+    fontWeight: '500',
   },
   recurrenceGrid: {
     flexDirection: 'row',
@@ -537,7 +554,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 10,
     backgroundColor: AppColors.surfaceLight,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: AppColors.border,
   },
   recurrenceButtonActive: {
@@ -545,17 +562,17 @@ const styles = StyleSheet.create({
     borderColor: AppColors.blue[200],
   },
   recurrenceButtonText: {
-    fontFamily: sfProDisplayMedium,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '500',
-    color: AppColors.textLight,
+    fontWeight: '600',
+    color: AppColors.textSecondary,
   },
   recurrenceButtonTextActive: {
     color: AppColors.primary,
     fontWeight: '600',
   },
   recurrenceDescription: {
-    fontFamily: sfProDisplayRegular,
+    fontFamily: fontFamily,
     fontSize: 13,
     color: AppColors.textLight,
     marginTop: 10,
@@ -571,7 +588,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 10,
     backgroundColor: AppColors.surfaceLight,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: AppColors.border,
   },
   categoryButtonActive: {
@@ -579,10 +596,10 @@ const styles = StyleSheet.create({
     borderColor: AppColors.textPrimary,
   },
   categoryButtonText: {
-    fontFamily: sfProDisplayMedium,
+    fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: '500',
-    color: AppColors.textLight,
+    fontWeight: '600',
+    color: AppColors.textSecondary,
   },
   categoryButtonTextActive: {
     color: AppColors.textInverse,
@@ -592,7 +609,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   summaryTitle: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     fontSize: 18,
     fontWeight: '700',
     color: AppColors.textPrimary,
@@ -612,12 +629,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryLabel: {
-    fontFamily: sfProDisplayMedium,
+    fontFamily: fontFamily,
     fontSize: 14,
     color: AppColors.textLight,
+    fontWeight: '500',
   },
   summaryValue: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     fontSize: 15,
     fontWeight: '600',
     color: AppColors.textPrimary,
@@ -634,7 +652,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.dangerLight,
   },
   summaryBadgeText: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -657,21 +675,23 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 12,
     backgroundColor: AppColors.surfaceLight,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: AppColors.border,
   },
   cancelButtonText: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.textLight,
+    color: AppColors.textPrimary,
   },
   submitButton: {
     flex: 2,
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 12,
     backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -685,7 +705,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
