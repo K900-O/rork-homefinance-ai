@@ -31,10 +31,8 @@ export default function LandingScreen() {
   // 1: Final Landing State (Split Screen)
   const animValue = useRef(new Animated.Value(0)).current;
   
-  // Logo loading animation
-  const [logoLoaded, setLogoLoaded] = useState(false);
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const logoScale = useRef(new Animated.Value(0.95)).current;
+  // Logo animation
+  const logoScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Start animation after a small delay to show the "splash"
@@ -50,57 +48,25 @@ export default function LandingScreen() {
     return () => clearTimeout(timeout);
   }, [animValue]);
 
-  // Logo loading animation effect
+  // Logo breathing animation
   useEffect(() => {
-    if (logoLoaded) {
-      Animated.parallel([
-        Animated.timing(logoOpacity, {
-          toValue: 1,
-          duration: 600,
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(logoScale, {
+          toValue: 1.03,
+          duration: 2000,
           useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
         }),
-        Animated.spring(logoScale, {
+        Animated.timing(logoScale, {
           toValue: 1,
-          tension: 40,
-          friction: 7,
+          duration: 2000,
           useNativeDriver: true,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
         }),
-      ]).start();
-
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(logoScale, {
-            toValue: 1.02,
-            duration: 2000,
-            useNativeDriver: true,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
-          }),
-          Animated.timing(logoScale, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: true,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
-          }),
-        ])
-      ).start();
-    }
-  }, [logoLoaded, logoOpacity, logoScale]);
-
-  // Fallback: show logo after timeout if onLoad doesn't fire
-  useEffect(() => {
-    const fallbackTimeout = setTimeout(() => {
-      if (!logoLoaded) {
-        console.log('Logo fallback triggered');
-        setLogoLoaded(true);
-      }
-    }, 500);
-    return () => clearTimeout(fallbackTimeout);
-  }, [logoLoaded]);
-
-  const handleLogoLoad = () => {
-    setLogoLoaded(true);
-  };
+      ])
+    ).start();
+  }, [logoScale]);
 
   // Interpolations
   const bgTop = animValue.interpolate({
@@ -226,16 +192,10 @@ export default function LandingScreen() {
               style={[
                 styles.logoImage,
                 {
-                  opacity: logoOpacity,
                   transform: [{ scale: logoScale }],
                 }
               ]}
               resizeMode="contain"
-              onLoad={handleLogoLoad}
-              onError={(e) => {
-                console.log('Logo load error:', e.nativeEvent.error);
-                setLogoLoaded(true);
-              }}
             />
           </View>
         </Animated.View>
