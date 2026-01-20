@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useFonts } from 'expo-font';
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FinanceProvider } from "@/contexts/FinanceContext";
@@ -65,20 +64,9 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    'YourCustomFont-Regular': require('../assets/fonts/YourCustomFont-Regular.ttf'),
-    'YourCustomFont-Bold': require('../assets/fonts/YourCustomFont-Bold.ttf'),
-  });
-
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
+    SplashScreen.hideAsync();
+  }, []);
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
