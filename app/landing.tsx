@@ -37,6 +37,8 @@ export default function LandingScreen() {
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const logoPulse = useRef(new Animated.Value(1)).current;
   const logoGlow = useRef(new Animated.Value(0)).current;
+  const logoShine = useRef(new Animated.Value(0)).current;
+  const logoRotate = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Start animation after a small delay to show the "splash"
@@ -55,51 +57,93 @@ export default function LandingScreen() {
   // Logo loading animation effect
   useEffect(() => {
     if (logoLoaded) {
-      // Fade in the logo smoothly
-      Animated.timing(logoOpacity, {
+      // Fade in the logo with a nice entrance
+      Animated.spring(logoOpacity, {
         toValue: 1,
-        duration: 600,
+        tension: 50,
+        friction: 8,
         useNativeDriver: true,
-        easing: Easing.out(Easing.cubic),
       }).start();
 
-      // Start gentle pulse animation
+      // Start breathing pulse animation - more noticeable
       Animated.loop(
         Animated.sequence([
           Animated.timing(logoPulse, {
-            toValue: 1.02,
-            duration: 2000,
+            toValue: 1.06,
+            duration: 1800,
             useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
           }),
           Animated.timing(logoPulse, {
             toValue: 1,
-            duration: 2000,
+            duration: 1800,
             useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
           }),
         ])
       ).start();
 
-      // Glow animation
+      // Enhanced glow animation - more dramatic
       Animated.loop(
         Animated.sequence([
           Animated.timing(logoGlow, {
             toValue: 1,
-            duration: 1500,
+            duration: 1200,
             useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
           }),
           Animated.timing(logoGlow, {
             toValue: 0,
-            duration: 1500,
+            duration: 1200,
             useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          }),
+        ])
+      ).start();
+
+      // Shine sweep animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(logoShine, {
+            toValue: 1,
+            duration: 2500,
+            useNativeDriver: true,
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+          }),
+          Animated.delay(1000),
+          Animated.timing(logoShine, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+
+      // Subtle rotation wobble
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(logoRotate, {
+            toValue: 1,
+            duration: 3000,
+            useNativeDriver: true,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          }),
+          Animated.timing(logoRotate, {
+            toValue: -1,
+            duration: 3000,
+            useNativeDriver: true,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          }),
+          Animated.timing(logoRotate, {
+            toValue: 0,
+            duration: 3000,
+            useNativeDriver: true,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
           }),
         ])
       ).start();
     }
-  }, [logoLoaded, logoOpacity, logoPulse, logoGlow]);
+  }, [logoLoaded, logoOpacity, logoPulse, logoGlow, logoShine, logoRotate]);
 
   const handleLogoLoad = () => {
     setLogoLoaded(true);
@@ -222,29 +266,77 @@ export default function LandingScreen() {
           pointerEvents="none"
         >
           <View style={styles.logoContainer}>
+            {/* Outer glow ring */}
+            <Animated.View 
+              style={[
+                styles.logoGlowOuter,
+                {
+                  opacity: logoGlow.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.15, 0.4],
+                  }),
+                  transform: [
+                    { scale: logoPulse.interpolate({
+                      inputRange: [1, 1.06],
+                      outputRange: [1.1, 1.25],
+                    })}
+                  ],
+                }
+              ]}
+            />
+            {/* Inner glow */}
             <Animated.View 
               style={[
                 styles.logoGlow,
                 {
                   opacity: logoGlow.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0.3, 0.6],
+                    outputRange: [0.25, 0.7],
                   }),
                   transform: [{ scale: logoPulse }],
                 }
               ]}
             />
+            {/* Main logo image */}
             <Animated.Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
+              source={{ 
+                uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn',
+                cache: 'force-cache',
+              }}
               style={[
                 styles.logoImage,
                 {
                   opacity: logoOpacity,
-                  transform: [{ scale: logoPulse }],
+                  transform: [
+                    { scale: logoPulse },
+                    { rotate: logoRotate.interpolate({
+                      inputRange: [-1, 0, 1],
+                      outputRange: ['-1deg', '0deg', '1deg'],
+                    })}
+                  ],
                 }
               ]}
               resizeMode="contain"
               onLoad={handleLogoLoad}
+            />
+            {/* Shine overlay */}
+            <Animated.View 
+              style={[
+                styles.logoShine,
+                {
+                  opacity: logoShine.interpolate({
+                    inputRange: [0, 0.3, 0.7, 1],
+                    outputRange: [0, 0.6, 0.6, 0],
+                  }),
+                  transform: [
+                    { translateX: logoShine.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-200, 200],
+                    })},
+                    { rotate: '25deg' }
+                  ],
+                }
+              ]}
             />
           </View>
         </Animated.View>
@@ -360,21 +452,35 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   logoContainer: {
-    width: 350,
-    height: 350,
+    width: 380,
+    height: 380,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  logoGlowOuter: {
+    position: 'absolute',
+    width: 360,
+    height: 360,
+    borderRadius: 180,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   logoGlow: {
     position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   logoImage: {
-    width: 350,
-    height: 350,
+    width: 380,
+    height: 380,
+  },
+  logoShine: {
+    position: 'absolute',
+    width: 60,
+    height: 500,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
   },
   
   // Content
