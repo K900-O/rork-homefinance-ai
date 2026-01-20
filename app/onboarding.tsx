@@ -34,7 +34,6 @@ import {
   BarChart3,
   Leaf
 } from 'lucide-react-native';
-import { useFinance } from '@/contexts/FinanceContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { RiskTolerance } from '@/constants/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -64,7 +63,6 @@ const RISK_OPTIONS: { value: RiskTolerance; label: string; description: string; 
 export default function OnboardingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ name?: string; email?: string; password?: string }>();
-  const { createProfile } = useFinance();
   const { signUp } = useAuth();
   const insets = useSafeAreaInsets();
 
@@ -199,43 +197,38 @@ export default function OnboardingScreen() {
   };
 
   const handleComplete = async () => {
-    // In a real app we might want to validate params again or handle the case where they are missing
-    // For now we assume they are passed from signup (or we are in dev mode)
-    // If params are missing, we could show an error or just proceed with defaults/mock if desired.
-    // Given the previous code, it alerts.
-    
-    if (!params.name && !params.email && !params.password) {
-        // Fallback for dev/testing if accessed directly without params, 
-        // though realistically this page is reached via router.replace with params.
-        // We'll proceed but it might fail in context if context relies on them.
-        // Let's keep the check from previous code but maybe less strict if we want to allow testing?
-        // No, let's keep it strict as per previous code.
-         if (!params.name || !params.email || !params.password) {
-            // For now, let's just log and try to proceed if we can, or alert.
-            // Previous code:
-             Alert.alert('Error', 'Missing registration information. Please start over.');
-             router.replace('/login' as any);
-             return;
-         }
+    if (!params.name || !params.email || !params.password) {
+      Alert.alert('Error', 'Missing registration information. Please start over.');
+      router.replace('/signup' as any);
+      return;
     }
 
     setIsLoading(true);
     try {
+      console.log('Starting signup process...');
       const { data: authData, error: authError } = await signUp(
-        params.email!,
-        params.password!,
-        params.name!
+        params.email,
+        params.password,
+        params.name
       );
 
-      if (authError || !authData) {
+      if (authError || !authData?.user) {
+        console.error('Signup failed:', authError);
         Alert.alert('Error', 'Failed to create account. Please try again.');
         setIsLoading(false);
         return;
       }
 
-      const success = await createProfile({
-        name: params.name!,
-        email: params.email!,
+      console.log('Signup successful, user ID:', authData.user.id);
+      
+      // Wait a moment for auth state to propagate
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Create profile directly with Supabase since we have the user ID
+      const { createProfileDirect } = await import('@/lib/supabase');
+      const success = await createProfileDirect(authData.user.id, {
+        name: params.name,
+        email: params.email,
         monthlyIncome: parseFloat(monthlyIncome),
         householdSize: parseInt(householdSize),
         primaryGoals: selectedGoals,
@@ -243,6 +236,7 @@ export default function OnboardingScreen() {
       });
 
       if (success) {
+        console.log('Profile created successfully, navigating to home...');
         router.replace('/(tabs)/(home)/home' as any);
       } else {
         Alert.alert('Error', 'Failed to complete onboarding. Please try again.');
