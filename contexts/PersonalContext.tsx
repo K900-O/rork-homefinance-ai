@@ -1,35 +1,85 @@
 import createContextHook from '@nkzw/create-context-hook';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Activity, Habit, DailySummary, ActivityCategory } from '@/constants/personalTypes';
 
-const STORAGE_KEYS = {
-  ACTIVITIES: '@domusiq_activities',
-  HABITS: '@domusiq_habits',
-};
-
 export const [PersonalProvider, usePersonal] = createContextHook(() => {
+  const { user } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (user) {
+      loadData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user]);
 
   const loadData = async () => {
+    if (!user) return;
+    
     try {
-      const [activitiesData, habitsData] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.ACTIVITIES),
-        AsyncStorage.getItem(STORAGE_KEYS.HABITS),
+      const [activitiesResult, habitsResult] = await Promise.all([
+        supabase
+          .from('activities')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false }),
+        supabase
+          .from('habits')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
       ]);
 
-      if (activitiesData) {
-        setActivities(JSON.parse(activitiesData));
+      if (activitiesResult.data) {
+        const mappedActivities: Activity[] = activitiesResult.data.map(a => ({
+          id: a.id,
+          title: a.title,
+          description: a.description || undefined,
+          category: a.category as ActivityCategory,
+          priority: a.priority as 'high' | 'medium' | 'low',
+          status: a.status as 'pending' | 'in_progress' | 'completed' | 'cancelled',
+          startTime: a.start_time || undefined,
+          endTime: a.end_time || undefined,
+          date: a.date,
+          duration: a.duration || undefined,
+          location: a.location || undefined,
+          isAllDay: a.is_all_day,
+          reminders: a.reminders || [],
+          tags: a.tags || [],
+          createdAt: a.created_at,
+          completedAt: a.completed_at || undefined,
+        }));
+        setActivities(mappedActivities);
       }
 
-      if (habitsData) {
-        setHabits(JSON.parse(habitsData));
+      if (habitsResult.data) {
+        const mappedHabits: Habit[] = habitsResult.data.map(h => ({
+          id: h.id,
+          title: h.title,
+          description: h.description || undefined,
+          category: h.category as ActivityCategory,
+          type: h.type as 'good' | 'bad',
+          frequency: h.frequency as 'daily' | 'weekly' | 'monthly',
+          targetCount: h.target_count,
+          currentStreak: h.current_streak,
+          longestStreak: h.longest_streak,
+          completedDates: h.completed_dates || [],
+          successDates: h.success_dates || [],
+          lastRelapsedDate: h.last_relapsed_date || undefined,
+          totalRelapses: h.total_relapses,
+          daysClean: h.days_clean,
+          color: h.color,
+          icon: h.icon,
+          reminders: h.reminders || [],
+          createdAt: h.created_at,
+          isActive: h.is_active,
+        }));
+        setHabits(mappedHabits);
       }
     } catch (error) {
       console.error('Error loading personal data:', error);
@@ -38,126 +88,337 @@ export const [PersonalProvider, usePersonal] = createContextHook(() => {
     }
   };
 
-  const saveActivities = async (newActivities: Activity[]) => {
+  const addActivity = useCallback(async (activity: Omit<Activity, 'id' | 'createdAt'>) => {
+    if (!user) return;
+    
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify(newActivities));
-      setActivities(newActivities);
-    } catch (error) {
-      console.error('Error saving activities:', error);
-    }
-  };
+      const { data, error } = await supabase
+        .from('activities')
+        .insert({
+          user_id: user.id,
+          title: activity.title,
+          description: activity.description,
+          category: activity.category,
+          priority: activity.priority,
+          status: activity.status,
+          start_time: activity.startTime,
+          end_time: activity.endTime,
+          date: activity.date,
+          duration: activity.duration,
+          location: activity.location,
+          is_all_day: activity.isAllDay,
+          reminders: activity.reminders || [],
+          tags: activity.tags || [],
+          completed_at: activity.completedAt,
+        })
+        .select()
+        .single();
 
-  const saveHabits = async (newHabits: Habit[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(newHabits));
-      setHabits(newHabits);
-    } catch (error) {
-      console.error('Error saving habits:', error);
-    }
-  };
+      if (error) throw error;
 
-  const addActivity = useCallback((activity: Omit<Activity, 'id' | 'createdAt'>) => {
-    const newActivity: Activity = {
-      ...activity,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [newActivity, ...activities];
-    saveActivities(updated);
-  }, [activities]);
-
-  const updateActivity = useCallback((id: string, updates: Partial<Activity>) => {
-    const updated = activities.map(a => a.id === id ? { ...a, ...updates } : a);
-    saveActivities(updated);
-  }, [activities]);
-
-  const deleteActivity = useCallback((id: string) => {
-    const updated = activities.filter(a => a.id !== id);
-    saveActivities(updated);
-  }, [activities]);
-
-  const completeActivity = useCallback((id: string) => {
-    const updated = activities.map(a => 
-      a.id === id ? { ...a, status: 'completed' as const, completedAt: new Date().toISOString() } : a
-    );
-    saveActivities(updated);
-  }, [activities]);
-
-  const addHabit = useCallback((habit: Omit<Habit, 'id' | 'createdAt' | 'currentStreak' | 'longestStreak' | 'completedDates' | 'successDates' | 'daysClean' | 'totalRelapses'>) => {
-    const newHabit: Habit = {
-      ...habit,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      currentStreak: 0,
-      longestStreak: 0,
-      completedDates: [],
-      successDates: [],
-      daysClean: 0,
-      totalRelapses: 0,
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...habits, newHabit];
-    saveHabits(updated);
-  }, [habits]);
-
-  const updateHabit = useCallback((id: string, updates: Partial<Habit>) => {
-    const updated = habits.map(h => h.id === id ? { ...h, ...updates } : h);
-    saveHabits(updated);
-  }, [habits]);
-
-  const deleteHabit = useCallback((id: string) => {
-    const updated = habits.filter(h => h.id !== id);
-    saveHabits(updated);
-  }, [habits]);
-
-  const completeHabitForToday = useCallback((id: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const updated = habits.map(h => {
-      if (h.id !== id) return h;
-      
-      if (h.completedDates.includes(today)) return h;
-      
-      const newCompletedDates = [...h.completedDates, today].sort();
-      
-      let newStreak = 1;
-      const sortedDates = newCompletedDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-      
-      for (let i = 0; i < sortedDates.length - 1; i++) {
-        const current = new Date(sortedDates[i]);
-        const next = new Date(sortedDates[i + 1]);
-        const diffDays = Math.floor((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
-          newStreak++;
-        } else {
-          break;
-        }
+      if (data) {
+        const newActivity: Activity = {
+          id: data.id,
+          title: data.title,
+          description: data.description || undefined,
+          category: data.category as ActivityCategory,
+          priority: data.priority as 'high' | 'medium' | 'low',
+          status: data.status as 'pending' | 'in_progress' | 'completed' | 'cancelled',
+          startTime: data.start_time || undefined,
+          endTime: data.end_time || undefined,
+          date: data.date,
+          duration: data.duration || undefined,
+          location: data.location || undefined,
+          isAllDay: data.is_all_day,
+          reminders: data.reminders || [],
+          tags: data.tags || [],
+          createdAt: data.created_at,
+          completedAt: data.completed_at || undefined,
+        };
+        setActivities(prev => [newActivity, ...prev]);
       }
-      
-      return {
-        ...h,
-        completedDates: newCompletedDates,
-        currentStreak: newStreak,
-        longestStreak: Math.max(h.longestStreak, newStreak),
-      };
-    });
-    saveHabits(updated);
-  }, [habits]);
+    } catch (error) {
+      console.error('Error adding activity:', error);
+    }
+  }, [user]);
 
-  const relapseBadHabit = useCallback((id: string) => {
+  const updateActivity = useCallback(async (id: string, updates: Partial<Activity>) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('activities')
+        .update({
+          title: updates.title,
+          description: updates.description,
+          category: updates.category,
+          priority: updates.priority,
+          status: updates.status,
+          start_time: updates.startTime,
+          end_time: updates.endTime,
+          date: updates.date,
+          duration: updates.duration,
+          location: updates.location,
+          is_all_day: updates.isAllDay,
+          reminders: updates.reminders,
+          tags: updates.tags,
+          completed_at: updates.completedAt,
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setActivities(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
+    } catch (error) {
+      console.error('Error updating activity:', error);
+    }
+  }, [user]);
+
+  const deleteActivity = useCallback(async (id: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('activities')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setActivities(prev => prev.filter(a => a.id !== id));
+    } catch (error) {
+      console.error('Error deleting activity:', error);
+    }
+  }, [user]);
+
+  const completeActivity = useCallback(async (id: string) => {
+    if (!user) return;
+    
+    const completedAt = new Date().toISOString();
+    
+    try {
+      const { error } = await supabase
+        .from('activities')
+        .update({
+          status: 'completed',
+          completed_at: completedAt,
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setActivities(prev => prev.map(a => 
+        a.id === id ? { ...a, status: 'completed' as const, completedAt } : a
+      ));
+    } catch (error) {
+      console.error('Error completing activity:', error);
+    }
+  }, [user]);
+
+  const addHabit = useCallback(async (habit: Omit<Habit, 'id' | 'createdAt' | 'currentStreak' | 'longestStreak' | 'completedDates' | 'successDates' | 'daysClean' | 'totalRelapses'>) => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('habits')
+        .insert({
+          user_id: user.id,
+          title: habit.title,
+          description: habit.description,
+          category: habit.category,
+          type: habit.type,
+          frequency: habit.frequency,
+          target_count: habit.targetCount,
+          current_streak: 0,
+          longest_streak: 0,
+          completed_dates: [],
+          success_dates: [],
+          days_clean: 0,
+          total_relapses: 0,
+          color: habit.color,
+          icon: habit.icon,
+          reminders: habit.reminders || [],
+          is_active: habit.isActive,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const newHabit: Habit = {
+          id: data.id,
+          title: data.title,
+          description: data.description || undefined,
+          category: data.category as ActivityCategory,
+          type: data.type as 'good' | 'bad',
+          frequency: data.frequency as 'daily' | 'weekly' | 'monthly',
+          targetCount: data.target_count,
+          currentStreak: data.current_streak,
+          longestStreak: data.longest_streak,
+          completedDates: data.completed_dates || [],
+          successDates: data.success_dates || [],
+          lastRelapsedDate: data.last_relapsed_date || undefined,
+          totalRelapses: data.total_relapses,
+          daysClean: data.days_clean,
+          color: data.color,
+          icon: data.icon,
+          reminders: data.reminders || [],
+          createdAt: data.created_at,
+          isActive: data.is_active,
+        };
+        setHabits(prev => [...prev, newHabit]);
+      }
+    } catch (error) {
+      console.error('Error adding habit:', error);
+    }
+  }, [user]);
+
+  const updateHabit = useCallback(async (id: string, updates: Partial<Habit>) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .update({
+          title: updates.title,
+          description: updates.description,
+          category: updates.category,
+          type: updates.type,
+          frequency: updates.frequency,
+          target_count: updates.targetCount,
+          current_streak: updates.currentStreak,
+          longest_streak: updates.longestStreak,
+          completed_dates: updates.completedDates,
+          success_dates: updates.successDates,
+          last_relapsed_date: updates.lastRelapsedDate,
+          total_relapses: updates.totalRelapses,
+          days_clean: updates.daysClean,
+          color: updates.color,
+          icon: updates.icon,
+          reminders: updates.reminders,
+          is_active: updates.isActive,
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setHabits(prev => prev.map(h => h.id === id ? { ...h, ...updates } : h));
+    } catch (error) {
+      console.error('Error updating habit:', error);
+    }
+  }, [user]);
+
+  const deleteHabit = useCallback(async (id: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setHabits(prev => prev.filter(h => h.id !== id));
+    } catch (error) {
+      console.error('Error deleting habit:', error);
+    }
+  }, [user]);
+
+  const completeHabitForToday = useCallback(async (id: string) => {
+    if (!user) return;
+    
     const today = new Date().toISOString().split('T')[0];
-    const updated = habits.map(h => {
-      if (h.id !== id || h.type !== 'bad') return h;
+    const habit = habits.find(h => h.id === id);
+    
+    if (!habit || habit.completedDates.includes(today)) return;
+    
+    const newCompletedDates = [...habit.completedDates, today].sort();
+    
+    let newStreak = 1;
+    const sortedDates = newCompletedDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    for (let i = 0; i < sortedDates.length - 1; i++) {
+      const current = new Date(sortedDates[i]);
+      const next = new Date(sortedDates[i + 1]);
+      const diffDays = Math.floor((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
       
-      return {
-        ...h,
-        lastRelapsedDate: today,
-        totalRelapses: h.totalRelapses + 1,
-        daysClean: 0,
-        currentStreak: 0,
-      };
-    });
-    saveHabits(updated);
-  }, [habits]);
+      if (diffDays === 1) {
+        newStreak++;
+      } else {
+        break;
+      }
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .update({
+          completed_dates: newCompletedDates,
+          current_streak: newStreak,
+          longest_streak: Math.max(habit.longestStreak, newStreak),
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setHabits(prev => prev.map(h => {
+        if (h.id !== id) return h;
+        return {
+          ...h,
+          completedDates: newCompletedDates,
+          currentStreak: newStreak,
+          longestStreak: Math.max(h.longestStreak, newStreak),
+        };
+      }));
+    } catch (error) {
+      console.error('Error completing habit:', error);
+    }
+  }, [user, habits]);
+
+  const relapseBadHabit = useCallback(async (id: string) => {
+    if (!user) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const habit = habits.find(h => h.id === id);
+    
+    if (!habit || habit.type !== 'bad') return;
+    
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .update({
+          last_relapsed_date: today,
+          total_relapses: habit.totalRelapses + 1,
+          days_clean: 0,
+          current_streak: 0,
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setHabits(prev => prev.map(h => {
+        if (h.id !== id || h.type !== 'bad') return h;
+        return {
+          ...h,
+          lastRelapsedDate: today,
+          totalRelapses: h.totalRelapses + 1,
+          daysClean: 0,
+          currentStreak: 0,
+        };
+      }));
+    } catch (error) {
+      console.error('Error recording relapse:', error);
+    }
+  }, [user, habits]);
 
   const calculateDaysClean = useCallback((habit: Habit) => {
     if (habit.type !== 'bad') return 0;
@@ -184,40 +445,60 @@ export const [PersonalProvider, usePersonal] = createContextHook(() => {
     return habit.completedDates.includes(today);
   }, [habits]);
 
-  const logSuccessBadHabit = useCallback((id: string) => {
+  const logSuccessBadHabit = useCallback(async (id: string) => {
+    if (!user) return;
+    
     const today = new Date().toISOString().split('T')[0];
-    const updated = habits.map(h => {
-      if (h.id !== id || h.type !== 'bad') return h;
+    const habit = habits.find(h => h.id === id);
+    
+    if (!habit || habit.type !== 'bad') return;
+    
+    const successDates = habit.successDates || [];
+    if (successDates.includes(today)) return;
+    
+    const newSuccessDates = [...successDates, today].sort();
+    
+    let newStreak = 1;
+    const sortedDates = newSuccessDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    for (let i = 0; i < sortedDates.length - 1; i++) {
+      const current = new Date(sortedDates[i]);
+      const next = new Date(sortedDates[i + 1]);
+      const diffDays = Math.floor((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
       
-      const successDates = h.successDates || [];
-      if (successDates.includes(today)) return h;
-      
-      const newSuccessDates = [...successDates, today].sort();
-      
-      let newStreak = 1;
-      const sortedDates = newSuccessDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-      
-      for (let i = 0; i < sortedDates.length - 1; i++) {
-        const current = new Date(sortedDates[i]);
-        const next = new Date(sortedDates[i + 1]);
-        const diffDays = Math.floor((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
-          newStreak++;
-        } else {
-          break;
-        }
+      if (diffDays === 1) {
+        newStreak++;
+      } else {
+        break;
       }
-      
-      return {
-        ...h,
-        successDates: newSuccessDates,
-        currentStreak: newStreak,
-        longestStreak: Math.max(h.longestStreak, newStreak),
-      };
-    });
-    saveHabits(updated);
-  }, [habits]);
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .update({
+          success_dates: newSuccessDates,
+          current_streak: newStreak,
+          longest_streak: Math.max(habit.longestStreak, newStreak),
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setHabits(prev => prev.map(h => {
+        if (h.id !== id || h.type !== 'bad') return h;
+        return {
+          ...h,
+          successDates: newSuccessDates,
+          currentStreak: newStreak,
+          longestStreak: Math.max(h.longestStreak, newStreak),
+        };
+      }));
+    } catch (error) {
+      console.error('Error logging success:', error);
+    }
+  }, [user, habits]);
 
   const isBadHabitSuccessToday = useCallback((id: string) => {
     const habit = habits.find(h => h.id === id);
