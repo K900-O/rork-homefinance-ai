@@ -21,6 +21,7 @@ import AddPlannedTransactionModal from '@/components/AddPlannedTransactionModal'
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
 import { BlueGlow } from '@/components/BlueGlow';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AppColors } from '@/constants/colors';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -152,7 +153,7 @@ export default function TransactionsScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={['#3B82F6', '#2563EB']}
+              colors={[AppColors.primaryLight, AppColors.primary]}
               style={styles.addButtonGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -193,11 +194,11 @@ export default function TransactionsScreen() {
 
         <View style={styles.searchContainer}>
           <View style={styles.searchBox}>
-            <Search color="#71717A" size={20} />
+            <Search color={AppColors.textLight} size={20} />
             <TextInput
               style={styles.searchInput}
               placeholder="Search..."
-              placeholderTextColor="#71717A"
+              placeholderTextColor={AppColors.textLight}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -250,7 +251,7 @@ export default function TransactionsScreen() {
                   style={styles.addPlannedBtn}
                   onPress={() => setShowPlannedModal(true)}
                 >
-                  <Plus size={16} color="#2563EB" />
+                  <Plus size={16} color={AppColors.primary} />
                 </TouchableOpacity>
               </TouchableOpacity>
               
@@ -367,15 +368,15 @@ function PlannedItem({ planned, onProcess, onDelete }: PlannedItemProps) {
           isIncome ? styles.plannedIconIncome : styles.plannedIconExpense
         ]}>
           {isIncome ? (
-            <TrendingUp size={16} color="#2563EB" />
+            <TrendingUp size={16} color={AppColors.primary} />
           ) : (
-            <TrendingDown size={16} color="#EF4444" />
+            <TrendingDown size={16} color={AppColors.danger} />
           )}
         </View>
         <View style={styles.plannedInfo}>
           <Text style={styles.plannedName}>{planned.description}</Text>
           <View style={styles.plannedMeta}>
-            <RefreshCw size={10} color="#71717A" />
+            <RefreshCw size={10} color={AppColors.textLight} />
             <Text style={styles.plannedRecurrence}>{getRecurrenceLabel(planned.recurrence)}</Text>
             <Text style={styles.plannedMetaDot}>•</Text>
             <Text style={[
@@ -397,11 +398,11 @@ function PlannedItem({ planned, onProcess, onDelete }: PlannedItemProps) {
         <View style={styles.plannedActions}>
           {isToday && (
             <TouchableOpacity style={styles.processBtn} onPress={onProcess}>
-              <Play size={12} color="#2563EB" />
+              <Play size={12} color={AppColors.primary} />
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
-            <Trash2 size={12} color="#71717A" />
+            <Trash2 size={12} color={AppColors.textLight} />
           </TouchableOpacity>
         </View>
       </View>
@@ -443,11 +444,11 @@ function TransactionItem({ transaction, budgetStatus, index }: TransactionItemPr
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'safe': return '#2563EB';
-      case 'warning': return '#F59E0B';
-      case 'danger': return '#EF4444';
+      case 'safe': return AppColors.primary;
+      case 'warning': return AppColors.warning;
+      case 'danger': return AppColors.danger;
       case 'exceeded': return '#DC2626';
-      default: return '#71717A';
+      default: return AppColors.textLight;
     }
   };
 
@@ -459,9 +460,9 @@ function TransactionItem({ transaction, budgetStatus, index }: TransactionItemPr
     <TouchableOpacity style={styles.transactionItem} activeOpacity={0.7}>
       <View style={[styles.transactionIcon]}>
         {isIncome ? (
-          <ArrowDownLeft color="#2563EB" size={20} />
+          <ArrowDownLeft color={AppColors.primary} size={20} />
         ) : (
-          <ArrowUpRight color="#EF4444" size={20} />
+          <ArrowUpRight color={AppColors.danger} size={20} />
         )}
       </View>
       <View style={styles.transactionDetails}>
@@ -502,7 +503,7 @@ function TransactionItem({ transaction, budgetStatus, index }: TransactionItemPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.background,
   },
   contentContainer: {
     flex: 1,
@@ -518,10 +519,10 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 28,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
   },
   addButton: {
-    shadowColor: '#2563EB',
+    shadowColor: AppColors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -544,13 +545,13 @@ const styles = StyleSheet.create({
   budgetChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: AppColors.backgroundDark,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     gap: 6,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: AppColors.border,
   },
   budgetChipExceeded: {
     backgroundColor: 'rgba(220, 38, 38, 0.1)',
@@ -572,18 +573,18 @@ const styles = StyleSheet.create({
   budgetChipName: {
     fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
     fontWeight: '500',
   },
   budgetChipPercent: {
     fontFamily: sfProDisplayMedium,
     fontSize: 12,
-    color: '#71717A',
+    color: AppColors.textLight,
     fontWeight: '600',
   },
   budgetChipPercentExceeded: { color: '#DC2626' },
-  budgetChipPercentDanger: { color: '#EF4444' },
-  budgetChipPercentWarning: { color: '#F59E0B' },
+  budgetChipPercentDanger: { color: AppColors.danger },
+  budgetChipPercentWarning: { color: AppColors.warning },
   searchContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -594,25 +595,25 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: AppColors.backgroundDark,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: AppColors.border,
   },
   searchInput: {
     fontFamily: sfProDisplayRegular,
     flex: 1,
     fontSize: 16,
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
   },
   filterIconButton: {
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: '#2563EB',
+    backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -627,19 +628,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: AppColors.backgroundDark,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: AppColors.border,
   },
   filterButtonActive: {
-    backgroundColor: '#2563EB',
-    borderColor: '#2563EB',
+    backgroundColor: AppColors.primary,
+    borderColor: AppColors.primary,
   },
   filterButtonText: {
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   filterButtonTextActive: {
     color: '#FFFFFF',
@@ -657,7 +658,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: AppColors.surfaceBlue,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -666,13 +667,13 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
     marginBottom: 8,
   },
   emptyStateText: {
     fontFamily: sfProDisplayRegular,
     fontSize: 14,
-    color: '#71717A',
+    color: AppColors.textLight,
     textAlign: 'center',
   },
   transactionGroup: {
@@ -689,7 +690,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#71717A',
+    color: AppColors.textLight,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -697,7 +698,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   transactionsList: {
     paddingHorizontal: 20,
@@ -706,11 +707,11 @@ const styles = StyleSheet.create({
   transactionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.surface,
     padding: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: AppColors.border,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -724,7 +725,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: AppColors.backgroundDark,
   },
   transactionDetails: {
     flex: 1,
@@ -733,7 +734,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayMedium,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
     marginBottom: 4,
   },
   transactionMeta: {
@@ -744,7 +745,7 @@ const styles = StyleSheet.create({
   transactionCategory: {
     fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   dotSeparator: {
       fontFamily: sfProDisplayRegular,
@@ -756,7 +757,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: AppColors.backgroundDark,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
@@ -779,19 +780,19 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
   },
   incomeText: {
-    color: '#2563EB',
+    color: AppColors.primary,
   },
   plannedSection: {
     marginHorizontal: 20,
     marginBottom: 24,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: AppColors.backgroundLight,
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: AppColors.border,
   },
   plannedHeader: {
     flexDirection: 'row',
@@ -808,7 +809,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: AppColors.surfaceBlue,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -816,10 +817,10 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
   },
   plannedBadge: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: AppColors.surfaceBlue,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -828,13 +829,13 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayBold,
     fontSize: 12,
     fontWeight: '600',
-    color: '#2563EB',
+    color: AppColors.primary,
   },
   addPlannedBtn: {
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: AppColors.surfaceBlue,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -846,11 +847,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.surface,
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: AppColors.border,
   },
   plannedItemLeft: {
     flexDirection: 'row',
@@ -866,7 +867,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   plannedIconIncome: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: AppColors.surfaceBlue,
   },
   plannedIconExpense: {
     backgroundColor: '#FEE2E2',
@@ -878,7 +879,7 @@ const styles = StyleSheet.create({
     fontFamily: sfProDisplayMedium,
     fontSize: 14,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: AppColors.textPrimary,
     marginBottom: 2,
   },
   plannedMeta: {
@@ -889,7 +890,7 @@ const styles = StyleSheet.create({
   plannedRecurrence: {
     fontFamily: sfProDisplayRegular,
     fontSize: 11,
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   plannedMetaDot: {
     fontFamily: sfProDisplayRegular,
@@ -899,10 +900,10 @@ const styles = StyleSheet.create({
   plannedDate: {
     fontFamily: sfProDisplayRegular,
     fontSize: 11,
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   plannedDateToday: {
-    color: '#F59E0B',
+    color: AppColors.warning,
     fontWeight: '600',
   },
   plannedItemRight: {
@@ -915,10 +916,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   plannedAmountIncome: {
-    color: '#2563EB',
+    color: AppColors.primary,
   },
   plannedAmountExpense: {
-    color: '#EF4444',
+    color: AppColors.danger,
   },
   plannedActions: {
     flexDirection: 'row',
@@ -928,7 +929,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: AppColors.surfaceBlue,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -936,7 +937,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: AppColors.backgroundDark,
     alignItems: 'center',
     justifyContent: 'center',
   },

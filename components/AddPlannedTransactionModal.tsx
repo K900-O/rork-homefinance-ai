@@ -9,11 +9,13 @@ import {
   ScrollView,
   Alert,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { X, Calendar, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
 import type { TransactionType, TransactionCategory, RecurrenceType } from '@/constants/types';
-import { fontFamily } from '@/constants/Typography';
+import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
+import { AppColors } from '@/constants/colors';
 
 const CATEGORIES: { value: TransactionCategory; label: string }[] = [
   { value: 'food', label: 'Food & Dining' },
@@ -144,17 +146,20 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
       presentationStyle="pageSheet"
       onRequestClose={handleClose}
     >
-      <View style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Plan Transaction</Text>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose} activeOpacity={0.7}>
-            <X color="#FFFFFF" size={24} />
+            <X color={AppColors.textPrimary} size={24} />
           </TouchableOpacity>
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
-            <Text style={styles.label}>Type</Text>
+            <Text style={styles.label}>Transaction Type</Text>
             <View style={styles.typeContainer}>
               <TouchableOpacity
                 style={[styles.typeButton, type === 'expense' && styles.typeButtonActiveExpense]}
@@ -164,8 +169,8 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
                 }}
                 activeOpacity={0.7}
               >
-                <TrendingDown size={18} color={type === 'expense' ? '#000' : '#A1A1AA'} />
-                <Text style={[styles.typeButtonText, type === 'expense' && styles.typeButtonTextActive]}>
+                <TrendingDown size={18} color={type === 'expense' ? AppColors.danger : AppColors.textLight} />
+                <Text style={[styles.typeButtonText, type === 'expense' && styles.typeButtonTextActiveExpense]}>
                   Expense
                 </Text>
               </TouchableOpacity>
@@ -177,8 +182,8 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
                 }}
                 activeOpacity={0.7}
               >
-                <TrendingUp size={18} color={type === 'income' ? '#000' : '#A1A1AA'} />
-                <Text style={[styles.typeButtonText, type === 'income' && styles.typeButtonTextActive]}>
+                <TrendingUp size={18} color={type === 'income' ? AppColors.primary : AppColors.textLight} />
+                <Text style={[styles.typeButtonText, type === 'income' && styles.typeButtonTextActiveIncome]}>
                   Income
                 </Text>
               </TouchableOpacity>
@@ -187,38 +192,43 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
 
           <View style={styles.section}>
             <Text style={styles.label}>Amount (USD)</Text>
-            <TextInput
-              style={styles.input}
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="decimal-pad"
-              placeholder="0.00"
-              placeholderTextColor="#52525B"
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.currencySymbol}>$</Text>
+              <TextInput
+                style={styles.amountInput}
+                value={amount}
+                onChangeText={setAmount}
+                keyboardType="decimal-pad"
+                placeholder="0.00"
+                placeholderTextColor={AppColors.textLight}
+              />
+            </View>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>Description</Text>
-            <TextInput
-              style={styles.input}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="e.g., Monthly rent, Salary"
-              placeholderTextColor="#52525B"
-              maxLength={100}
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="e.g., Monthly rent, Salary"
+                placeholderTextColor={AppColors.textLight}
+                maxLength={100}
+              />
+            </View>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>Scheduled Date</Text>
             <View style={styles.dateInputContainer}>
-              <Calendar size={20} color="#10B981" />
+              <Calendar size={20} color={AppColors.primary} />
               <TextInput
                 style={styles.dateInput}
                 value={scheduledDate}
                 onChangeText={setScheduledDate}
                 placeholder="YYYY-MM-DD"
-                placeholderTextColor="#52525B"
+                placeholderTextColor={AppColors.textLight}
               />
             </View>
             {scheduledDate && (
@@ -241,7 +251,7 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
                 >
                   <RefreshCw 
                     size={16} 
-                    color={recurrence === option.value ? '#10B981' : '#71717A'} 
+                    color={recurrence === option.value ? AppColors.primary : AppColors.textLight} 
                   />
                   <Text
                     style={[
@@ -287,16 +297,18 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
 
           <View style={styles.section}>
             <Text style={styles.label}>Notes (Optional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Add any additional notes..."
-              placeholderTextColor="#52525B"
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={notes}
+                onChangeText={setNotes}
+                placeholder="Add any additional notes..."
+                placeholderTextColor={AppColors.textLight}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+            </View>
           </View>
 
           <View style={styles.summarySection}>
@@ -339,6 +351,7 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
               </View>
             </View>
           </View>
+          <View style={{ height: 40 }} />
         </ScrollView>
 
         <View style={styles.footer}>
@@ -360,7 +373,7 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -368,7 +381,7 @@ export default function AddPlannedTransactionModal({ visible, onClose }: AddPlan
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: AppColors.background,
   },
   header: {
     flexDirection: 'row',
@@ -378,19 +391,21 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 20 : 20,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#18181B',
+    borderBottomColor: AppColors.border,
   },
   headerTitle: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 24,
-    fontWeight: 'bold' as const,
-    color: '#FFFFFF',
+    fontWeight: '700',
+    color: AppColors.textPrimary,
   },
   closeButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: AppColors.surfaceLight,
   },
   content: {
     flex: 1,
@@ -400,11 +415,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   label: {
-    fontFamily,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
-    marginBottom: 12,
+    fontFamily: sfProDisplayMedium,
+    fontSize: 15,
+    fontWeight: '600',
+    color: AppColors.textPrimary,
+    marginBottom: 10,
   },
   typeContainer: {
     flexDirection: 'row',
@@ -416,67 +431,98 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: AppColors.border,
   },
   typeButtonActiveExpense: {
-    backgroundColor: '#FEE2E2',
-    borderColor: '#FCA5A5',
+    backgroundColor: AppColors.dangerLight,
+    borderColor: AppColors.dangerLight,
   },
   typeButtonActiveIncome: {
-    backgroundColor: '#D1FAE5',
-    borderColor: '#6EE7B7',
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.blue[100],
   },
   typeButtonText: {
-    fontFamily,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#A1A1AA',
+    fontFamily: sfProDisplayMedium,
+    fontSize: 15,
+    fontWeight: '600',
+    color: AppColors.textLight,
   },
-  typeButtonTextActive: {
-    color: '#000000',
+  typeButtonTextActiveExpense: {
+    color: AppColors.danger,
+  },
+  typeButtonTextActiveIncome: {
+    color: AppColors.primary,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: AppColors.surfaceLight,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppColors.border,
+    paddingHorizontal: 16,
+    height: 56,
+  },
+  inputWrapper: {
+    backgroundColor: AppColors.surfaceLight,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppColors.border,
+    overflow: 'hidden',
+  },
+  currencySymbol: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 20,
+    color: AppColors.textPrimary,
+    marginRight: 8,
+  },
+  amountInput: {
+    fontFamily: sfProDisplayBold,
+    flex: 1,
+    fontSize: 24,
+    color: AppColors.textPrimary,
+    paddingVertical: 10,
   },
   input: {
-    fontFamily,
-    backgroundColor: '#18181B',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    fontFamily: sfProDisplayRegular,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   textArea: {
-    minHeight: 80,
+    minHeight: 100,
     paddingTop: 14,
   },
   dateInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#18181B',
-    borderRadius: 12,
+    backgroundColor: AppColors.surfaceLight,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: AppColors.border,
     paddingHorizontal: 16,
     gap: 12,
+    height: 52,
   },
   dateInput: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     flex: 1,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: AppColors.textPrimary,
   },
   datePreview: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 13,
-    color: '#10B981',
+    color: AppColors.primary,
     marginTop: 8,
+    marginLeft: 4,
   },
   recurrenceGrid: {
     flexDirection: 'row',
@@ -490,28 +536,30 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 10,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: AppColors.border,
   },
   recurrenceButtonActive: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderColor: '#10B981',
+    backgroundColor: AppColors.blue[50],
+    borderColor: AppColors.blue[200],
   },
   recurrenceButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#71717A',
+    fontWeight: '500',
+    color: AppColors.textLight,
   },
   recurrenceButtonTextActive: {
-    color: '#10B981',
+    color: AppColors.primary,
+    fontWeight: '600',
   },
   recurrenceDescription: {
-    fontFamily,
+    fontFamily: sfProDisplayRegular,
     fontSize: 13,
-    color: '#52525B',
+    color: AppColors.textLight,
     marginTop: 10,
+    marginLeft: 4,
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -522,41 +570,41 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
-    backgroundColor: '#18181B',
+    backgroundColor: AppColors.surfaceLight,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: AppColors.border,
   },
   categoryButtonActive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    backgroundColor: AppColors.textPrimary,
+    borderColor: AppColors.textPrimary,
   },
   categoryButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#A1A1AA',
+    fontWeight: '500',
+    color: AppColors.textLight,
   },
   categoryButtonTextActive: {
-    color: '#000000',
+    color: AppColors.textInverse,
   },
   summarySection: {
     marginTop: 32,
     marginBottom: 24,
   },
   summaryTitle: {
-    fontFamily,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
-    marginBottom: 12,
+    fontFamily: sfProDisplayBold,
+    fontSize: 18,
+    fontWeight: '700',
+    color: AppColors.textPrimary,
+    marginBottom: 16,
   },
   summaryCard: {
-    backgroundColor: '#18181B',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: AppColors.surfaceLight,
+    borderRadius: 20,
+    padding: 20,
     borderWidth: 1,
-    borderColor: '#27272A',
-    gap: 12,
+    borderColor: AppColors.border,
+    gap: 16,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -564,15 +612,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryLabel: {
-    fontFamily,
+    fontFamily: sfProDisplayMedium,
     fontSize: 14,
-    color: '#71717A',
+    color: AppColors.textLight,
   },
   summaryValue: {
-    fontFamily,
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
+    fontFamily: sfProDisplayBold,
+    fontSize: 15,
+    fontWeight: '600',
+    color: AppColors.textPrimary,
   },
   summaryBadge: {
     paddingHorizontal: 10,
@@ -580,62 +628,66 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   incomeBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: AppColors.blue[50],
   },
   expenseBadge: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: AppColors.dangerLight,
   },
   summaryBadgeText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '600',
   },
   incomeText: {
-    color: '#10B981',
+    color: AppColors.primary,
   },
   expenseText: {
-    color: '#EF4444',
+    color: AppColors.danger,
   },
   footer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 24,
     borderTopWidth: 1,
-    borderTopColor: '#18181B',
+    borderTopColor: AppColors.borderDark,
+    backgroundColor: AppColors.background,
     gap: 12,
   },
   cancelButton: {
     flex: 1,
     paddingVertical: 16,
-    borderRadius: 12,
-    backgroundColor: '#18181B',
-    borderWidth: 1,
-    borderColor: '#333',
+    borderRadius: 16,
+    backgroundColor: AppColors.surfaceLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
+    fontWeight: '600',
+    color: AppColors.textLight,
   },
   submitButton: {
     flex: 2,
     paddingVertical: 16,
-    borderRadius: 12,
-    backgroundColor: '#10B981',
+    borderRadius: 16,
+    backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
-    fontFamily,
+    fontFamily: sfProDisplayBold,
     fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#000000',
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });
