@@ -334,8 +334,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   logo: {
-    width: 36,
-    height: 36,
+    width: 48,
+    height: 48,
   },
   title: {
     fontFamily: sfProDisplayBold,
