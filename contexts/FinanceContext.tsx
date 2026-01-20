@@ -30,7 +30,7 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
   const [optimizations, setOptimizations] = useState<OptimizationSuggestion[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [budgetRules, setBudgetRules] = useState<BudgetRule[]>([]);
-  const [budgetRewards, setBudgetRewards] = useState<BudgetReward[]>([]);
+  const [budgetRewards] = useState<BudgetReward[]>([]);
   const [plannedTransactions, setPlannedTransactions] = useState<PlannedTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -41,6 +41,7 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
     } else if (!authLoading && !authUser) {
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser, authLoading]);
 
   const loadData = async () => {
@@ -112,7 +113,42 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
           color: b.color,
           rules: b.rules,
         }));
-        setBudgets(budgetsData);
+
+        if (transactionsRes.data && budgetsData.length > 0) {
+          const now = new Date();
+          const updatedBudgets: Budget[] = [];
+
+          for (const budget of budgetsData) {
+            const startOfPeriod = budget.period === 'monthly' 
+              ? new Date(now.getFullYear(), now.getMonth(), 1)
+              : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            const relevantTransactions = transactionsRes.data.filter(t => {
+              if (t.type !== 'expense') return false;
+              const budgetCategory = CATEGORY_TO_BUDGET[t.category as TransactionCategory];
+              if (budgetCategory !== budget.category) return false;
+              const transDate = new Date(t.date);
+              return transDate >= startOfPeriod && transDate <= now;
+            });
+
+            const actualSpent = relevantTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+            
+            if (Math.abs(actualSpent - Number(budget.spent)) > 0.01) {
+              await supabase
+                .from('budgets')
+                .update({ spent: actualSpent })
+                .eq('id', budget.id);
+              console.log('Synced budget spent:', budget.name, actualSpent);
+              updatedBudgets.push({ ...budget, spent: actualSpent });
+            } else {
+              updatedBudgets.push(budget);
+            }
+          }
+
+          setBudgets(updatedBudgets);
+        } else {
+          setBudgets(budgetsData);
+        }
       }
 
       if (rulesRes.data) {
@@ -190,6 +226,7 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
       console.error('Error creating profile:', error);
       return false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser]);
 
   const updateProfile = useCallback(async (updates: Partial<UserProfile>): Promise<boolean> => {
@@ -254,16 +291,34 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
           notes: data.notes || undefined,
         };
         setTransactions(prev => [newTransaction, ...prev]);
+
+        if (transaction.type === 'expense') {
+          const budgetCategory = CATEGORY_TO_BUDGET[transaction.category];
+          if (budgetCategory) {
+            const relevantBudget = budgets.find(b => b.category === budgetCategory);
+            if (relevantBudget) {
+              const newSpent = relevantBudget.spent + transaction.amount;
+              await supabase
+                .from('budgets')
+                .update({ spent: newSpent })
+                .eq('id', relevantBudget.id);
+              console.log('Updated budget spent:', relevantBudget.name, newSpent);
+            }
+          }
+        }
       }
     } catch (error) {
       console.error('Error adding transaction:', error);
     }
-  }, [authUser]);
+  }, [authUser, budgets]);
 
   const deleteTransaction = useCallback(async (id: string) => {
     if (!authUser) return;
     
     try {
+      const transaction = transactions.find(t => t.id === id);
+      if (!transaction) return;
+
       const { error } = await supabase.from('transactions').delete().eq('id', id);
 
       if (error) {
@@ -272,10 +327,25 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
       }
 
       setTransactions(prev => prev.filter(t => t.id !== id));
+
+      if (transaction.type === 'expense') {
+        const budgetCategory = CATEGORY_TO_BUDGET[transaction.category];
+        if (budgetCategory) {
+          const relevantBudget = budgets.find(b => b.category === budgetCategory);
+          if (relevantBudget) {
+            const newSpent = Math.max(0, relevantBudget.spent - transaction.amount);
+            await supabase
+              .from('budgets')
+              .update({ spent: newSpent })
+              .eq('id', relevantBudget.id);
+            console.log('Updated budget spent after delete:', relevantBudget.name, newSpent);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error deleting transaction:', error);
     }
-  }, [authUser]);
+  }, [authUser, transactions, budgets]);
 
   const addGoal = useCallback(async (goal: Omit<SavingsGoal, 'id'>) => {
     if (!authUser) return;

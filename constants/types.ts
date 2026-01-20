@@ -66,7 +66,6 @@ export interface UserProfile {
 export interface OnboardingData {
   name: string;
   email: string;
-  password: string;
   monthlyIncome: number;
   householdSize: number;
   primaryGoals: string[];
