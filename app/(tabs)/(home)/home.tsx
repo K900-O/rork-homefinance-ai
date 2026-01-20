@@ -81,6 +81,20 @@ export default function HomeScreen() {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const getFinanceMessage = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Ready to make today count?';
+    if (hour < 17) return 'Your finances are looking great';
+    return 'Time to review your day';
+  };
+
   return (
     <View style={styles.container}>
       <BlueGlow />
@@ -110,8 +124,9 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.welcomeText}>{getGreeting()},</Text>
             <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
+            <Text style={styles.welcomeSubtext}>{getFinanceMessage()}</Text>
           </View>
 
           <View style={styles.cardsSection}>
@@ -636,6 +651,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#1A1A1A',
     letterSpacing: 0.3,
+  },
+  welcomeSubtext: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 15,
+    color: '#2563EB',
+    marginTop: 6,
+    letterSpacing: 0.2,
   },
   cardsSection: {
     paddingHorizontal: 20,

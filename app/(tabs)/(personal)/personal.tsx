@@ -195,9 +195,16 @@ export default function PersonalHomeScreen() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const getPersonalMessage = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Let\'s make today amazing';
+    if (hour < 17) return 'You\'re doing great today';
+    return 'Reflect and recharge';
   };
 
   return (
@@ -231,6 +238,7 @@ export default function PersonalHomeScreen() {
         <View style={styles.welcomeSection}>
           <Text style={styles.welcomeText}>{getGreeting()},</Text>
           <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
+          <Text style={styles.welcomeSubtext}>{getPersonalMessage()}</Text>
         </View>
 
         <ScrollView
@@ -737,6 +745,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#1A1A1A',
     letterSpacing: 0.3,
+  },
+  welcomeSubtext: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 15,
+    color: '#2563EB',
+    marginTop: 6,
+    letterSpacing: 0.2,
   },
   mainCard: {
     marginHorizontal: 20,
