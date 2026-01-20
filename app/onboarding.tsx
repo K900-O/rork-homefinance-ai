@@ -15,6 +15,7 @@ import {
   TouchableWithoutFeedback,
   StatusBar,
   Easing,
+  Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
@@ -264,7 +265,11 @@ export default function OnboardingScreen() {
           <View style={styles.stepContent}>
             <View style={styles.headerContainer}>
               <View style={styles.iconBadge}>
-                <DollarSign color={AppColors.primary} size={28} />
+                <Image 
+                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
+                  style={styles.stepLogoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.stepTitle}>Monthly Income</Text>
               <Text style={styles.stepDescription}>
@@ -296,7 +301,11 @@ export default function OnboardingScreen() {
           <View style={styles.stepContent}>
             <View style={styles.headerContainer}>
               <View style={styles.iconBadge}>
-                <Users color={AppColors.primary} size={28} />
+                <Image 
+                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
+                  style={styles.stepLogoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.stepTitle}>Household Size</Text>
               <Text style={styles.stepDescription}>
@@ -351,7 +360,11 @@ export default function OnboardingScreen() {
           <View style={styles.stepContent}>
              <View style={styles.headerContainer}>
               <View style={styles.iconBadge}>
-                <Target color={AppColors.primary} size={28} />
+                <Image 
+                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
+                  style={styles.stepLogoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.stepTitle}>Financial Goals</Text>
               <Text style={styles.stepDescription}>
@@ -407,7 +420,11 @@ export default function OnboardingScreen() {
           <View style={styles.stepContent}>
             <View style={styles.headerContainer}>
               <View style={styles.iconBadge}>
-                <TrendingUp color={AppColors.primary} size={28} />
+                <Image 
+                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
+                  style={styles.stepLogoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.stepTitle}>Risk Tolerance</Text>
               <Text style={styles.stepDescription}>
@@ -659,6 +676,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 4,
+  },
+  stepLogoImage: {
+    width: 36,
+    height: 36,
   },
   stepTitle: {
     fontFamily: sfProDisplayBold,
