@@ -37,9 +37,9 @@ export default function LandingScreen() {
     const timeout = setTimeout(() => {
       Animated.timing(animValue, {
         toValue: 1,
-        duration: 1000, // Slightly faster for snappier feel
-        useNativeDriver: false, // transforming layout properties (top, borderRadius)
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Cubic Bezier for smooth "Apple-like" motion
+        duration: 1400,
+        useNativeDriver: false,
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
       }).start();
     }, 1200);
 
@@ -59,19 +59,19 @@ export default function LandingScreen() {
 
   // Splash Elements (Fade Out & Scale)
   const splashOpacity = animValue.interpolate({
-    inputRange: [0, 0.5],
-    outputRange: [1, 0],
+    inputRange: [0, 0.6, 1],
+    outputRange: [1, 0.8, 0],
     extrapolate: 'clamp',
   });
 
   const splashScale = animValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.9], // Subtle scale down
+    inputRange: [0, 0.6, 1],
+    outputRange: [1, 0.98, 0.85],
   });
 
   const splashTranslateY = animValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -100], // Move up faster
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, -20, -100],
   });
 
   // Main Content (Fade In & Slide Up)
