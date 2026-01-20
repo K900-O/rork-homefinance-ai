@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FinanceProvider } from "@/contexts/FinanceContext";
 import { PersonalProvider } from "@/contexts/PersonalContext";
 import { AppModeProvider } from "@/contexts/AppModeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { trpc, trpcClient } from "@/lib/trpc";
 import ModeTransitionOverlay from "@/components/ModeTransitionOverlay";
 
@@ -70,16 +71,18 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <AppModeProvider>
-          <FinanceProvider>
-            <PersonalProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <RootLayoutNav />
-                <ModeTransitionOverlay />
-              </GestureHandlerRootView>
-            </PersonalProvider>
-          </FinanceProvider>
-        </AppModeProvider>
+        <AuthProvider>
+          <AppModeProvider>
+            <FinanceProvider>
+              <PersonalProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <RootLayoutNav />
+                  <ModeTransitionOverlay />
+                </GestureHandlerRootView>
+              </PersonalProvider>
+            </FinanceProvider>
+          </AppModeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );
