@@ -12,12 +12,11 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Command, Sparkles, Wallet } from 'lucide-react-native';
+import { Command } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   sfProDisplayBold, 
   sfProDisplayMedium,
-  paraboleRegular, 
 } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
 

@@ -15,14 +15,12 @@ import {
   TouchableWithoutFeedback,
   StatusBar,
   Easing,
+  Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
   ArrowRight, 
   ArrowLeft, 
-  DollarSign, 
-  Users, 
-  Target, 
   TrendingUp, 
   Check,
   Briefcase,

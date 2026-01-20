@@ -12,12 +12,11 @@ import {
   StatusBar,
   Animated,
   Easing,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lock, Mail, ArrowLeft, ArrowRight } from 'lucide-react-native';
-import { Image } from 'react-native';
-import { useFinance } from '@/contexts/FinanceContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
