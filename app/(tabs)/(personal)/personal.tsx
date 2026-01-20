@@ -679,8 +679,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    width: 120,
-    height: 40,
+    width: 200,
+    height: 65,
   },
   header: {
     flexDirection: 'row',
