@@ -91,6 +91,13 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
           <View style={styles.header}>
             <View style={styles.userInfo}>
                <Image 
@@ -574,6 +581,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  logo: {
+    width: 120,
+    height: 40,
   },
   header: {
     flexDirection: 'row',
