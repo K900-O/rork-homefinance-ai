@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoContainer: {
-    alignSelf: 'flex-start',
+    flex: 1,
   },
   logo: {
     width: 360,
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 20,
     marginBottom: 20,
     marginTop: 8,
@@ -701,6 +701,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
+    marginTop: 8,
   },
   avatarFallback: {
     alignItems: 'center',
