@@ -81,9 +81,9 @@ export const sfProDisplayLight = Platform.select({
 
 export const paraboleRegular = Platform.select({
   web: '"Parabole", "Parabole Regular", system-ui, -apple-system, sans-serif',
-  ios: 'System',
-  android: 'sans-serif',
-  default: 'System',
+  ios: 'Paranole Regular',
+  android: 'Parabole Regular',
+  default: 'Parabole Regular',
 });
 
 export const Typography = {
