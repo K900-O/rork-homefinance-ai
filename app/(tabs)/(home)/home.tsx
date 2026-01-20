@@ -91,23 +91,13 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-          <View style={styles.logoContainer}>
-            <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
           <View style={styles.header}>
-            <View style={styles.userInfo}>
-               <Image 
-                source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' }} 
-                style={styles.avatar} 
+            <View style={styles.logoContainer}>
+              <Image 
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
+                style={styles.logo}
+                resizeMode="contain"
               />
-              <View>
-                <Text style={styles.greeting}>Hello,</Text>
-                <Text style={styles.userName}>{userProfile?.name || 'User'}!</Text>
-              </View>
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
@@ -583,13 +573,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
-    alignItems: 'center',
-    paddingVertical: 12,
-    marginBottom: 8,
+    flex: 1,
   },
   logo: {
-    width: 120,
-    height: 40,
+    width: 420,
+    height: 140,
   },
   header: {
     flexDirection: 'row',
@@ -597,29 +585,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     marginBottom: 20,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#E5E5E5',
-  },
-  greeting: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 14,
-    color: '#71717A',
-  },
-  userName: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 20,
-    color: '#1A1A1A',
-    letterSpacing: 0.3,
   },
   headerActions: {
     flexDirection: 'row',

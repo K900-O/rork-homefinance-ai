@@ -213,18 +213,13 @@ export default function PersonalHomeScreen() {
         }
       ]}>
         
-        <View style={styles.logoContainer}>
-          <Image 
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-        
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greetingText}>{getGreeting()}</Text>
-            <Text style={styles.dateText}>{formattedDate}</Text>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
           <TouchableOpacity onPress={toggleMode} style={styles.avatarContainer}>
             <View style={styles.avatarFallback}>
@@ -681,13 +676,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoContainer: {
-    alignItems: 'center',
-    paddingVertical: 12,
-    marginBottom: 8,
+    flex: 1,
   },
   logo: {
-    width: 120,
-    height: 40,
+    width: 420,
+    height: 140,
   },
   header: {
     flexDirection: 'row',
@@ -696,17 +689,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 20,
     marginTop: 8,
-  },
-  greetingText: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 14,
-    color: '#71717A',
-    marginBottom: 2,
-  },
-  dateText: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 20,
-    color: '#1A1A1A',
   },
   avatarContainer: {
     width: 40,
