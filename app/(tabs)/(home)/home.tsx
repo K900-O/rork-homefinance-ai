@@ -576,8 +576,8 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   logo: {
-    width: 120,
-    height: 40,
+    width: 360,
+    height: 120,
   },
   header: {
     flexDirection: 'row',
