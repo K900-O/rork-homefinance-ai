@@ -47,6 +47,7 @@ import {
   Moon
 } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppMode } from '@/contexts/AppModeContext';
 import type { RiskTolerance } from '@/constants/types';
 import type { ActivityCategory } from '@/constants/personalTypes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -105,6 +106,7 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ name?: string; email?: string; password?: string }>();
   const { signUp } = useAuth();
+  const { setMode } = useAppMode();
   const insets = useSafeAreaInsets();
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -324,18 +326,30 @@ export default function OnboardingScreen() {
       });
 
       if (success) {
-        console.log('Profile created successfully, navigating to home...');
+        console.log('Profile created successfully');
+        
+        const targetMode = selectedMode === 'both' ? 'financial' : selectedMode;
+        console.log('Setting app mode to:', targetMode);
+        await setMode(targetMode);
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        console.log('Navigating to home page...');
         const destination = selectedMode === 'personal' 
           ? '/(tabs)/(personal)/personal' 
           : '/(tabs)/(home)/home';
+        
         router.replace(destination as any);
+        
+        console.log('Navigation complete to:', destination);
       } else {
+        console.error('Profile creation failed');
         Alert.alert('Error', 'Failed to complete onboarding. Please try again.');
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Onboarding error:', error);
       Alert.alert('Error', 'An unexpected error occurred.');
-    } finally {
       setIsLoading(false);
     }
   };
