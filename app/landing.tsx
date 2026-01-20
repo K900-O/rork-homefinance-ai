@@ -159,7 +159,7 @@ export default function LandingScreen() {
           pointerEvents="none"
         >
            <Image 
-             source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/jwuncgk2hse11ri9y8kc5' }}
+             source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ton3spo0r8fykw4h7le8m' }}
              style={styles.logoImage}
              resizeMode="contain"
            />
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   logoImage: {
-    width: 200,
-    height: 200,
+    width: 280,
+    height: 280,
   },
   
   // Content
