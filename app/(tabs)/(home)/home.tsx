@@ -105,42 +105,29 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-          <View style={styles.headerContainer}>
-            <LinearGradient
-              colors={['#FFFFFF', '#F8FAFC']}
-              style={styles.headerGradient}
-            >
-              <View style={styles.headerTop}>
-                <View style={styles.logoContainer}>
-                  <Image 
-                    source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
-                    style={styles.logo}
-                    resizeMode="contain"
-                  />
-                </View>
-                <View style={styles.headerActions}>
-                  <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-                    <View style={styles.modeButtonGlow} />
-                    <Repeat2 size={16} color="#FFF" strokeWidth={2.5} />
-                    <Text style={styles.modeButtonText}>Personal</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.iconButton}>
-                    <GlassBellIcon size={22} focused={true} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              
-              <View style={styles.welcomeSection}>
-                <View style={styles.welcomeContent}>
-                  <Text style={styles.welcomeText}>{getGreeting()},</Text>
-                  <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
-                </View>
-                <View style={styles.statusBadge}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusText}>{getFinanceMessage()}</Text>
-                </View>
-              </View>
-            </LinearGradient>
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Image 
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
+                <Repeat2 size={18} color="#FFF" />
+                <Text style={styles.modeButtonText}>Personal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconButton}>
+                <GlassBellIcon size={24} focused={true} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.welcomeSection}>
+            <Text style={styles.welcomeText}>{getGreeting()},</Text>
+            <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
+            <Text style={styles.welcomeSubtext}>{getFinanceMessage()}</Text>
           </View>
 
           <View style={styles.bannerContainer}>
@@ -635,20 +622,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  headerContainer: {
-    marginBottom: 24,
-  },
-  headerGradient: {
-    paddingTop: 16,
-    paddingBottom: 24,
-    paddingHorizontal: 20,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
   logoContainer: {
     alignItems: 'flex-start',
   },
@@ -656,106 +629,71 @@ const styles = StyleSheet.create({
     width: 200,
     height: 65,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
   headerActions: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 6,
+    gap: 12,
+    marginTop: 8,
   },
   modeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 24,
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
     backgroundColor: '#2563EB',
-    position: 'relative',
-    overflow: 'hidden',
     shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  modeButtonGlow: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
   },
   modeButtonText: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 12,
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
     color: '#FFFFFF',
-    fontWeight: '700' as const,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase' as const,
+    fontWeight: '600' as const,
   },
   iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#E5E5E5',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
   content: {
     flex: 1,
   },
   welcomeSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 16,
-  },
-  welcomeContent: {
-    flex: 1,
+    paddingHorizontal: 20,
+    marginBottom: 24,
   },
   welcomeText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 14,
+    fontFamily: sfProDisplayRegular,
+    fontSize: 16,
     color: '#71717A',
     marginBottom: 4,
-    letterSpacing: 0.3,
   },
   welcomeName: {
     fontFamily: sfProDisplayBold,
-    fontSize: 32,
+    fontSize: 28,
     color: '#1A1A1A',
-    letterSpacing: -0.5,
-    lineHeight: 38,
+    letterSpacing: 0.3,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#DBEAFE',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#2563EB',
-  },
-  statusText: {
-    fontFamily: sfProDisplayMedium,
-    fontSize: 11,
-    color: '#1D4ED8',
-    fontWeight: '600' as const,
+  welcomeSubtext: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 15,
+    color: '#2563EB',
+    marginTop: 6,
     letterSpacing: 0.2,
   },
   bannerContainer: {
