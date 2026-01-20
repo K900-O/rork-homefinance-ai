@@ -8,10 +8,11 @@ import {
   Dimensions,
   Easing,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Command, Sparkles, Wallet, Asterisk } from 'lucide-react-native';
+import { Command, Sparkles, Wallet } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   sfProDisplayBold, 
@@ -157,10 +158,11 @@ export default function LandingScreen() {
           ]}
           pointerEvents="none"
         >
-           <View style={styles.splashIconCircle}>
-             <Asterisk color="#FFFFFF" size={48} strokeWidth={3} />
-           </View>
-           <Text style={styles.splashText}>nazm</Text>
+           <Image 
+             source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/xq8kvmk3rurqzccqmsckj' }}
+             style={styles.logoImage}
+             resizeMode="contain"
+           />
         </Animated.View>
 
         {/* Final State: Card Content */}
@@ -269,26 +271,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 20,
   },
-  splashIconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: AppColors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  splashText: {
-    fontFamily: paraboleRegular,
-    fontSize: 32,
-    color: '#FFFFFF',
-    fontWeight: '400' as const,
-    letterSpacing: 1,
+  logoImage: {
+    width: 280,
+    height: 120,
   },
   
   // Content
