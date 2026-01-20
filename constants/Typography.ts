@@ -86,6 +86,20 @@ export const paraboleRegular = Platform.select({
   default: 'Parabole Regular',
 });
 
+export const customFontRegular = Platform.select({
+  web: '"YourCustomFont-Regular", system-ui, -apple-system, sans-serif',
+  ios: 'YourCustomFont-Regular',
+  android: 'YourCustomFont-Regular',
+  default: 'YourCustomFont-Regular',
+});
+
+export const customFontBold = Platform.select({
+  web: '"YourCustomFont-Bold", system-ui, -apple-system, sans-serif',
+  ios: 'YourCustomFont-Bold',
+  android: 'YourCustomFont-Bold',
+  default: 'YourCustomFont-Bold',
+});
+
 export const Typography = {
   // Display styles - Helvetica Neue optimized for fintech
   largeTitle: {
