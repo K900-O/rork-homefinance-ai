@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -31,6 +31,12 @@ export default function LandingScreen() {
   // 0: Initial Splash State (Full Screen Blue)
   // 1: Final Landing State (Split Screen)
   const animValue = useRef(new Animated.Value(0)).current;
+  
+  // Logo loading animation
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const logoPulse = useRef(new Animated.Value(1)).current;
+  const logoGlow = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Start animation after a small delay to show the "splash"
@@ -45,6 +51,59 @@ export default function LandingScreen() {
 
     return () => clearTimeout(timeout);
   }, [animValue]);
+
+  // Logo loading animation effect
+  useEffect(() => {
+    if (logoLoaded) {
+      // Fade in the logo smoothly
+      Animated.timing(logoOpacity, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }).start();
+
+      // Start gentle pulse animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(logoPulse, {
+            toValue: 1.02,
+            duration: 2000,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          Animated.timing(logoPulse, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+        ])
+      ).start();
+
+      // Glow animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(logoGlow, {
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          Animated.timing(logoGlow, {
+            toValue: 0,
+            duration: 1500,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+        ])
+      ).start();
+    }
+  }, [logoLoaded, logoOpacity, logoPulse, logoGlow]);
+
+  const handleLogoLoad = () => {
+    setLogoLoaded(true);
+  };
 
   // Interpolations
   const bgTop = animValue.interpolate({
@@ -162,11 +221,32 @@ export default function LandingScreen() {
           ]}
           pointerEvents="none"
         >
-           <Image 
-             source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
-             style={styles.logoImage}
-             resizeMode="contain"
-           />
+          <View style={styles.logoContainer}>
+            <Animated.View 
+              style={[
+                styles.logoGlow,
+                {
+                  opacity: logoGlow.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.3, 0.6],
+                  }),
+                  transform: [{ scale: logoPulse }],
+                }
+              ]}
+            />
+            <Animated.Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
+              style={[
+                styles.logoImage,
+                {
+                  opacity: logoOpacity,
+                  transform: [{ scale: logoPulse }],
+                }
+              ]}
+              resizeMode="contain"
+              onLoad={handleLogoLoad}
+            />
+          </View>
         </Animated.View>
 
         {/* Final State: Card Content */}
@@ -278,6 +358,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
+  },
+  logoContainer: {
+    width: 350,
+    height: 350,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoGlow: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
   logoImage: {
     width: 350,
