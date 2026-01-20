@@ -228,6 +228,11 @@ export default function PersonalHomeScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.welcomeSection}>
+          <Text style={styles.welcomeText}>{getGreeting()},</Text>
+          <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
+        </View>
+
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
@@ -716,6 +721,22 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  welcomeSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  welcomeText: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 16,
+    color: '#71717A',
+    marginBottom: 4,
+  },
+  welcomeName: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 28,
+    color: '#1A1A1A',
+    letterSpacing: 0.3,
   },
   mainCard: {
     marginHorizontal: 20,

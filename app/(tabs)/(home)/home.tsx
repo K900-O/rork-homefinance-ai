@@ -109,6 +109,11 @@ export default function HomeScreen() {
             </View>
           </View>
 
+          <View style={styles.welcomeSection}>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
+          </View>
+
           <View style={styles.cardsSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>My Card</Text>
@@ -615,6 +620,22 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  welcomeSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  welcomeText: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 16,
+    color: '#71717A',
+    marginBottom: 4,
+  },
+  welcomeName: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 28,
+    color: '#1A1A1A',
+    letterSpacing: 0.3,
   },
   cardsSection: {
     paddingHorizontal: 20,
