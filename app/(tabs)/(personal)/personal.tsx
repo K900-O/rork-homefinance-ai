@@ -116,7 +116,7 @@ const CircularProgress = ({
 export default function PersonalHomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user } = useFinance();
+  const { userProfile } = useFinance();
   const { toggleMode } = useAppMode();
   const { 
     dailySummary, 
@@ -219,7 +219,7 @@ export default function PersonalHomeScreen() {
           </View>
           <TouchableOpacity onPress={toggleMode} style={styles.avatarContainer}>
             <View style={styles.avatarFallback}>
-              <Text style={styles.avatarText}>{user?.name?.[0] || 'U'}</Text>
+              <Text style={styles.avatarText}>{userProfile?.name?.[0] || 'U'}</Text>
             </View>
           </TouchableOpacity>
         </View>

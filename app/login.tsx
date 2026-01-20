@@ -17,13 +17,14 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lock, Mail, ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login } = useFinance();
+  const { signIn } = useAuth();
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -101,10 +102,10 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    const success = await login(email.trim().toLowerCase(), password);
+    const { data, error } = await signIn(email.trim().toLowerCase(), password);
     setIsLoading(false);
 
-    if (success) {
+    if (data && !error) {
       router.replace('/(tabs)/(home)/home' as any);
     } else {
       Alert.alert('Error', 'Invalid credentials. Please check your inputs.');

@@ -35,6 +35,7 @@ import {
   Leaf
 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
+import { useAuth } from '@/contexts/AuthContext';
 import type { RiskTolerance } from '@/constants/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/colors';
@@ -63,7 +64,8 @@ const RISK_OPTIONS: { value: RiskTolerance; label: string; description: string; 
 export default function OnboardingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ name?: string; email?: string; password?: string }>();
-  const { signup } = useFinance();
+  const { createProfile } = useFinance();
+  const { signUp } = useAuth();
   const insets = useSafeAreaInsets();
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -219,10 +221,21 @@ export default function OnboardingScreen() {
 
     setIsLoading(true);
     try {
-      const success = await signup({
+      const { data: authData, error: authError } = await signUp(
+        params.email!,
+        params.password!,
+        params.name!
+      );
+
+      if (authError || !authData) {
+        Alert.alert('Error', 'Failed to create account. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      const success = await createProfile({
         name: params.name!,
         email: params.email!,
-        password: params.password!,
         monthlyIncome: parseFloat(monthlyIncome),
         householdSize: parseInt(householdSize),
         primaryGoals: selectedGoals,

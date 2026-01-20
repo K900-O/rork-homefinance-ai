@@ -44,7 +44,7 @@ if (Platform.OS === 'android') {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { user, financialSummary, transactions, budgetStatuses, budgetRules, totalRewardPoints, budgetRewards, upcomingPlannedTransactions, projectedBalance, processPlannedTransaction, deletePlannedTransaction } = useFinance();
+  const { userProfile, financialSummary, transactions, budgetStatuses, budgetRules, totalRewardPoints, budgetRewards, upcomingPlannedTransactions, projectedBalance, processPlannedTransaction, deletePlannedTransaction } = useFinance();
   const { toggleMode } = useAppMode();
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -99,7 +99,7 @@ export default function HomeScreen() {
               />
               <View>
                 <Text style={styles.greeting}>Hello,</Text>
-                <Text style={styles.userName}>{user?.name || 'User'}!</Text>
+                <Text style={styles.userName}>{userProfile?.name || 'User'}!</Text>
               </View>
             </View>
             <View style={styles.headerActions}>

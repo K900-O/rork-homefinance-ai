@@ -38,6 +38,7 @@ import {
   Calendar,
 } from 'lucide-react-native';
 import { useFinance } from '@/contexts/FinanceContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 
 import { sfProDisplayBold, sfProDisplayMedium, sfProDisplayRegular } from '@/constants/Typography';
@@ -55,7 +56,8 @@ const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'JD', 'AED', 'SAR'];
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { user, updateUser, logout, financialSummary, transactions, totalRewardPoints } = useFinance();
+  const { userProfile, updateProfile, financialSummary, transactions, totalRewardPoints } = useFinance();
+  const { signOut } = useAuth();
   const { toggleMode, isFinancialMode } = useAppMode();
   
   const [showEditModal, setShowEditModal] = useState(false);
@@ -91,13 +93,13 @@ export default function ProfileScreen() {
           text: 'Sign Out',
           style: 'destructive',
           onPress: async () => {
-            await logout();
+            await signOut();
             router.replace('/landing');
           },
         },
       ]
     );
-  }, [logout]);
+  }, [signOut]);
 
   const openEditModal = (field: string, currentValue: string) => {
     setEditField(field);
@@ -144,7 +146,7 @@ export default function ProfileScreen() {
         break;
     }
 
-    const success = await updateUser(updates);
+    const success = await updateProfile(updates);
     if (success) {
       setShowEditModal(false);
       console.log('Profile updated:', updates);
@@ -153,8 +155,8 @@ export default function ProfileScreen() {
     }
   };
 
-  const memberSince = user?.createdAt 
-    ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const memberSince = userProfile?.createdAt 
+    ? new Date(userProfile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     : 'N/A';
 
   const totalTransactions = transactions.length;
@@ -200,8 +202,8 @@ export default function ProfileScreen() {
             </View>
             
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{user?.name || 'User'}</Text>
-              <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
+              <Text style={styles.profileName}>{userProfile?.name || 'User'}</Text>
+              <Text style={styles.profileEmail}>{userProfile?.email || 'email@example.com'}</Text>
               <View style={styles.memberBadge}>
                 <Calendar size={12} color="#FFF" />
                 <Text style={styles.memberText}>Member since {memberSince}</Text>
@@ -240,7 +242,7 @@ export default function ProfileScreen() {
             
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => openEditModal('name', user?.name || '')}
+              onPress={() => openEditModal('name', userProfile?.name || '')}
             >
               <View style={styles.menuItemLeft}>
                 <View style={[styles.menuIcon, { backgroundColor: '#EDE9FE' }]}>
@@ -248,7 +250,7 @@ export default function ProfileScreen() {
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Name</Text>
-                  <Text style={styles.menuValue}>{user?.name || 'Not set'}</Text>
+                  <Text style={styles.menuValue}>{userProfile?.name || 'Not set'}</Text>
                 </View>
               </View>
               <ChevronRight size={20} color="#A1A1AA" />
@@ -256,7 +258,7 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => openEditModal('email', user?.email || '')}
+              onPress={() => openEditModal('email', userProfile?.email || '')}
             >
               <View style={styles.menuItemLeft}>
                 <View style={[styles.menuIcon, { backgroundColor: '#FCE7F3' }]}>
@@ -264,7 +266,7 @@ export default function ProfileScreen() {
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Email</Text>
-                  <Text style={styles.menuValue}>{user?.email || 'Not set'}</Text>
+                  <Text style={styles.menuValue}>{userProfile?.email || 'Not set'}</Text>
                 </View>
               </View>
               <ChevronRight size={20} color="#A1A1AA" />
@@ -272,7 +274,7 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => openEditModal('monthlyIncome', user?.monthlyIncome?.toString() || '')}
+              onPress={() => openEditModal('monthlyIncome', userProfile?.monthlyIncome?.toString() || '')}
             >
               <View style={styles.menuItemLeft}>
                 <View style={[styles.menuIcon, { backgroundColor: '#DBEAFE' }]}>
@@ -281,7 +283,7 @@ export default function ProfileScreen() {
                 <View>
                   <Text style={styles.menuLabel}>Monthly Income</Text>
                   <Text style={styles.menuValue}>
-                    {user?.monthlyIncome?.toLocaleString() || '0'} {user?.currency || 'USD'}
+                    {userProfile?.monthlyIncome?.toLocaleString() || '0'} {userProfile?.currency || 'USD'}
                   </Text>
                 </View>
               </View>
@@ -290,7 +292,7 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => openEditModal('householdSize', user?.householdSize?.toString() || '')}
+              onPress={() => openEditModal('householdSize', userProfile?.householdSize?.toString() || '')}
             >
               <View style={styles.menuItemLeft}>
                 <View style={[styles.menuIcon, { backgroundColor: '#DBEAFE' }]}>
@@ -298,7 +300,7 @@ export default function ProfileScreen() {
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Household Size</Text>
-                  <Text style={styles.menuValue}>{user?.householdSize || 1} {user?.householdSize === 1 ? 'person' : 'people'}</Text>
+                  <Text style={styles.menuValue}>{userProfile?.householdSize || 1} {userProfile?.householdSize === 1 ? 'person' : 'people'}</Text>
                 </View>
               </View>
               <ChevronRight size={20} color="#A1A1AA" />
@@ -310,7 +312,7 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => openEditModal('currency', user?.currency || 'USD')}
+              onPress={() => openEditModal('currency', userProfile?.currency || 'USD')}
             >
               <View style={styles.menuItemLeft}>
                 <View style={[styles.menuIcon, { backgroundColor: '#FEF3C7' }]}>
@@ -318,7 +320,7 @@ export default function ProfileScreen() {
                 </View>
                 <View>
                   <Text style={styles.menuLabel}>Currency</Text>
-                  <Text style={styles.menuValue}>{user?.currency || 'USD'}</Text>
+                  <Text style={styles.menuValue}>{userProfile?.currency || 'USD'}</Text>
                 </View>
               </View>
               <ChevronRight size={20} color="#A1A1AA" />
@@ -326,7 +328,7 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => openEditModal('riskTolerance', user?.riskTolerance || 'moderate')}
+              onPress={() => openEditModal('riskTolerance', userProfile?.riskTolerance || 'moderate')}
             >
               <View style={styles.menuItemLeft}>
                 <View style={[styles.menuIcon, { backgroundColor: '#FEE2E2' }]}>
@@ -335,7 +337,7 @@ export default function ProfileScreen() {
                 <View>
                   <Text style={styles.menuLabel}>Risk Tolerance</Text>
                   <Text style={styles.menuValue}>
-                    {user?.riskTolerance ? user.riskTolerance.charAt(0).toUpperCase() + user.riskTolerance.slice(1) : 'Moderate'}
+                    {userProfile?.riskTolerance ? userProfile.riskTolerance.charAt(0).toUpperCase() + userProfile.riskTolerance.slice(1) : 'Moderate'}
                   </Text>
                 </View>
               </View>
@@ -363,9 +365,9 @@ export default function ProfileScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Goals</Text>
             
-            {user?.primaryGoals && user.primaryGoals.length > 0 ? (
+            {userProfile?.primaryGoals && userProfile.primaryGoals.length > 0 ? (
               <View style={styles.goalsContainer}>
-                {user.primaryGoals.map((goal, index) => (
+                {userProfile.primaryGoals.map((goal: string, index: number) => (
                   <View key={index} style={styles.goalTag}>
                     <Target size={12} color="#2563EB" />
                     <Text style={styles.goalTagText}>{goal}</Text>
