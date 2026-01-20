@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
-    flex: 1,
+    marginRight: 'auto',
   },
   logo: {
     width: 500,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'flex-start',
     paddingHorizontal: 20,
     marginBottom: 20,
