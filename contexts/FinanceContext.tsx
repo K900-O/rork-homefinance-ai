@@ -1,20 +1,12 @@
 import createContextHook from '@nkzw/create-context-hook';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Transaction, SavingsGoal, FinancialSummary, CategorySpending, TransactionCategory, UserProfile, OnboardingData, OptimizationSuggestion, OptimizationReport, Budget, BudgetRule, BudgetReward, BudgetStatus, BudgetCategory, BudgetImpact, RuleViolation, PlannedTransaction, RecurrenceType } from '@/constants/types';
 import { generateObject } from '@rork-ai/toolkit-sdk';
 import { z } from 'zod';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './AuthContext';
 
-const STORAGE_KEYS = {
-  TRANSACTIONS: '@domusiq_transactions',
-  GOALS: '@domusiq_goals',
-  USER: '@domusiq_user',
-  OPTIMIZATIONS: '@domusiq_optimizations',
-  BUDGETS: '@domusiq_budgets',
-  BUDGET_RULES: '@domusiq_budget_rules',
-  BUDGET_REWARDS: '@domusiq_budget_rewards',
-  PLANNED_TRANSACTIONS: '@domusiq_planned_transactions',
-};
+
 
 const CATEGORY_TO_BUDGET: Record<TransactionCategory, BudgetCategory | null> = {
   food: 'groceries',
@@ -31,9 +23,10 @@ const CATEGORY_TO_BUDGET: Record<TransactionCategory, BudgetCategory | null> = {
 };
 
 export const [FinanceProvider, useFinance] = createContextHook(() => {
+  const { user: authUser, isLoading: authLoading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [optimizations, setOptimizations] = useState<OptimizationSuggestion[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [budgetRules, setBudgetRules] = useState<BudgetRule[]>([]);
@@ -43,188 +36,324 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
   const [isOptimizing, setIsOptimizing] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!authLoading && authUser) {
+      loadData();
+    } else if (!authLoading && !authUser) {
+      setIsLoading(false);
+    }
+  }, [authUser, authLoading]);
 
   const loadData = async () => {
+    if (!authUser) return;
+    
     try {
-      const [transactionsData, goalsData, userData, optimizationsData, budgetsData, rulesData, rewardsData, plannedData] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.TRANSACTIONS),
-        AsyncStorage.getItem(STORAGE_KEYS.GOALS),
-        AsyncStorage.getItem(STORAGE_KEYS.USER),
-        AsyncStorage.getItem(STORAGE_KEYS.OPTIMIZATIONS),
-        AsyncStorage.getItem(STORAGE_KEYS.BUDGETS),
-        AsyncStorage.getItem(STORAGE_KEYS.BUDGET_RULES),
-        AsyncStorage.getItem(STORAGE_KEYS.BUDGET_REWARDS),
-        AsyncStorage.getItem(STORAGE_KEYS.PLANNED_TRANSACTIONS),
+      console.log('Loading financial data for user:', authUser.id);
+
+      const [profileRes, transactionsRes, goalsRes, budgetsRes, rulesRes, plannedRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('user_id', authUser.id).single(),
+        supabase.from('transactions').select('*').eq('user_id', authUser.id).order('date', { ascending: false }),
+        supabase.from('goals').select('*').eq('user_id', authUser.id),
+        supabase.from('budgets').select('*').eq('user_id', authUser.id),
+        supabase.from('budget_rules').select('*').eq('user_id', authUser.id),
+        supabase.from('planned_transactions').select('*').eq('user_id', authUser.id),
       ]);
 
-      if (transactionsData) {
-        setTransactions(JSON.parse(transactionsData));
+      if (profileRes.data) {
+        const profile: UserProfile = {
+          id: profileRes.data.id,
+          email: profileRes.data.email,
+          name: profileRes.data.name,
+          monthlyIncome: Number(profileRes.data.monthly_income),
+          householdSize: profileRes.data.household_size,
+          primaryGoals: profileRes.data.primary_goals,
+          riskTolerance: profileRes.data.risk_tolerance as 'conservative' | 'moderate' | 'aggressive',
+          currency: profileRes.data.currency,
+          hasCompletedOnboarding: profileRes.data.has_completed_onboarding,
+          createdAt: profileRes.data.created_at,
+        };
+        setUserProfile(profile);
       }
 
-      if (goalsData) {
-        setGoals(JSON.parse(goalsData));
+      if (transactionsRes.data) {
+        const trans: Transaction[] = transactionsRes.data.map(t => ({
+          id: t.id,
+          type: t.type as 'income' | 'expense',
+          category: t.category as TransactionCategory,
+          amount: Number(t.amount),
+          description: t.description,
+          date: t.date,
+          notes: t.notes || undefined,
+        }));
+        setTransactions(trans);
       }
 
-      if (userData) {
-        setUser(JSON.parse(userData));
+      if (goalsRes.data) {
+        const goalsData: SavingsGoal[] = goalsRes.data.map(g => ({
+          id: g.id,
+          title: g.title,
+          targetAmount: Number(g.target_amount),
+          currentAmount: Number(g.current_amount),
+          deadline: g.deadline || undefined,
+          category: g.category,
+          color: g.color,
+        }));
+        setGoals(goalsData);
       }
 
-      if (optimizationsData) {
-        setOptimizations(JSON.parse(optimizationsData));
+      if (budgetsRes.data) {
+        const budgetsData: Budget[] = budgetsRes.data.map(b => ({
+          id: b.id,
+          category: b.category as BudgetCategory,
+          name: b.name,
+          limit: Number(b.limit),
+          spent: Number(b.spent),
+          period: b.period as 'weekly' | 'monthly',
+          startDate: b.start_date,
+          color: b.color,
+          rules: b.rules,
+        }));
+        setBudgets(budgetsData);
       }
 
-      if (budgetsData) {
-        setBudgets(JSON.parse(budgetsData));
+      if (rulesRes.data) {
+        const rulesData: BudgetRule[] = rulesRes.data.map(r => ({
+          id: r.id,
+          name: r.name,
+          description: r.description,
+          category: r.category as BudgetCategory | undefined,
+          maxPercentage: r.max_percentage ? Number(r.max_percentage) : undefined,
+          maxAmount: r.max_amount ? Number(r.max_amount) : undefined,
+          strictness: r.strictness as 'flexible' | 'moderate' | 'strict',
+          isActive: r.is_active,
+          createdAt: r.created_at,
+        }));
+        setBudgetRules(rulesData);
       }
 
-      if (rulesData) {
-        setBudgetRules(JSON.parse(rulesData));
+      if (plannedRes.data) {
+        const plannedData: PlannedTransaction[] = plannedRes.data.map(p => ({
+          id: p.id,
+          type: p.type as 'income' | 'expense',
+          category: p.category as TransactionCategory,
+          amount: Number(p.amount),
+          description: p.description,
+          scheduledDate: p.scheduled_date,
+          recurrence: p.recurrence as RecurrenceType,
+          notes: p.notes || undefined,
+          isActive: p.is_active,
+          lastProcessedDate: p.last_processed_date || undefined,
+          createdAt: p.created_at,
+        }));
+        setPlannedTransactions(plannedData);
       }
 
-      if (rewardsData) {
-        setBudgetRewards(JSON.parse(rewardsData));
-      }
-
-      if (plannedData) {
-        setPlannedTransactions(JSON.parse(plannedData));
-      }
+      console.log('Financial data loaded successfully');
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Error loading financial data:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const saveTransactions = async (newTransactions: Transaction[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(newTransactions));
-      setTransactions(newTransactions);
-    } catch (error) {
-      console.error('Error saving transactions:', error);
-    }
-  };
 
-  const saveGoals = async (newGoals: SavingsGoal[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(newGoals));
-      setGoals(newGoals);
-    } catch (error) {
-      console.error('Error saving goals:', error);
-    }
-  };
 
-  const saveUser = async (newUser: UserProfile) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
-      setUser(newUser);
-    } catch (error) {
-      console.error('Error saving user:', error);
-    }
-  };
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    try {
-      const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER);
-      if (userData) {
-        const user: UserProfile = JSON.parse(userData);
-        if (user.email === email) {
-          setUser(user);
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error('Error logging in:', error);
-      return false;
-    }
-  }, []);
 
-  const signup = useCallback(async (data: OnboardingData): Promise<boolean> => {
+
+
+
+
+  const createProfile = useCallback(async (data: OnboardingData): Promise<boolean> => {
+    if (!authUser) return false;
+    
     try {
-      const newUser: UserProfile = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      const { error } = await supabase.from('profiles').insert({
+        user_id: authUser.id,
         email: data.email,
         name: data.name,
-        monthlyIncome: data.monthlyIncome,
-        householdSize: data.householdSize,
-        primaryGoals: data.primaryGoals,
-        riskTolerance: data.riskTolerance,
+        monthly_income: data.monthlyIncome,
+        household_size: data.householdSize,
+        primary_goals: data.primaryGoals,
+        risk_tolerance: data.riskTolerance,
         currency: 'JD',
-        hasCompletedOnboarding: true,
-        createdAt: new Date().toISOString(),
-      };
-      
-      await saveUser(newUser);
+        has_completed_onboarding: true,
+      });
+
+      if (error) {
+        console.error('Error creating profile:', error);
+        return false;
+      }
+
+      await loadData();
       return true;
     } catch (error) {
-      console.error('Error signing up:', error);
+      console.error('Error creating profile:', error);
       return false;
     }
-  }, []);
+  }, [authUser]);
 
-  const updateUser = useCallback(async (updates: Partial<UserProfile>): Promise<boolean> => {
-    if (!user) return false;
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>): Promise<boolean> => {
+    if (!authUser || !userProfile) return false;
+    
     try {
-      const updatedUser = { ...user, ...updates };
-      await saveUser(updatedUser);
+      const updateData: any = {};
+      if (updates.name) updateData.name = updates.name;
+      if (updates.monthlyIncome) updateData.monthly_income = updates.monthlyIncome;
+      if (updates.householdSize) updateData.household_size = updates.householdSize;
+      if (updates.primaryGoals) updateData.primary_goals = updates.primaryGoals;
+      if (updates.riskTolerance) updateData.risk_tolerance = updates.riskTolerance;
+      if (updates.hasCompletedOnboarding !== undefined) updateData.has_completed_onboarding = updates.hasCompletedOnboarding;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updateData)
+        .eq('user_id', authUser.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        return false;
+      }
+
+      setUserProfile({ ...userProfile, ...updates });
       return true;
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error('Error updating profile:', error);
       return false;
     }
-  }, [user]);
+  }, [authUser, userProfile]);
 
-  const logout = useCallback(async () => {
+
+
+  const addTransaction = useCallback(async (transaction: Omit<Transaction, 'id'>) => {
+    if (!authUser) return;
+    
     try {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.USER,
-        STORAGE_KEYS.TRANSACTIONS,
-        STORAGE_KEYS.GOALS,
-        STORAGE_KEYS.OPTIMIZATIONS,
-      ]);
-      setUser(null);
-      setTransactions([]);
-      setGoals([]);
-      setOptimizations([]);
+      const { data, error } = await supabase.from('transactions').insert({
+        user_id: authUser.id,
+        type: transaction.type,
+        category: transaction.category,
+        amount: transaction.amount,
+        description: transaction.description,
+        date: transaction.date,
+        notes: transaction.notes || null,
+      }).select().single();
+
+      if (error) {
+        console.error('Error adding transaction:', error);
+        return;
+      }
+
+      if (data) {
+        const newTransaction: Transaction = {
+          id: data.id,
+          type: data.type as 'income' | 'expense',
+          category: data.category as TransactionCategory,
+          amount: Number(data.amount),
+          description: data.description,
+          date: data.date,
+          notes: data.notes || undefined,
+        };
+        setTransactions(prev => [newTransaction, ...prev]);
+      }
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Error adding transaction:', error);
     }
-  }, []);
+  }, [authUser]);
 
-  const addTransaction = useCallback((transaction: Omit<Transaction, 'id'>) => {
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-    };
-    const updated = [newTransaction, ...transactions];
-    saveTransactions(updated);
-  }, [transactions]);
+  const deleteTransaction = useCallback(async (id: string) => {
+    if (!authUser) return;
+    
+    try {
+      const { error } = await supabase.from('transactions').delete().eq('id', id);
 
-  const deleteTransaction = useCallback((id: string) => {
-    const updated = transactions.filter(t => t.id !== id);
-    saveTransactions(updated);
-  }, [transactions]);
+      if (error) {
+        console.error('Error deleting transaction:', error);
+        return;
+      }
 
-  const addGoal = useCallback((goal: Omit<SavingsGoal, 'id'>) => {
-    const newGoal: SavingsGoal = {
-      ...goal,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-    };
-    const updated = [...goals, newGoal];
-    saveGoals(updated);
-  }, [goals]);
+      setTransactions(prev => prev.filter(t => t.id !== id));
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  }, [authUser]);
 
-  const updateGoal = useCallback((id: string, updates: Partial<SavingsGoal>) => {
-    const updated = goals.map(g => g.id === id ? { ...g, ...updates } : g);
-    saveGoals(updated);
-  }, [goals]);
+  const addGoal = useCallback(async (goal: Omit<SavingsGoal, 'id'>) => {
+    if (!authUser) return;
+    
+    try {
+      const { data, error } = await supabase.from('goals').insert({
+        user_id: authUser.id,
+        title: goal.title,
+        target_amount: goal.targetAmount,
+        current_amount: goal.currentAmount,
+        deadline: goal.deadline || null,
+        category: goal.category,
+        color: goal.color,
+      }).select().single();
 
-  const deleteGoal = useCallback((id: string) => {
-    const updated = goals.filter(g => g.id !== id);
-    saveGoals(updated);
-  }, [goals]);
+      if (error) {
+        console.error('Error adding goal:', error);
+        return;
+      }
+
+      if (data) {
+        const newGoal: SavingsGoal = {
+          id: data.id,
+          title: data.title,
+          targetAmount: Number(data.target_amount),
+          currentAmount: Number(data.current_amount),
+          deadline: data.deadline || undefined,
+          category: data.category,
+          color: data.color,
+        };
+        setGoals(prev => [...prev, newGoal]);
+      }
+    } catch (error) {
+      console.error('Error adding goal:', error);
+    }
+  }, [authUser]);
+
+  const updateGoal = useCallback(async (id: string, updates: Partial<SavingsGoal>) => {
+    if (!authUser) return;
+    
+    try {
+      const updateData: any = {};
+      if (updates.title) updateData.title = updates.title;
+      if (updates.targetAmount) updateData.target_amount = updates.targetAmount;
+      if (updates.currentAmount !== undefined) updateData.current_amount = updates.currentAmount;
+      if (updates.deadline) updateData.deadline = updates.deadline;
+      if (updates.category) updateData.category = updates.category;
+      if (updates.color) updateData.color = updates.color;
+
+      const { error } = await supabase.from('goals').update(updateData).eq('id', id);
+
+      if (error) {
+        console.error('Error updating goal:', error);
+        return;
+      }
+
+      setGoals(prev => prev.map(g => g.id === id ? { ...g, ...updates } : g));
+    } catch (error) {
+      console.error('Error updating goal:', error);
+    }
+  }, [authUser]);
+
+  const deleteGoal = useCallback(async (id: string) => {
+    if (!authUser) return;
+    
+    try {
+      const { error } = await supabase.from('goals').delete().eq('id', id);
+
+      if (error) {
+        console.error('Error deleting goal:', error);
+        return;
+      }
+
+      setGoals(prev => prev.filter(g => g.id !== id));
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+    }
+  }, [authUser]);
 
   const financialSummary = useMemo<FinancialSummary>(() => {
     const totalIncome = transactions
@@ -326,11 +455,11 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
 
       const contextData = {
         user: {
-          name: user?.name,
-          monthlyIncome: user?.monthlyIncome,
-          householdSize: user?.householdSize,
-          primaryGoals: user?.primaryGoals,
-          riskTolerance: user?.riskTolerance,
+          name: userProfile?.name,
+          monthlyIncome: userProfile?.monthlyIncome,
+          householdSize: userProfile?.householdSize,
+          primaryGoals: userProfile?.primaryGoals,
+          riskTolerance: userProfile?.riskTolerance,
         },
         financial: {
           totalIncome,
@@ -394,7 +523,7 @@ Guidelines:
 - Be specific with amounts (in JD)
 - Focus on actionable, realistic advice
 - Consider their household size and income level
-- Align with their primary goals: ${user?.primaryGoals?.join(', ') || 'general financial health'}
+- Align with their primary goals: ${userProfile?.primaryGoals?.join(', ') || 'general financial health'}
 - Provide 3-5 concrete action items per suggestion
 - Estimate realistic savings/income potential (don't overestimate)
 
@@ -422,7 +551,6 @@ Generate suggestions that will genuinely improve their financial state.`,
         generatedAt: new Date().toISOString(),
       };
 
-      await AsyncStorage.setItem(STORAGE_KEYS.OPTIMIZATIONS, JSON.stringify(suggestions));
       setOptimizations(suggestions);
       
       console.log('AI optimization complete:', report);
@@ -433,151 +561,187 @@ Generate suggestions that will genuinely improve their financial state.`,
     } finally {
       setIsOptimizing(false);
     }
-  }, [transactions, user, financialSummary, goals]);
+  }, [transactions, userProfile, financialSummary, goals]);
 
   const markOptimizationImplemented = useCallback(async (id: string) => {
-    try {
-      const updated = optimizations.map(opt => 
-        opt.id === id ? { ...opt, implemented: true } : opt
-      );
-      await AsyncStorage.setItem(STORAGE_KEYS.OPTIMIZATIONS, JSON.stringify(updated));
-      setOptimizations(updated);
-    } catch (error) {
-      console.error('Error marking optimization as implemented:', error);
-    }
+    const updated = optimizations.map(opt => 
+      opt.id === id ? { ...opt, implemented: true } : opt
+    );
+    setOptimizations(updated);
   }, [optimizations]);
 
-  const clearOptimizations = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.OPTIMIZATIONS);
-      setOptimizations([]);
-    } catch (error) {
-      console.error('Error clearing optimizations:', error);
-    }
+  const clearOptimizations = useCallback(() => {
+    setOptimizations([]);
   }, []);
 
-  const saveBudgets = async (newBudgets: Budget[]) => {
+  const addBudget = useCallback(async (budget: Omit<Budget, 'id' | 'spent'>) => {
+    if (!authUser) return;
+    
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.BUDGETS, JSON.stringify(newBudgets));
-      setBudgets(newBudgets);
-    } catch (error) {
-      console.error('Error saving budgets:', error);
-    }
-  };
+      const { data, error } = await supabase.from('budgets').insert({
+        user_id: authUser.id,
+        category: budget.category,
+        name: budget.name,
+        limit: budget.limit,
+        spent: 0,
+        period: budget.period,
+        start_date: budget.startDate,
+        color: budget.color,
+        rules: budget.rules,
+      }).select().single();
 
-  const saveBudgetRules = async (newRules: BudgetRule[]) => {
+      if (error) {
+        console.error('Error adding budget:', error);
+        return;
+      }
+
+      if (data) {
+        const newBudget: Budget = {
+          id: data.id,
+          category: data.category as BudgetCategory,
+          name: data.name,
+          limit: Number(data.limit),
+          spent: Number(data.spent),
+          period: data.period as 'weekly' | 'monthly',
+          startDate: data.start_date,
+          color: data.color,
+          rules: data.rules,
+        };
+        setBudgets(prev => [...prev, newBudget]);
+      }
+    } catch (error) {
+      console.error('Error adding budget:', error);
+    }
+  }, [authUser]);
+
+  const updateBudget = useCallback(async (id: string, updates: Partial<Budget>) => {
+    if (!authUser) return;
+    
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.BUDGET_RULES, JSON.stringify(newRules));
-      setBudgetRules(newRules);
-    } catch (error) {
-      console.error('Error saving budget rules:', error);
-    }
-  };
+      const updateData: any = {};
+      if (updates.name) updateData.name = updates.name;
+      if (updates.limit) updateData.limit = updates.limit;
+      if (updates.spent !== undefined) updateData.spent = updates.spent;
+      if (updates.category) updateData.category = updates.category;
+      if (updates.period) updateData.period = updates.period;
+      if (updates.color) updateData.color = updates.color;
+      if (updates.rules) updateData.rules = updates.rules;
 
-  const saveBudgetRewards = async (newRewards: BudgetReward[]) => {
+      const { error } = await supabase.from('budgets').update(updateData).eq('id', id);
+
+      if (error) {
+        console.error('Error updating budget:', error);
+        return;
+      }
+
+      setBudgets(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
+    } catch (error) {
+      console.error('Error updating budget:', error);
+    }
+  }, [authUser]);
+
+  const deleteBudget = useCallback(async (id: string) => {
+    if (!authUser) return;
+    
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.BUDGET_REWARDS, JSON.stringify(newRewards));
-      setBudgetRewards(newRewards);
+      const { error } = await supabase.from('budgets').delete().eq('id', id);
+
+      if (error) {
+        console.error('Error deleting budget:', error);
+        return;
+      }
+
+      setBudgets(prev => prev.filter(b => b.id !== id));
     } catch (error) {
-      console.error('Error saving budget rewards:', error);
+      console.error('Error deleting budget:', error);
     }
-  };
+  }, [authUser]);
 
-  const addBudget = useCallback((budget: Omit<Budget, 'id' | 'spent'>) => {
-    const newBudget: Budget = {
-      ...budget,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      spent: 0,
-    };
-    const updated = [...budgets, newBudget];
-    saveBudgets(updated);
-    console.log('Budget added:', newBudget);
-  }, [budgets]);
+  const addBudgetRule = useCallback(async (rule: Omit<BudgetRule, 'id' | 'createdAt'>) => {
+    if (!authUser) return;
+    
+    try {
+      const { data, error } = await supabase.from('budget_rules').insert({
+        user_id: authUser.id,
+        name: rule.name,
+        description: rule.description,
+        category: rule.category || null,
+        max_percentage: rule.maxPercentage || null,
+        max_amount: rule.maxAmount || null,
+        strictness: rule.strictness,
+        is_active: rule.isActive,
+      }).select().single();
 
-  const updateBudget = useCallback((id: string, updates: Partial<Budget>) => {
-    const updated = budgets.map(b => b.id === id ? { ...b, ...updates } : b);
-    saveBudgets(updated);
-  }, [budgets]);
+      if (error) {
+        console.error('Error adding budget rule:', error);
+        return;
+      }
 
-  const deleteBudget = useCallback((id: string) => {
-    const updated = budgets.filter(b => b.id !== id);
-    saveBudgets(updated);
-  }, [budgets]);
+      if (data) {
+        const newRule: BudgetRule = {
+          id: data.id,
+          name: data.name,
+          description: data.description,
+          category: data.category as BudgetCategory | undefined,
+          maxPercentage: data.max_percentage ? Number(data.max_percentage) : undefined,
+          maxAmount: data.max_amount ? Number(data.max_amount) : undefined,
+          strictness: data.strictness as 'flexible' | 'moderate' | 'strict',
+          isActive: data.is_active,
+          createdAt: data.created_at,
+        };
+        setBudgetRules(prev => [...prev, newRule]);
+      }
+    } catch (error) {
+      console.error('Error adding budget rule:', error);
+    }
+  }, [authUser]);
 
-  const addBudgetRule = useCallback((rule: Omit<BudgetRule, 'id' | 'createdAt'>) => {
-    const newRule: BudgetRule = {
-      ...rule,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...budgetRules, newRule];
-    saveBudgetRules(updated);
-    console.log('Budget rule added:', newRule);
-  }, [budgetRules]);
+  const updateBudgetRule = useCallback(async (id: string, updates: Partial<BudgetRule>) => {
+    if (!authUser) return;
+    
+    try {
+      const updateData: any = {};
+      if (updates.name) updateData.name = updates.name;
+      if (updates.description) updateData.description = updates.description;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.maxPercentage !== undefined) updateData.max_percentage = updates.maxPercentage;
+      if (updates.maxAmount !== undefined) updateData.max_amount = updates.maxAmount;
+      if (updates.strictness) updateData.strictness = updates.strictness;
+      if (updates.isActive !== undefined) updateData.is_active = updates.isActive;
 
-  const updateBudgetRule = useCallback((id: string, updates: Partial<BudgetRule>) => {
-    const updated = budgetRules.map(r => r.id === id ? { ...r, ...updates } : r);
-    saveBudgetRules(updated);
-  }, [budgetRules]);
+      const { error } = await supabase.from('budget_rules').update(updateData).eq('id', id);
 
-  const deleteBudgetRule = useCallback((id: string) => {
-    const updated = budgetRules.filter(r => r.id !== id);
-    saveBudgetRules(updated);
-  }, [budgetRules]);
+      if (error) {
+        console.error('Error updating budget rule:', error);
+        return;
+      }
+
+      setBudgetRules(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+    } catch (error) {
+      console.error('Error updating budget rule:', error);
+    }
+  }, [authUser]);
+
+  const deleteBudgetRule = useCallback(async (id: string) => {
+    if (!authUser) return;
+    
+    try {
+      const { error } = await supabase.from('budget_rules').delete().eq('id', id);
+
+      if (error) {
+        console.error('Error deleting budget rule:', error);
+        return;
+      }
+
+      setBudgetRules(prev => prev.filter(r => r.id !== id));
+    } catch (error) {
+      console.error('Error deleting budget rule:', error);
+    }
+  }, [authUser]);
 
   const checkAndAwardRewards = useCallback(() => {
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    
-    budgets.forEach(budget => {
-      const existingReward = budgetRewards.find(
-        r => r.budgetId === budget.id && r.period === currentMonth
-      );
-      
-      if (!existingReward && budget.spent <= budget.limit) {
-        const percentUsed = (budget.spent / budget.limit) * 100;
-        const savingsAmount = budget.limit - budget.spent;
-        
-        let tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-        let points: number;
-        let message: string;
-        
-        if (percentUsed <= 50) {
-          tier = 'platinum';
-          points = 100;
-          message = `Outstanding! You only used ${percentUsed.toFixed(0)}% of your ${budget.name} budget!`;
-        } else if (percentUsed <= 75) {
-          tier = 'gold';
-          points = 75;
-          message = `Excellent! You saved ${savingsAmount.toFixed(0)} on ${budget.name}!`;
-        } else if (percentUsed <= 90) {
-          tier = 'silver';
-          points = 50;
-          message = `Great job staying under your ${budget.name} budget!`;
-        } else {
-          tier = 'bronze';
-          points = 25;
-          message = `You stayed within your ${budget.name} budget!`;
-        }
-        
-        const newReward: BudgetReward = {
-          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-          budgetId: budget.id,
-          budgetName: budget.name,
-          tier,
-          points,
-          earnedAt: new Date().toISOString(),
-          period: currentMonth,
-          savingsAmount,
-          message,
-        };
-        
-        const updatedRewards = [...budgetRewards, newReward];
-        saveBudgetRewards(updatedRewards);
-        console.log('Reward earned:', newReward);
-      }
-    });
-  }, [budgets, budgetRewards]);
+    console.log('Budget rewards system needs implementation');
+  }, []);
 
   const budgetStatuses = useMemo<BudgetStatus[]>(() => {
     const now = new Date();
@@ -680,36 +844,92 @@ Generate suggestions that will genuinely improve their financial state.`,
     return violations;
   }, [budgetRules, budgets, budgetStatuses]);
 
-  const savePlannedTransactions = async (newPlanned: PlannedTransaction[]) => {
+  const addPlannedTransaction = useCallback(async (planned: Omit<PlannedTransaction, 'id' | 'createdAt' | 'isActive'>) => {
+    if (!authUser) return;
+    
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.PLANNED_TRANSACTIONS, JSON.stringify(newPlanned));
-      setPlannedTransactions(newPlanned);
+      const { data, error } = await supabase.from('planned_transactions').insert({
+        user_id: authUser.id,
+        type: planned.type,
+        category: planned.category,
+        amount: planned.amount,
+        description: planned.description,
+        scheduled_date: planned.scheduledDate,
+        recurrence: planned.recurrence,
+        notes: planned.notes || null,
+        is_active: true,
+      }).select().single();
+
+      if (error) {
+        console.error('Error adding planned transaction:', error);
+        return;
+      }
+
+      if (data) {
+        const newPlanned: PlannedTransaction = {
+          id: data.id,
+          type: data.type as 'income' | 'expense',
+          category: data.category as TransactionCategory,
+          amount: Number(data.amount),
+          description: data.description,
+          scheduledDate: data.scheduled_date,
+          recurrence: data.recurrence as RecurrenceType,
+          notes: data.notes || undefined,
+          isActive: data.is_active,
+          lastProcessedDate: data.last_processed_date || undefined,
+          createdAt: data.created_at,
+        };
+        setPlannedTransactions(prev => [...prev, newPlanned]);
+      }
     } catch (error) {
-      console.error('Error saving planned transactions:', error);
+      console.error('Error adding planned transaction:', error);
     }
-  };
+  }, [authUser]);
 
-  const addPlannedTransaction = useCallback((planned: Omit<PlannedTransaction, 'id' | 'createdAt' | 'isActive'>) => {
-    const newPlanned: PlannedTransaction = {
-      ...planned,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      isActive: true,
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...plannedTransactions, newPlanned];
-    savePlannedTransactions(updated);
-    console.log('Planned transaction added:', newPlanned);
-  }, [plannedTransactions]);
+  const updatePlannedTransaction = useCallback(async (id: string, updates: Partial<PlannedTransaction>) => {
+    if (!authUser) return;
+    
+    try {
+      const updateData: any = {};
+      if (updates.type) updateData.type = updates.type;
+      if (updates.category) updateData.category = updates.category;
+      if (updates.amount) updateData.amount = updates.amount;
+      if (updates.description) updateData.description = updates.description;
+      if (updates.scheduledDate) updateData.scheduled_date = updates.scheduledDate;
+      if (updates.recurrence) updateData.recurrence = updates.recurrence;
+      if (updates.notes !== undefined) updateData.notes = updates.notes;
+      if (updates.isActive !== undefined) updateData.is_active = updates.isActive;
+      if (updates.lastProcessedDate !== undefined) updateData.last_processed_date = updates.lastProcessedDate;
 
-  const updatePlannedTransaction = useCallback((id: string, updates: Partial<PlannedTransaction>) => {
-    const updated = plannedTransactions.map(p => p.id === id ? { ...p, ...updates } : p);
-    savePlannedTransactions(updated);
-  }, [plannedTransactions]);
+      const { error } = await supabase.from('planned_transactions').update(updateData).eq('id', id);
 
-  const deletePlannedTransaction = useCallback((id: string) => {
-    const updated = plannedTransactions.filter(p => p.id !== id);
-    savePlannedTransactions(updated);
-  }, [plannedTransactions]);
+      if (error) {
+        console.error('Error updating planned transaction:', error);
+        return;
+      }
+
+      setPlannedTransactions(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    } catch (error) {
+      console.error('Error updating planned transaction:', error);
+    }
+  }, [authUser]);
+
+  const deletePlannedTransaction = useCallback(async (id: string) => {
+    if (!authUser) return;
+    
+    try {
+      const { error } = await supabase.from('planned_transactions').delete().eq('id', id);
+
+      if (error) {
+        console.error('Error deleting planned transaction:', error);
+        return;
+      }
+
+      setPlannedTransactions(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Error deleting planned transaction:', error);
+    }
+  }, [authUser]);
 
   const getNextOccurrence = (date: string, recurrence: RecurrenceType): string => {
     const d = new Date(date);
@@ -834,8 +1054,8 @@ Generate suggestions that will genuinely improve their financial state.`,
     };
   }, [budgetStatuses, checkRuleViolation]);
 
-  const isAuthenticated = user !== null;
-  const hasCompletedOnboarding = user?.hasCompletedOnboarding ?? false;
+  const isAuthenticated = authUser !== null;
+  const hasCompletedOnboarding = userProfile?.hasCompletedOnboarding ?? false;
 
   return useMemo(() => ({
     transactions,
@@ -874,10 +1094,8 @@ Generate suggestions that will genuinely improve their financial state.`,
     deletePlannedTransaction,
     processPlannedTransaction,
     checkAndAwardRewards,
-    login,
-    signup,
-    logout,
-    updateUser,
+    createProfile,
+    updateProfile,
     generateOptimizations,
     markOptimizationImplemented,
     clearOptimizations,
@@ -918,10 +1136,8 @@ Generate suggestions that will genuinely improve their financial state.`,
     deletePlannedTransaction,
     processPlannedTransaction,
     checkAndAwardRewards,
-    login,
-    signup,
-    logout,
-    updateUser,
+    createProfile,
+    updateProfile,
     generateOptimizations,
     markOptimizationImplemented,
     clearOptimizations,
