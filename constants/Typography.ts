@@ -79,6 +79,13 @@ export const sfProDisplayLight = Platform.select({
   default: 'System',
 });
 
+export const paraboleRegular = Platform.select({
+  web: '"Parabole", "Parabole Regular", system-ui, -apple-system, sans-serif',
+  ios: 'System',
+  android: 'sans-serif',
+  default: 'System',
+});
+
 export const Typography = {
   // Display styles - Helvetica Neue optimized for fintech
   largeTitle: {

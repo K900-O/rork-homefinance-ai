@@ -15,7 +15,8 @@ import { Command, Sparkles, Wallet, Asterisk } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   sfProDisplayBold, 
-  sfProDisplayMedium, 
+  sfProDisplayMedium,
+  paraboleRegular, 
 } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
 
@@ -283,10 +284,11 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   splashText: {
-    fontFamily: sfProDisplayBold,
+    fontFamily: paraboleRegular,
     fontSize: 32,
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '400' as const,
+    letterSpacing: 1,
   },
   
   // Content
