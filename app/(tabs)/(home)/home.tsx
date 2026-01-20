@@ -415,7 +415,7 @@ function BudgetItem({ status, index }: { status: BudgetStatus; index: number }) 
             {status.budget.spent.toFixed(0)} USD
           </Text>
           <Text style={styles.limitAmount}>
-            / {status.budget.limit.toFixed(0)} USD
+            / {status.budget.budgetLimit.toFixed(0)} USD
           </Text>
         </View>
       </View>
@@ -423,7 +423,7 @@ function BudgetItem({ status, index }: { status: BudgetStatus; index: number }) 
       <View style={styles.budgetFooter}>
         <Text style={[styles.remainingText, { color: getStatusColor() }]}>
           {status.status === 'exceeded' 
-            ? `Over by ${(status.budget.spent - status.budget.limit).toFixed(0)} USD`
+            ? `Over by ${(status.budget.spent - status.budget.budgetLimit).toFixed(0)} USD`
             : `${status.remaining.toFixed(0)} USD remaining`
           }
         </Text>

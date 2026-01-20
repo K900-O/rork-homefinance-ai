@@ -106,7 +106,7 @@ export const [FinanceProvider, useFinance] = createContextHook(() => {
           id: b.id,
           category: b.category as BudgetCategory,
           name: b.name,
-          limit: Number(b.limit),
+          budgetLimit: Number(b.budget_limit),
           spent: Number(b.spent),
           period: b.period as 'weekly' | 'monthly',
           startDate: b.start_date,
@@ -644,15 +644,15 @@ Generate suggestions that will genuinely improve their financial state.`,
     setOptimizations([]);
   }, []);
 
-  const addBudget = useCallback(async (budget: Omit<Budget, 'id' | 'spent'>) => {
-    if (!authUser) return;
+  const addBudget = useCallback(async (budget: Omit<Budget, 'id' | 'spent'>): Promise<boolean> => {
+    if (!authUser) return false;
     
     try {
       const { data, error } = await supabase.from('budgets').insert({
         user_id: authUser.id,
         category: budget.category,
         name: budget.name,
-        limit: budget.limit,
+        budget_limit: budget.budgetLimit,
         spent: 0,
         period: budget.period,
         start_date: budget.startDate,
@@ -661,8 +661,8 @@ Generate suggestions that will genuinely improve their financial state.`,
       }).select().single();
 
       if (error) {
-        console.error('Error adding budget:', error);
-        return;
+        console.error('Error adding budget:', JSON.stringify(error, null, 2));
+        return false;
       }
 
       if (data) {
@@ -670,7 +670,7 @@ Generate suggestions that will genuinely improve their financial state.`,
           id: data.id,
           category: data.category as BudgetCategory,
           name: data.name,
-          limit: Number(data.limit),
+          budgetLimit: Number(data.budget_limit),
           spent: Number(data.spent),
           period: data.period as 'weekly' | 'monthly',
           startDate: data.start_date,
@@ -678,9 +678,12 @@ Generate suggestions that will genuinely improve their financial state.`,
           rules: data.rules,
         };
         setBudgets(prev => [...prev, newBudget]);
+        return true;
       }
+      return false;
     } catch (error) {
       console.error('Error adding budget:', error);
+      return false;
     }
   }, [authUser]);
 
@@ -690,7 +693,7 @@ Generate suggestions that will genuinely improve their financial state.`,
     try {
       const updateData: any = {};
       if (updates.name) updateData.name = updates.name;
-      if (updates.limit) updateData.limit = updates.limit;
+      if (updates.budgetLimit) updateData.budget_limit = updates.budgetLimit;
       if (updates.spent !== undefined) updateData.spent = updates.spent;
       if (updates.category) updateData.category = updates.category;
       if (updates.period) updateData.period = updates.period;
@@ -838,14 +841,14 @@ Generate suggestions that will genuinely improve their financial state.`,
       });
       
       const spent = relevantTransactions.reduce((sum, t) => sum + t.amount, 0);
-      const percentageUsed = budget.limit > 0 ? (spent / budget.limit) * 100 : 0;
-      const remaining = Math.max(0, budget.limit - spent);
+      const percentageUsed = budget.budgetLimit > 0 ? (spent / budget.budgetLimit) * 100 : 0;
+      const remaining = Math.max(0, budget.budgetLimit - spent);
       
       const dailyRate = spent / Math.max(1, daysPassed);
       const projectedEnd = dailyRate * daysInMonth;
       
       let status: 'safe' | 'warning' | 'danger' | 'exceeded';
-      if (spent > budget.limit) {
+      if (spent > budget.budgetLimit) {
         status = 'exceeded';
       } else if (percentageUsed >= 90) {
         status = 'danger';
@@ -897,7 +900,7 @@ Generate suggestions that will genuinely improve their financial state.`,
         if (budget) {
           const currentSpent = budgetStatuses.find(s => s.budget.id === budget.id)?.budget.spent || 0;
           const wouldBeSpent = currentSpent + transaction.amount;
-          const wouldBePercentage = (wouldBeSpent / budget.limit) * 100;
+          const wouldBePercentage = (wouldBeSpent / budget.budgetLimit) * 100;
           
           if (wouldBePercentage > rule.maxPercentage) {
             violations.push({
@@ -1095,11 +1098,11 @@ Generate suggestions that will genuinely improve their financial state.`,
     
     const currentSpent = budgetStatus.budget.spent;
     const newSpent = currentSpent + transaction.amount;
-    const newPercentage = (newSpent / budgetStatus.budget.limit) * 100;
-    const newRemaining = Math.max(0, budgetStatus.budget.limit - newSpent);
+    const newPercentage = (newSpent / budgetStatus.budget.budgetLimit) * 100;
+    const newRemaining = Math.max(0, budgetStatus.budget.budgetLimit - newSpent);
     
     let newStatus: 'safe' | 'warning' | 'danger' | 'exceeded';
-    if (newSpent > budgetStatus.budget.limit) {
+    if (newSpent > budgetStatus.budget.budgetLimit) {
       newStatus = 'exceeded';
     } else if (newPercentage >= 90) {
       newStatus = 'danger';
@@ -1119,7 +1122,7 @@ Generate suggestions that will genuinely improve their financial state.`,
       newPercentage,
       remaining: newRemaining,
       status: newStatus,
-      willExceed: newSpent > budgetStatus.budget.limit,
+      willExceed: newSpent > budgetStatus.budget.budgetLimit,
       ruleViolations,
     };
   }, [budgetStatuses, checkRuleViolation]);

@@ -85,14 +85,20 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
     handleClose();
   };
 
-  const handleAddBudget = () => {
+  const handleAddBudget = async () => {
     if (!budgetName.trim() || !budgetLimit) return;
     
+    const limitAmount = parseFloat(budgetLimit);
+    if (isNaN(limitAmount)) {
+      alert("Please enter a valid amount");
+      return;
+    }
+
     const categoryInfo = BUDGET_CATEGORIES.find(c => c.value === budgetCategory);
     
-    addBudget({
+    const success = await addBudget({
       name: budgetName.trim(),
-      limit: parseFloat(budgetLimit),
+      budgetLimit: limitAmount,
       category: budgetCategory,
       period: budgetPeriod,
       startDate: new Date().toISOString(),
@@ -100,8 +106,10 @@ export default function BudgetModal({ visible, onClose }: BudgetModalProps) {
       rules: [],
     });
     
-    setSuccessType('budget');
-    setShowSuccess(true);
+    if (success) {
+      setSuccessType('budget');
+      setShowSuccess(true);
+    }
   };
 
   const handleAddRule = () => {

@@ -329,7 +329,7 @@ function FilterButton({ label, isActive, onPress }: { label: string; isActive: b
 interface TransactionItemProps {
   transaction: Transaction;
   budgetStatus: {
-    budget: { name: string; color: string; limit: number; spent: number };
+    budget: { name: string; color: string; budgetLimit: number; spent: number };
     percentageUsed: number;
     status: 'safe' | 'warning' | 'danger' | 'exceeded';
   } | null;

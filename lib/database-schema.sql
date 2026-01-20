@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS budgets (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   category TEXT NOT NULL,
   name TEXT NOT NULL,
-  limit NUMERIC NOT NULL,
+  budget_limit NUMERIC NOT NULL,
   spent NUMERIC NOT NULL DEFAULT 0,
   period TEXT NOT NULL CHECK (period IN ('weekly', 'monthly')),
   start_date TIMESTAMPTZ NOT NULL,

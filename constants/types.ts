@@ -120,7 +120,7 @@ export interface Budget {
   id: string;
   category: BudgetCategory;
   name: string;
-  limit: number;
+  budgetLimit: number;
   spent: number;
   period: BudgetPeriod;
   startDate: string;
