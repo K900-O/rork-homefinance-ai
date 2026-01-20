@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Leaf, Command, Sparkles, Wallet } from 'lucide-react-native';
+import { Command, Sparkles, Wallet, Asterisk } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   sfProDisplayBold, 
@@ -157,9 +157,9 @@ export default function LandingScreen() {
           pointerEvents="none"
         >
            <View style={styles.splashIconCircle}>
-             <Leaf color={AppColors.primary} size={48} fill={AppColors.primary} />
+             <Asterisk color="#FFFFFF" size={48} strokeWidth={3} />
            </View>
-           <Text style={styles.splashText}>Hayati</Text>
+           <Text style={styles.splashText}>nazm</Text>
         </Animated.View>
 
         {/* Final State: Card Content */}
@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
   splashIconCircle: {
     width: 96,
     height: 96,
-    borderRadius: 32,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 48,
+    backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
