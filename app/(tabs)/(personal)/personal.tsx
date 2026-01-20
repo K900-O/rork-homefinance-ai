@@ -30,6 +30,7 @@ import {
   ListTodo,
   Heart,
   Zap,
+  Repeat2,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
@@ -230,22 +231,15 @@ export default function PersonalHomeScreen() {
               resizeMode="contain"
             />
           </View>
-          <TouchableOpacity onPress={toggleMode} style={styles.avatarContainer}>
-            <View style={styles.avatarFallback}>
-              <Text style={styles.avatarText}>{userProfile?.name?.[0] || 'U'}</Text>
-            </View>
+          <TouchableOpacity onPress={toggleMode} style={styles.modeButton}>
+            <Repeat2 size={18} color="#FFF" />
+            <Text style={styles.modeButtonText}>Finance</Text>
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>{getGreeting()},</Text>
-          <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
-          <Text style={styles.welcomeSubtext}>{getPersonalMessage()}</Text>
         </View>
 
         <View style={styles.bannerContainer}>
           <LinearGradient
-            colors={['#7C3AED', '#8B5CF6', '#A78BFA']}
+            colors={['#2563EB', '#3B82F6', '#60A5FA']}
             style={styles.banner}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -255,19 +249,15 @@ export default function PersonalHomeScreen() {
               <View style={[styles.bannerCircle, styles.bannerCircle2]} />
               <View style={[styles.bannerCircle, styles.bannerCircle3]} />
             </View>
-            <View style={styles.bannerContent}>
-              <View style={styles.bannerLeft}>
-                <View style={styles.bannerIconContainer}>
-                  <Zap size={28} color="#FFF" fill="#FFF" />
-                </View>
-                <View style={styles.bannerTextContainer}>
-                  <Text style={styles.bannerTitle}>Boost Your Habits</Text>
-                  <Text style={styles.bannerDescription}>Build routines, track progress, stay motivated</Text>
-                </View>
+            <View style={styles.bannerContentPersonal}>
+              <View style={styles.bannerWelcomeSection}>
+                <Text style={styles.bannerGreeting}>{getGreeting()},</Text>
+                <Text style={styles.bannerUserName}>{userProfile?.name || 'User'}!</Text>
+                <Text style={styles.bannerMessage}>{getPersonalMessage()}</Text>
               </View>
-              <TouchableOpacity style={styles.bannerButton}>
-                <Text style={styles.bannerButtonText}>Start</Text>
-              </TouchableOpacity>
+              <View style={styles.bannerIconDecor}>
+                <Zap size={32} color="#FFF" fill="#FFF" style={{ opacity: 0.4 }} />
+              </View>
             </View>
           </LinearGradient>
         </View>
@@ -734,55 +724,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 8,
   },
-  avatarContainer: {
-    width: 40,
-    height: 40,
+  modeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 20,
     backgroundColor: '#2563EB',
-    alignItems: 'center',
-    justifyContent: 'center',
     shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
     marginTop: 8,
   },
-  avatarFallback: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: '100%',
-  },
-  avatarText: {
-    fontFamily: sfProDisplayBold,
-    color: '#FFF',
-    fontSize: 16,
+  modeButtonText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontWeight: '600' as const,
   },
   content: {
     flex: 1,
-  },
-  welcomeSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-  },
-  welcomeText: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 16,
-    color: '#71717A',
-    marginBottom: 4,
-  },
-  welcomeName: {
-    fontFamily: sfProDisplayBold,
-    fontSize: 28,
-    color: '#1A1A1A',
-    letterSpacing: 0.3,
-  },
-  welcomeSubtext: {
-    fontFamily: sfProDisplayRegular,
-    fontSize: 15,
-    color: '#2563EB',
-    marginTop: 6,
-    letterSpacing: 0.2,
   },
   bannerContainer: {
     paddingHorizontal: 20,
@@ -790,13 +753,14 @@ const styles = StyleSheet.create({
   },
   banner: {
     borderRadius: 20,
-    padding: 20,
+    padding: 24,
     overflow: 'hidden',
-    shadowColor: '#8B5CF6',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 8,
+    minHeight: 140,
   },
   bannerPattern: {
     ...StyleSheet.absoluteFillObject,
@@ -829,6 +793,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  bannerContentPersonal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  bannerWelcomeSection: {
+    flex: 1,
+  },
+  bannerGreeting: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 4,
+  },
+  bannerUserName: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 26,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
+    marginBottom: 8,
+  },
+  bannerMessage: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.85)',
+    letterSpacing: 0.2,
+  },
+  bannerIconDecor: {
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bannerLeft: {
     flexDirection: 'row',

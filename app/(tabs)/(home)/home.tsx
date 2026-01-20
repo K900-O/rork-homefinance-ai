@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus, ArrowDownLeft, AlertTriangle, CheckCircle, RefreshCw, Play, Trash2 } from 'lucide-react-native';
+import { Plus, ArrowDownLeft, AlertTriangle, CheckCircle, RefreshCw, Play, Trash2, Repeat2 } from 'lucide-react-native';
 import { 
   GlassBellIcon, 
   GlassWalletIcon, 
@@ -115,7 +115,8 @@ export default function HomeScreen() {
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.modeButton} onPress={toggleMode}>
-                <GlassProfileIcon size={24} focused={true} />
+                <Repeat2 size={18} color="#FFF" />
+                <Text style={styles.modeButtonText}>Personal</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconButton}>
                 <GlassBellIcon size={24} focused={true} />
@@ -641,16 +642,23 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   modeButton: {
-    width: 40,
-    height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 20,
     backgroundColor: '#2563EB',
-    alignItems: 'center',
-    justifyContent: 'center',
     shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
+  },
+  modeButtonText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontWeight: '600' as const,
   },
   iconButton: {
     width: 40,
