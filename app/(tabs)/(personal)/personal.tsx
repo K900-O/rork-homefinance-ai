@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoContainer: {
-    marginRight: 'auto',
+    marginLeft: 0,
   },
   logo: {
     width: 420,

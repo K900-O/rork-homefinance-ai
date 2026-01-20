@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
-    marginRight: 'auto',
+    marginLeft: 0,
   },
   logo: {
     width: 500,
