@@ -16,6 +16,7 @@ import {
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lock, Mail, User, ArrowLeft, ArrowRight } from 'lucide-react-native';
+import { Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
 import { AppColors } from '@/constants/colors';
@@ -185,6 +186,13 @@ export default function SignupScreen() {
                   }
                 ]}
               >
+                <View style={styles.logoContainer}>
+                  <Image 
+                    source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+                    style={styles.logo}
+                    resizeMode="contain"
+                  />
+                </View>
                 <Text style={styles.title}>Initiate</Text>
                 <Text style={styles.subtitle}>Begin your path to mastery</Text>
               </Animated.View>
@@ -374,6 +382,24 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 40,
+  },
+  logoContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  logo: {
+    width: 36,
+    height: 36,
   },
   title: {
     fontFamily: sfProDisplayBold,

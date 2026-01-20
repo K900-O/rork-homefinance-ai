@@ -112,7 +112,11 @@ export default function LandingScreen() {
             
             <View style={styles.menuItemActiveContainer}>
               <View style={styles.activeIconContainer}>
-                <Wallet color="#FFFFFF" size={20} fill="#FFFFFF" />
+                <Image 
+                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+                  style={styles.activeIcon}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.menuItemActive}>Finance</Text>
             </View>
@@ -178,7 +182,11 @@ export default function LandingScreen() {
         >
           <View style={styles.contentHeader}>
             <View style={styles.iconBadge}>
-               <Sparkles color="#1E40AF" size={24} fill="#1E40AF" />
+               <Image 
+                 source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+                 style={styles.iconBadgeImage}
+                 resizeMode="contain"
+               />
             </View>
             
             <Text style={styles.cardTitle}>Your life,{'\n'}mastered</Text>
@@ -294,6 +302,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
+  },
+  iconBadgeImage: {
+    width: 36,
+    height: 36,
+  },
+  activeIcon: {
+    width: 28,
+    height: 28,
   },
   cardTitle: {
     fontFamily: sfProDisplayBold,
