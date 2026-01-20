@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -42,14 +42,11 @@ import {
   Film,
   Gamepad2,
   Target,
-  Clock,
   Sun,
   Moon
 } from 'lucide-react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import type { RiskTolerance } from '@/constants/types';
-import type { ActivityCategory } from '@/constants/personalTypes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/colors';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
@@ -104,8 +101,7 @@ const RISK_OPTIONS: { value: RiskTolerance; label: string; description: string; 
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ name?: string; email?: string; password?: string }>();
-  const { signUp } = useAuth();
+  const params = useLocalSearchParams<{ name?: string; email?: string; userId?: string }>();
   const { setMode } = useAppMode();
   const insets = useSafeAreaInsets();
 
@@ -128,19 +124,11 @@ export default function OnboardingScreen() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
 
-  const getTotalSteps = () => {
+  const getTotalSteps = useCallback(() => {
     if (selectedMode === 'financial') return 5;
     if (selectedMode === 'personal') return 4;
     return 7;
-  };
-
-  const getCurrentStepForMode = () => {
-    if (selectedMode === 'both') {
-      const stepMap = [0, 1, 2, 3, 4, 5, 6, 7];
-      return stepMap[currentStep];
-    }
-    return currentStep;
-  };
+  }, [selectedMode]);
 
   // Entrance Animations
   const initialFadeAnim = useRef(new Animated.Value(0)).current;
@@ -179,7 +167,7 @@ export default function OnboardingScreen() {
       duration: 300,
       useNativeDriver: false,
     }).start();
-  }, [currentStep, selectedMode, progressAnim]);
+  }, [currentStep, selectedMode, progressAnim, getTotalSteps]);
 
   const animateSlide = (direction: 'forward' | 'backward') => {
     Animated.parallel([
@@ -284,7 +272,7 @@ export default function OnboardingScreen() {
   };
 
   const handleComplete = async () => {
-    if (!params.name || !params.email || !params.password) {
+    if (!params.name || !params.email || !params.userId) {
       Alert.alert('Error', 'Missing registration information. Please start over.');
       router.replace('/signup' as any);
       return;
@@ -292,26 +280,12 @@ export default function OnboardingScreen() {
 
     setIsLoading(true);
     try {
-      console.log('Starting signup process...');
-      const { data: authData, error: authError } = await signUp(
-        params.email,
-        params.password,
-        params.name
-      );
-
-      if (authError || !authData?.user) {
-        console.error('Signup failed:', authError);
-        Alert.alert('Error', 'Failed to create account. Please try again.');
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('Signup successful, user ID:', authData.user.id);
+      console.log('Creating user profile for user ID:', params.userId);
       
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       const { createProfileDirect } = await import('@/lib/supabase');
-      const success = await createProfileDirect(authData.user.id, {
+      const success = await createProfileDirect(params.userId, {
         name: params.name,
         email: params.email,
         preferredMode: selectedMode,

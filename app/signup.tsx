@@ -15,6 +15,7 @@ import {
   Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lock, Mail, User, ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,6 +24,7 @@ import { AppColors } from '@/constants/colors';
 
 export default function SignupScreen() {
   const router = useRouter();
+  const { signUp } = useAuth();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -112,13 +114,32 @@ export default function SignupScreen() {
     }
 
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setIsLoading(false);
+    
+    try {
+      console.log('Creating Supabase account...');
+      const { data, error } = await signUp(email, password, name);
 
-    router.replace({
-      pathname: '/onboarding' as any,
-      params: { name, email, password },
-    });
+      if (error || !data?.user) {
+        console.error('Signup failed:', error);
+        const errorMessage = typeof error === 'object' && error && 'message' in error 
+          ? String(error.message) 
+          : 'Failed to create account. Please try again.';
+        Alert.alert('Error', errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Account created successfully, user ID:', data.user.id);
+      
+      router.replace({
+        pathname: '/onboarding' as any,
+        params: { name, email, userId: data.user.id },
+      });
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (
