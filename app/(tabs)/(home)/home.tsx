@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
-    flex: 1,
+    flex: -11,
   },
   logo: {
     width: 360,
