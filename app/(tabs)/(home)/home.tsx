@@ -573,12 +573,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
-    marginLeft: 0,
+    alignSelf: 'flex-start',
   },
   logo: {
     width: 500,
     height: 170,
-    marginLeft: -20,
   },
   header: {
     flexDirection: 'row',

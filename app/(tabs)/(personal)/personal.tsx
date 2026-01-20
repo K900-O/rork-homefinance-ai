@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoContainer: {
-    marginLeft: 0,
+    alignSelf: 'flex-start',
   },
   logo: {
     width: 420,
