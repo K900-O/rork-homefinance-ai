@@ -679,12 +679,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   logo: {
-    width: 420,
-    height: 140,
+    width: 120,
+    height: 40,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     marginBottom: 20,
