@@ -129,6 +129,35 @@ export default function HomeScreen() {
             <Text style={styles.welcomeSubtext}>{getFinanceMessage()}</Text>
           </View>
 
+          <View style={styles.bannerContainer}>
+            <LinearGradient
+              colors={['#1E40AF', '#2563EB', '#3B82F6']}
+              style={styles.banner}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.bannerPattern}>
+                <View style={[styles.bannerCircle, styles.bannerCircle1]} />
+                <View style={[styles.bannerCircle, styles.bannerCircle2]} />
+                <View style={[styles.bannerCircle, styles.bannerCircle3]} />
+              </View>
+              <View style={styles.bannerContent}>
+                <View style={styles.bannerLeft}>
+                  <View style={styles.bannerIconContainer}>
+                    <GlassTrendUpIcon size={28} focused={true} />
+                  </View>
+                  <View style={styles.bannerTextContainer}>
+                    <Text style={styles.bannerTitle}>Financial Insights</Text>
+                    <Text style={styles.bannerDescription}>Track spending, build budgets, achieve goals</Text>
+                  </View>
+                </View>
+                <TouchableOpacity style={styles.bannerButton}>
+                  <Text style={styles.bannerButtonText}>View</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </View>
+
           <View style={styles.cardsSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>My Card</Text>
@@ -658,6 +687,96 @@ const styles = StyleSheet.create({
     color: '#2563EB',
     marginTop: 6,
     letterSpacing: 0.2,
+  },
+  bannerContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  banner: {
+    borderRadius: 20,
+    padding: 20,
+    overflow: 'hidden',
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  bannerPattern: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  bannerCircle: {
+    position: 'absolute',
+    borderRadius: 1000,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  bannerCircle1: {
+    width: 120,
+    height: 120,
+    top: -40,
+    right: -20,
+  },
+  bannerCircle2: {
+    width: 80,
+    height: 80,
+    bottom: -30,
+    left: -10,
+  },
+  bannerCircle3: {
+    width: 60,
+    height: 60,
+    top: 30,
+    right: 50,
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  bannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    flex: 1,
+  },
+  bannerIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bannerTextContainer: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 4,
+    letterSpacing: 0.2,
+  },
+  bannerDescription: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: 16,
+  },
+  bannerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  bannerButtonText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontWeight: '600' as const,
   },
   cardsSection: {
     paddingHorizontal: 20,

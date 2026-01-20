@@ -29,7 +29,9 @@ import {
   ShieldCheck,
   ListTodo,
   Heart,
+  Zap,
 } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
 import { usePersonal } from '@/contexts/PersonalContext';
 import { useFinance } from '@/contexts/FinanceContext';
@@ -239,6 +241,35 @@ export default function PersonalHomeScreen() {
           <Text style={styles.welcomeText}>{getGreeting()},</Text>
           <Text style={styles.welcomeName}>{userProfile?.name || 'User'}</Text>
           <Text style={styles.welcomeSubtext}>{getPersonalMessage()}</Text>
+        </View>
+
+        <View style={styles.bannerContainer}>
+          <LinearGradient
+            colors={['#7C3AED', '#8B5CF6', '#A78BFA']}
+            style={styles.banner}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.bannerPattern}>
+              <View style={[styles.bannerCircle, styles.bannerCircle1]} />
+              <View style={[styles.bannerCircle, styles.bannerCircle2]} />
+              <View style={[styles.bannerCircle, styles.bannerCircle3]} />
+            </View>
+            <View style={styles.bannerContent}>
+              <View style={styles.bannerLeft}>
+                <View style={styles.bannerIconContainer}>
+                  <Zap size={28} color="#FFF" fill="#FFF" />
+                </View>
+                <View style={styles.bannerTextContainer}>
+                  <Text style={styles.bannerTitle}>Boost Your Habits</Text>
+                  <Text style={styles.bannerDescription}>Build routines, track progress, stay motivated</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.bannerButton}>
+                <Text style={styles.bannerButtonText}>Start</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
         </View>
 
         <ScrollView
@@ -752,6 +783,96 @@ const styles = StyleSheet.create({
     color: '#2563EB',
     marginTop: 6,
     letterSpacing: 0.2,
+  },
+  bannerContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  banner: {
+    borderRadius: 20,
+    padding: 20,
+    overflow: 'hidden',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  bannerPattern: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  bannerCircle: {
+    position: 'absolute',
+    borderRadius: 1000,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  bannerCircle1: {
+    width: 120,
+    height: 120,
+    top: -40,
+    right: -20,
+  },
+  bannerCircle2: {
+    width: 80,
+    height: 80,
+    bottom: -30,
+    left: -10,
+  },
+  bannerCircle3: {
+    width: 60,
+    height: 60,
+    top: 30,
+    right: 50,
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  bannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    flex: 1,
+  },
+  bannerIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bannerTextContainer: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 4,
+    letterSpacing: 0.2,
+  },
+  bannerDescription: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: 16,
+  },
+  bannerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  bannerButtonText: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontWeight: '600' as const,
   },
   mainCard: {
     marginHorizontal: 20,
