@@ -15,7 +15,6 @@ import {
   TouchableWithoutFeedback,
   StatusBar,
   Easing,
-  Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { 
@@ -351,11 +350,6 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.stepContent}>
              <View style={styles.headerContainer}>
-              <Image 
-                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6i5wb9ahhme2u2igq7hed' }}
-                style={styles.logo}
-                resizeMode="contain"
-              />
               <View style={styles.iconBadge}>
                 <Target color={AppColors.primary} size={28} />
               </View>
@@ -651,11 +645,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 32,
-  },
-  logo: {
-    width: 56,
-    height: 56,
-    marginBottom: 16,
   },
   iconBadge: {
     width: 56,

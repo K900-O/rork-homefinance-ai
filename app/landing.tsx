@@ -159,7 +159,7 @@ export default function LandingScreen() {
           pointerEvents="none"
         >
            <Image 
-             source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6i5wb9ahhme2u2igq7hed' }}
+             source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/d0wbottxjej9u7ixm40mn' }}
              style={styles.logoImage}
              resizeMode="contain"
            />

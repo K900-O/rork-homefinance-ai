@@ -12,7 +12,6 @@ import {
   StatusBar,
   Animated,
   Easing,
-  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -186,11 +185,6 @@ export default function SignupScreen() {
                   }
                 ]}
               >
-                <Image 
-                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6i5wb9ahhme2u2igq7hed' }}
-                  style={styles.logo}
-                  resizeMode="contain"
-                />
                 <Text style={styles.title}>Initiate</Text>
                 <Text style={styles.subtitle}>Begin your path to mastery</Text>
               </Animated.View>
@@ -380,11 +374,6 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 40,
-  },
-  logo: {
-    width: 64,
-    height: 64,
-    marginBottom: 16,
   },
   title: {
     fontFamily: sfProDisplayBold,
