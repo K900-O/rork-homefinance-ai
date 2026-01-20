@@ -22,10 +22,15 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export interface OnboardingProfileData {
   name: string;
   email: string;
+  preferredMode: 'financial' | 'personal' | 'both';
   monthlyIncome: number;
   householdSize: number;
   primaryGoals: string[];
   riskTolerance: RiskTolerance;
+  personalInterests: string[];
+  dailyRoutineStart?: string;
+  dailyRoutineEnd?: string;
+  focusAreas: string[];
 }
 
 export async function createProfileDirect(
@@ -39,10 +44,16 @@ export async function createProfileDirect(
       user_id: userId,
       email: data.email,
       name: data.name,
+      preferred_mode: data.preferredMode,
       monthly_income: data.monthlyIncome,
       household_size: data.householdSize,
       primary_goals: data.primaryGoals,
       risk_tolerance: data.riskTolerance,
+      personal_interests: data.personalInterests,
+      daily_routine_start: data.dailyRoutineStart,
+      daily_routine_end: data.dailyRoutineEnd,
+      preferred_activity_categories: [],
+      focus_areas: data.focusAreas,
       currency: 'JD',
       has_completed_onboarding: true,
     });

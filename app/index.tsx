@@ -1,17 +1,45 @@
 import { Redirect } from 'expo-router';
 import { useFinance } from '@/contexts/FinanceContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppMode } from '@/contexts/AppModeContext';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { AppColors } from '@/constants/colors';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function Index() {
-  const { isLoading: authLoading, isAuthenticated: authIsAuthenticated } = useAuth();
+  const { isLoading: authLoading, isAuthenticated: authIsAuthenticated, user } = useAuth();
   const { hasCompletedOnboarding, isLoading: financeLoading } = useFinance();
+  const { mode, isLoading: modeLoading } = useAppMode();
+  const [preferredMode, setPreferredMode] = useState<'financial' | 'personal' | 'both' | null>(null);
+  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
 
-  console.log('Index - authLoading:', authLoading, 'authIsAuthenticated:', authIsAuthenticated, 'financeLoading:', financeLoading);
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (authIsAuthenticated && user) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('preferred_mode, has_completed_onboarding')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (profile) {
+            setPreferredMode(profile.preferred_mode as 'financial' | 'personal' | 'both');
+          }
+        } catch (error) {
+          console.error('Error checking user profile:', error);
+        }
+      }
+      setIsCheckingProfile(false);
+    };
 
-  // Show loading only while auth is being checked
-  if (authLoading) {
+    checkUserProfile();
+  }, [authIsAuthenticated, user]);
+
+  console.log('Index - authLoading:', authLoading, 'authIsAuthenticated:', authIsAuthenticated, 'financeLoading:', financeLoading, 'preferredMode:', preferredMode);
+
+  if (authLoading || modeLoading || isCheckingProfile) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color={AppColors.primary} />
@@ -19,13 +47,11 @@ export default function Index() {
     );
   }
 
-  // Not authenticated - go to landing
   if (!authIsAuthenticated) {
     console.log('Index - Redirecting to landing (not authenticated)');
     return <Redirect href="/landing" />;
   }
 
-  // Authenticated but still loading finance data
   if (financeLoading) {
     return (
       <View style={styles.container}>
@@ -34,13 +60,16 @@ export default function Index() {
     );
   }
 
-  // Authenticated and has completed onboarding - go to home
-  if (hasCompletedOnboarding) {
-    console.log('Index - Redirecting to home (onboarding complete)');
-    return <Redirect href="/(tabs)/(home)/home" />;
+  if (hasCompletedOnboarding && preferredMode) {
+    console.log('Index - Redirecting to home (onboarding complete), preferredMode:', preferredMode);
+    
+    if (preferredMode === 'personal') {
+      return <Redirect href="/(tabs)/(personal)/personal" />;
+    } else {
+      return <Redirect href="/(tabs)/(home)/home" />;
+    }
   }
 
-  // Authenticated but hasn't completed onboarding
   console.log('Index - Redirecting to onboarding');
   return <Redirect href="/onboarding" />;
 }

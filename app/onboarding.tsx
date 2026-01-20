@@ -30,16 +30,37 @@ import {
   Umbrella,
   Shield,
   BarChart3,
-  Leaf
+  Leaf,
+  DollarSign,
+  Heart,
+  Layers,
+  Dumbbell,
+  BookOpen,
+  Users,
+  Coffee,
+  Music,
+  Film,
+  Gamepad2,
+  Target,
+  Clock,
+  Sun,
+  Moon
 } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import type { RiskTolerance } from '@/constants/types';
+import type { ActivityCategory } from '@/constants/personalTypes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/colors';
 import { sfProDisplayRegular, sfProDisplayMedium, sfProDisplayBold } from '@/constants/Typography';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
+
+const MODE_OPTIONS = [
+  { value: 'financial' as const, label: 'Financial', description: 'Manage money & budgets', icon: DollarSign, color: AppColors.primary },
+  { value: 'personal' as const, label: 'Personal', description: 'Track habits & activities', icon: Heart, color: '#EC4899' },
+  { value: 'both' as const, label: 'Both', description: 'Complete life management', icon: Layers, color: '#8B5CF6' },
+];
 
 const AVAILABLE_GOALS = [
   { id: 'Emergency Fund', icon: Umbrella },
@@ -50,6 +71,28 @@ const AVAILABLE_GOALS = [
   { id: 'Build Wealth', icon: TrendingUp },
   { id: 'Education Fund', icon: GraduationCap },
   { id: 'Start a Business', icon: Briefcase },
+];
+
+const PERSONAL_INTERESTS = [
+  { id: 'fitness', label: 'Fitness', icon: Dumbbell },
+  { id: 'learning', label: 'Learning', icon: BookOpen },
+  { id: 'socializing', label: 'Socializing', icon: Users },
+  { id: 'health', label: 'Health', icon: Heart },
+  { id: 'work', label: 'Work', icon: Briefcase },
+  { id: 'hobbies', label: 'Hobbies', icon: Coffee },
+  { id: 'music', label: 'Music', icon: Music },
+  { id: 'entertainment', label: 'Entertainment', icon: Film },
+  { id: 'gaming', label: 'Gaming', icon: Gamepad2 },
+  { id: 'travel', label: 'Travel', icon: Plane },
+];
+
+const FOCUS_AREAS = [
+  { id: 'productivity', label: 'Productivity', icon: Target },
+  { id: 'health', label: 'Health & Wellness', icon: Heart },
+  { id: 'learning', label: 'Learning & Growth', icon: BookOpen },
+  { id: 'relationships', label: 'Relationships', icon: Users },
+  { id: 'fitness', label: 'Fitness', icon: Dumbbell },
+  { id: 'mindfulness', label: 'Mindfulness', icon: Leaf },
 ];
 
 const RISK_OPTIONS: { value: RiskTolerance; label: string; description: string; icon: any }[] = [
@@ -65,10 +108,15 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [selectedMode, setSelectedMode] = useState<'financial' | 'personal' | 'both'>('financial');
   const [monthlyIncome, setMonthlyIncome] = useState('');
   const [householdSize, setHouseholdSize] = useState('1');
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>('moderate');
+  const [personalInterests, setPersonalInterests] = useState<string[]>([]);
+  const [dailyRoutineStart, setDailyRoutineStart] = useState('07:00');
+  const [dailyRoutineEnd, setDailyRoutineEnd] = useState('22:00');
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
   const incomeInputRef = useRef<TextInput>(null);
@@ -76,7 +124,21 @@ export default function OnboardingScreen() {
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  const progressAnim = useRef(new Animated.Value(0.25)).current; // Start at 1/4
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  const getTotalSteps = () => {
+    if (selectedMode === 'financial') return 5;
+    if (selectedMode === 'personal') return 4;
+    return 7;
+  };
+
+  const getCurrentStepForMode = () => {
+    if (selectedMode === 'both') {
+      const stepMap = [0, 1, 2, 3, 4, 5, 6, 7];
+      return stepMap[currentStep];
+    }
+    return currentStep;
+  };
 
   // Entrance Animations
   const initialFadeAnim = useRef(new Animated.Value(0)).current;
@@ -109,16 +171,13 @@ export default function OnboardingScreen() {
   }, [initialFadeAnim, initialSlideAnim, headerSlideAnim]);
 
   useEffect(() => {
+    const totalSteps = getTotalSteps();
     Animated.timing(progressAnim, {
-      toValue: (currentStep + 1) / 4,
+      toValue: (currentStep + 1) / totalSteps,
       duration: 300,
       useNativeDriver: false,
     }).start();
-
-    if (currentStep === 0) {
-      setTimeout(() => incomeInputRef.current?.focus(), 300);
-    }
-  }, [currentStep, progressAnim]);
+  }, [currentStep, selectedMode, progressAnim]);
 
   const animateSlide = (direction: 'forward' | 'backward') => {
     Animated.parallel([
@@ -153,30 +212,58 @@ export default function OnboardingScreen() {
   const handleNext = () => {
     Keyboard.dismiss();
     
-    if (currentStep === 0) {
-      const income = parseFloat(monthlyIncome);
-      if (!monthlyIncome || isNaN(income) || income <= 0) {
-        Alert.alert('Invalid Input', 'Please enter a valid monthly income greater than 0');
-        return;
+    const totalSteps = getTotalSteps();
+    const isLastStep = currentStep === totalSteps - 1;
+
+    if (selectedMode === 'financial' || selectedMode === 'both') {
+      const incomeStep = selectedMode === 'both' ? 1 : 1;
+      const householdStep = selectedMode === 'both' ? 2 : 2;
+      const goalsStep = selectedMode === 'both' ? 3 : 3;
+
+      if (currentStep === incomeStep) {
+        const income = parseFloat(monthlyIncome);
+        if (!monthlyIncome || isNaN(income) || income <= 0) {
+          Alert.alert('Invalid Input', 'Please enter a valid monthly income greater than 0');
+          return;
+        }
+      }
+
+      if (currentStep === householdStep) {
+        const size = parseInt(householdSize);
+        if (!householdSize || isNaN(size) || size < 1) {
+          Alert.alert('Invalid Input', 'Please enter a valid household size');
+          return;
+        }
+      }
+
+      if (currentStep === goalsStep) {
+        if (selectedGoals.length === 0) {
+          Alert.alert('Selection Required', 'Please select at least one financial goal');
+          return;
+        }
       }
     }
 
-    if (currentStep === 1) {
-      const size = parseInt(householdSize);
-      if (!householdSize || isNaN(size) || size < 1) {
-        Alert.alert('Invalid Input', 'Please enter a valid household size');
-        return;
+    if (selectedMode === 'personal' || selectedMode === 'both') {
+      const interestsStep = selectedMode === 'both' ? 5 : 1;
+      const focusStep = selectedMode === 'both' ? 6 : 3;
+
+      if (currentStep === interestsStep) {
+        if (personalInterests.length === 0) {
+          Alert.alert('Selection Required', 'Please select at least one interest');
+          return;
+        }
+      }
+
+      if (currentStep === focusStep) {
+        if (focusAreas.length === 0) {
+          Alert.alert('Selection Required', 'Please select at least one focus area');
+          return;
+        }
       }
     }
 
-    if (currentStep === 2) {
-      if (selectedGoals.length === 0) {
-        Alert.alert('Selection Required', 'Please select at least one financial goal');
-        return;
-      }
-    }
-
-    if (currentStep < 3) {
+    if (!isLastStep) {
       animateSlide('forward');
       setTimeout(() => {
         setCurrentStep(currentStep + 1);
@@ -219,23 +306,29 @@ export default function OnboardingScreen() {
 
       console.log('Signup successful, user ID:', authData.user.id);
       
-      // Wait a moment for auth state to propagate
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Create profile directly with Supabase since we have the user ID
       const { createProfileDirect } = await import('@/lib/supabase');
       const success = await createProfileDirect(authData.user.id, {
         name: params.name,
         email: params.email,
-        monthlyIncome: parseFloat(monthlyIncome),
-        householdSize: parseInt(householdSize),
-        primaryGoals: selectedGoals,
-        riskTolerance,
+        preferredMode: selectedMode,
+        monthlyIncome: selectedMode !== 'personal' ? parseFloat(monthlyIncome) : 0,
+        householdSize: selectedMode !== 'personal' ? parseInt(householdSize) : 1,
+        primaryGoals: selectedMode !== 'personal' ? selectedGoals : [],
+        riskTolerance: selectedMode !== 'personal' ? riskTolerance : 'moderate',
+        personalInterests: selectedMode !== 'financial' ? personalInterests : [],
+        dailyRoutineStart: selectedMode !== 'financial' ? dailyRoutineStart : undefined,
+        dailyRoutineEnd: selectedMode !== 'financial' ? dailyRoutineEnd : undefined,
+        focusAreas: selectedMode !== 'financial' ? focusAreas : [],
       });
 
       if (success) {
         console.log('Profile created successfully, navigating to home...');
-        router.replace('/(tabs)/(home)/home' as any);
+        const destination = selectedMode === 'personal' 
+          ? '/(tabs)/(personal)/personal' 
+          : '/(tabs)/(home)/home';
+        router.replace(destination as any);
       } else {
         Alert.alert('Error', 'Failed to complete onboarding. Please try again.');
       }
@@ -255,226 +348,533 @@ export default function OnboardingScreen() {
     }
   };
 
+  const toggleInterest = (interest: string) => {
+    if (personalInterests.includes(interest)) {
+      setPersonalInterests(personalInterests.filter(i => i !== interest));
+    } else {
+      setPersonalInterests([...personalInterests, interest]);
+    }
+  };
+
+  const toggleFocusArea = (area: string) => {
+    if (focusAreas.includes(area)) {
+      setFocusAreas(focusAreas.filter(a => a !== area));
+    } else {
+      setFocusAreas([...focusAreas, area]);
+    }
+  };
+
   const renderStep = () => {
+    if (selectedMode === 'financial') {
+      return renderFinancialSteps();
+    } else if (selectedMode === 'personal') {
+      return renderPersonalSteps();
+    } else {
+      return renderBothSteps();
+    }
+  };
+
+  const renderFinancialSteps = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <View style={styles.stepContent}>
-            <View style={styles.headerContainer}>
-              <View style={styles.iconBadge}>
-                <Image 
-                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
-                  style={styles.iconImage}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.stepTitle}>Monthly Income</Text>
-              <Text style={styles.stepDescription}>
-                Enter your total monthly income after taxes. This builds your budget foundation.
-              </Text>
-            </View>
-            
-            <View style={styles.inputContainer}>
-              <Text style={styles.currencyPrefix}>JD</Text>
-              <TextInput
-                ref={incomeInputRef}
-                style={styles.mainInput}
-                value={monthlyIncome}
-                onChangeText={setMonthlyIncome}
-                keyboardType="decimal-pad"
-                placeholder="0"
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                returnKeyType="next"
-                onSubmitEditing={handleNext}
-                selectionColor="#FFFFFF"
-                blurOnSubmit={false}
-              />
-            </View>
-          </View>
-        );
-
+        return renderModeSelection();
       case 1:
-        return (
-          <View style={styles.stepContent}>
-            <View style={styles.headerContainer}>
-              <View style={styles.iconBadge}>
-                <Image 
-                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
-                  style={styles.iconImage}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.stepTitle}>Household Size</Text>
-              <Text style={styles.stepDescription}>
-                How many people does this income support?
-              </Text>
-            </View>
-
-            <View style={styles.gridContainer}>
-              {[1, 2, 3, 4, 5, 6].map(size => (
-                <TouchableOpacity
-                  key={size}
-                  style={[
-                    styles.gridOption,
-                    householdSize === size.toString() && styles.gridOptionSelected,
-                  ]}
-                  onPress={() => setHouseholdSize(size.toString())}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      styles.gridOptionText,
-                      householdSize === size.toString() && styles.gridOptionTextSelected,
-                    ]}
-                  >
-                    {size}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            
-            <View style={styles.otherInputContainer}>
-              <Text style={styles.otherLabel}>Other amount</Text>
-              <TextInput
-                ref={householdInputRef}
-                style={styles.otherInput}
-                value={householdSize}
-                onChangeText={setHouseholdSize}
-                keyboardType="number-pad"
-                placeholder="#"
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                returnKeyType="next"
-                onSubmitEditing={handleNext}
-                selectionColor="#FFFFFF"
-                blurOnSubmit={false}
-              />
-            </View>
-          </View>
-        );
-
+        return renderMonthlyIncome();
       case 2:
-        return (
-          <View style={styles.stepContent}>
-             <View style={styles.headerContainer}>
-              <View style={styles.iconBadge}>
-                <Image 
-                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
-                  style={styles.iconImage}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.stepTitle}>Financial Goals</Text>
-              <Text style={styles.stepDescription}>
-                What are you aiming for? Select all that apply.
-              </Text>
-            </View>
-
-            <ScrollView 
-              style={styles.scrollContainer} 
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.goalsGrid}>
-                {AVAILABLE_GOALS.map((goal) => {
-                  const Icon = goal.icon;
-                  const isSelected = selectedGoals.includes(goal.id);
-                  return (
-                    <TouchableOpacity
-                      key={goal.id}
-                      style={[
-                        styles.goalCard,
-                        isSelected && styles.goalCardSelected,
-                      ]}
-                      onPress={() => toggleGoal(goal.id)}
-                      activeOpacity={0.7}
-                    >
-                      <View style={[styles.goalIconWrapper, isSelected && styles.goalIconWrapperSelected]}>
-                        <Icon size={24} color={isSelected ? AppColors.primary : '#FFFFFF'} />
-                      </View>
-                      <Text
-                        style={[
-                          styles.goalText,
-                          isSelected && styles.goalTextSelected,
-                        ]}
-                      >
-                        {goal.id}
-                      </Text>
-                      {isSelected && (
-                        <View style={styles.checkMark}>
-                          <Check size={14} color={AppColors.primary} />
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
-        );
-
+        return renderHouseholdSize();
       case 3:
-        return (
-          <View style={styles.stepContent}>
-            <View style={styles.headerContainer}>
-              <View style={styles.iconBadge}>
-                <Image 
-                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
-                  style={styles.iconImage}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.stepTitle}>Risk Tolerance</Text>
-              <Text style={styles.stepDescription}>
-                Select the approach that best matches your investment style.
-              </Text>
-            </View>
-
-            <View style={styles.riskList}>
-              {RISK_OPTIONS.map(option => {
-                 const Icon = option.icon;
-                 const isSelected = riskTolerance === option.value;
-                 return (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.riskCard,
-                      isSelected && styles.riskCardSelected,
-                    ]}
-                    onPress={() => setRiskTolerance(option.value)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.riskIconBox, isSelected && styles.riskIconBoxSelected]}>
-                      <Icon size={24} color={isSelected ? AppColors.primary : '#FFFFFF'} />
-                    </View>
-                    <View style={styles.riskInfo}>
-                      <Text
-                        style={[
-                          styles.riskTitle,
-                          isSelected && styles.riskTitleSelected,
-                        ]}
-                      >
-                        {option.label}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.riskDesc,
-                          isSelected && styles.riskDescSelected,
-                        ]}
-                      >
-                        {option.description}
-                      </Text>
-                    </View>
-                    {isSelected && <Check size={20} color={AppColors.primary} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        );
-
+        return renderFinancialGoals();
+      case 4:
+        return renderRiskTolerance();
       default:
         return null;
     }
+  };
+
+  const renderPersonalSteps = () => {
+    switch (currentStep) {
+      case 0:
+        return renderModeSelection();
+      case 1:
+        return renderPersonalInterests();
+      case 2:
+        return renderDailyRoutine();
+      case 3:
+        return renderFocusAreas();
+      default:
+        return null;
+    }
+  };
+
+  const renderBothSteps = () => {
+    switch (currentStep) {
+      case 0:
+        return renderModeSelection();
+      case 1:
+        return renderMonthlyIncome();
+      case 2:
+        return renderHouseholdSize();
+      case 3:
+        return renderFinancialGoals();
+      case 4:
+        return renderRiskTolerance();
+      case 5:
+        return renderPersonalInterests();
+      case 6:
+        return renderFocusAreas();
+      default:
+        return null;
+    }
+  };
+
+  const renderModeSelection = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Choose Your Mode</Text>
+          <Text style={styles.stepDescription}>
+            How do you want to use DomusIQ?
+          </Text>
+        </View>
+
+        <View style={styles.modeList}>
+          {MODE_OPTIONS.map(option => {
+            const Icon = option.icon;
+            const isSelected = selectedMode === option.value;
+            return (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.modeCard,
+                  isSelected && styles.modeCardSelected,
+                ]}
+                onPress={() => setSelectedMode(option.value)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.modeIconBox, isSelected && { backgroundColor: `${option.color}15` }]}>
+                  <Icon size={28} color={isSelected ? option.color : '#FFFFFF'} />
+                </View>
+                <View style={styles.modeInfo}>
+                  <Text
+                    style={[
+                      styles.modeTitle,
+                      isSelected && styles.modeTitleSelected,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.modeDesc,
+                      isSelected && styles.modeDescSelected,
+                    ]}
+                  >
+                    {option.description}
+                  </Text>
+                </View>
+                {isSelected && <Check size={20} color={option.color} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const renderMonthlyIncome = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Monthly Income</Text>
+          <Text style={styles.stepDescription}>
+            Enter your total monthly income after taxes. This builds your budget foundation.
+          </Text>
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <Text style={styles.currencyPrefix}>JD</Text>
+          <TextInput
+            ref={incomeInputRef}
+            style={styles.mainInput}
+            value={monthlyIncome}
+            onChangeText={setMonthlyIncome}
+            keyboardType="decimal-pad"
+            placeholder="0"
+            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            returnKeyType="next"
+            onSubmitEditing={handleNext}
+            selectionColor="#FFFFFF"
+            blurOnSubmit={false}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  const renderHouseholdSize = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Household Size</Text>
+          <Text style={styles.stepDescription}>
+            How many people does this income support?
+          </Text>
+        </View>
+
+        <View style={styles.gridContainer}>
+          {[1, 2, 3, 4, 5, 6].map(size => (
+            <TouchableOpacity
+              key={size}
+              style={[
+                styles.gridOption,
+                householdSize === size.toString() && styles.gridOptionSelected,
+              ]}
+              onPress={() => setHouseholdSize(size.toString())}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.gridOptionText,
+                  householdSize === size.toString() && styles.gridOptionTextSelected,
+                ]}
+              >
+                {size}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        <View style={styles.otherInputContainer}>
+          <Text style={styles.otherLabel}>Other amount</Text>
+          <TextInput
+            ref={householdInputRef}
+            style={styles.otherInput}
+            value={householdSize}
+            onChangeText={setHouseholdSize}
+            keyboardType="number-pad"
+            placeholder="#"
+            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            returnKeyType="next"
+            onSubmitEditing={handleNext}
+            selectionColor="#FFFFFF"
+            blurOnSubmit={false}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  const renderFinancialGoals = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Financial Goals</Text>
+          <Text style={styles.stepDescription}>
+            What are you aiming for? Select all that apply.
+          </Text>
+        </View>
+
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.goalsGrid}>
+            {AVAILABLE_GOALS.map((goal) => {
+              const Icon = goal.icon;
+              const isSelected = selectedGoals.includes(goal.id);
+              return (
+                <TouchableOpacity
+                  key={goal.id}
+                  style={[
+                    styles.goalCard,
+                    isSelected && styles.goalCardSelected,
+                  ]}
+                  onPress={() => toggleGoal(goal.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.goalIconWrapper, isSelected && styles.goalIconWrapperSelected]}>
+                    <Icon size={24} color={isSelected ? AppColors.primary : '#FFFFFF'} />
+                  </View>
+                  <Text
+                    style={[
+                      styles.goalText,
+                      isSelected && styles.goalTextSelected,
+                    ]}
+                  >
+                    {goal.id}
+                  </Text>
+                  {isSelected && (
+                    <View style={styles.checkMark}>
+                      <Check size={14} color={AppColors.primary} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  const renderRiskTolerance = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Risk Tolerance</Text>
+          <Text style={styles.stepDescription}>
+            Select the approach that best matches your investment style.
+          </Text>
+        </View>
+
+        <View style={styles.riskList}>
+          {RISK_OPTIONS.map(option => {
+            const Icon = option.icon;
+            const isSelected = riskTolerance === option.value;
+            return (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.riskCard,
+                  isSelected && styles.riskCardSelected,
+                ]}
+                onPress={() => setRiskTolerance(option.value)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.riskIconBox, isSelected && styles.riskIconBoxSelected]}>
+                  <Icon size={24} color={isSelected ? AppColors.primary : '#FFFFFF'} />
+                </View>
+                <View style={styles.riskInfo}>
+                  <Text
+                    style={[
+                      styles.riskTitle,
+                      isSelected && styles.riskTitleSelected,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.riskDesc,
+                      isSelected && styles.riskDescSelected,
+                    ]}
+                  >
+                    {option.description}
+                  </Text>
+                </View>
+                {isSelected && <Check size={20} color={AppColors.primary} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const renderPersonalInterests = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Your Interests</Text>
+          <Text style={styles.stepDescription}>
+            What matters most to you? Select all that apply.
+          </Text>
+        </View>
+
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.goalsGrid}>
+            {PERSONAL_INTERESTS.map((interest) => {
+              const Icon = interest.icon;
+              const isSelected = personalInterests.includes(interest.id);
+              return (
+                <TouchableOpacity
+                  key={interest.id}
+                  style={[
+                    styles.goalCard,
+                    isSelected && styles.goalCardSelected,
+                  ]}
+                  onPress={() => toggleInterest(interest.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.goalIconWrapper, isSelected && styles.goalIconWrapperSelected]}>
+                    <Icon size={24} color={isSelected ? '#EC4899' : '#FFFFFF'} />
+                  </View>
+                  <Text
+                    style={[
+                      styles.goalText,
+                      isSelected && { color: '#EC4899' },
+                    ]}
+                  >
+                    {interest.label}
+                  </Text>
+                  {isSelected && (
+                    <View style={[styles.checkMark, { backgroundColor: 'rgba(236, 72, 153, 0.1)' }]}>
+                      <Check size={14} color="#EC4899" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  const renderDailyRoutine = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Daily Routine</Text>
+          <Text style={styles.stepDescription}>
+            When does your typical day start and end?
+          </Text>
+        </View>
+
+        <View style={styles.routineContainer}>
+          <View style={styles.routineItem}>
+            <View style={styles.routineIconWrapper}>
+              <Sun size={24} color="#FFFFFF" />
+            </View>
+            <View style={styles.routineContent}>
+              <Text style={styles.routineLabel}>Day Starts</Text>
+              <TextInput
+                style={styles.routineInput}
+                value={dailyRoutineStart}
+                onChangeText={setDailyRoutineStart}
+                placeholder="07:00"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                selectionColor="#FFFFFF"
+              />
+            </View>
+          </View>
+
+          <View style={styles.routineItem}>
+            <View style={styles.routineIconWrapper}>
+              <Moon size={24} color="#FFFFFF" />
+            </View>
+            <View style={styles.routineContent}>
+              <Text style={styles.routineLabel}>Day Ends</Text>
+              <TextInput
+                style={styles.routineInput}
+                value={dailyRoutineEnd}
+                onChangeText={setDailyRoutineEnd}
+                placeholder="22:00"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                selectionColor="#FFFFFF"
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderFocusAreas = () => {
+    return (
+      <View style={styles.stepContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.iconBadge}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.stepTitle}>Focus Areas</Text>
+          <Text style={styles.stepDescription}>
+            What do you want to improve? Select all that apply.
+          </Text>
+        </View>
+
+        <View style={styles.focusList}>
+          {FOCUS_AREAS.map((area) => {
+            const Icon = area.icon;
+            const isSelected = focusAreas.includes(area.id);
+            return (
+              <TouchableOpacity
+                key={area.id}
+                style={[
+                  styles.riskCard,
+                  isSelected && styles.riskCardSelected,
+                ]}
+                onPress={() => toggleFocusArea(area.id)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.riskIconBox, isSelected && { backgroundColor: 'rgba(236, 72, 153, 0.1)' }]}>
+                  <Icon size={24} color={isSelected ? '#EC4899' : '#FFFFFF'} />
+                </View>
+                <View style={styles.riskInfo}>
+                  <Text
+                    style={[
+                      styles.riskTitle,
+                      isSelected && { color: '#EC4899' },
+                    ]}
+                  >
+                    {area.label}
+                  </Text>
+                </View>
+                {isSelected && <Check size={20} color="#EC4899" />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
   };
 
   return (
@@ -561,7 +961,7 @@ export default function OnboardingScreen() {
                             <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
                                 <TouchableOpacity
                                     style={[styles.nextButton, isLoading && styles.buttonDisabled]}
-                                    onPress={currentStep === 3 ? handleComplete : handleNext}
+                                    onPress={currentStep === getTotalSteps() - 1 ? handleComplete : handleNext}
                                     onPressIn={() => {
                                         Animated.spring(buttonScaleAnim, {
                                             toValue: 0.95,
@@ -578,7 +978,7 @@ export default function OnboardingScreen() {
                                     activeOpacity={0.9}
                                 >
                                     <Text style={styles.nextButtonText}>
-                                    {isLoading ? 'Processing...' : currentStep === 3 ? 'Get Started' : 'Continue'}
+                                    {isLoading ? 'Processing...' : currentStep === getTotalSteps() - 1 ? 'Get Started' : 'Continue'}
                                     </Text>
                                     {!isLoading && <ArrowRight color={AppColors.primary} size={20} />}
                                 </TouchableOpacity>
@@ -873,6 +1273,96 @@ const styles = StyleSheet.create({
   },
   riskDescSelected: {
     color: 'rgba(37, 99, 235, 0.8)',
+  },
+
+  // Mode Selection
+  modeList: {
+    gap: 12,
+  },
+  modeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  modeCardSelected: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
+  },
+  modeIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  modeInfo: {
+    flex: 1,
+  },
+  modeTitle: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 17,
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  modeTitleSelected: {
+    color: '#000000',
+  },
+  modeDesc: {
+    fontFamily: sfProDisplayRegular,
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  modeDescSelected: {
+    color: 'rgba(0, 0, 0, 0.6)',
+  },
+
+  // Daily Routine
+  routineContainer: {
+    gap: 16,
+  },
+  routineItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  routineIconWrapper: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  routineContent: {
+    flex: 1,
+  },
+  routineLabel: {
+    fontFamily: sfProDisplayMedium,
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 8,
+  },
+  routineInput: {
+    fontFamily: sfProDisplayBold,
+    fontSize: 20,
+    color: '#FFFFFF',
+    padding: 0,
+  },
+
+  // Focus Areas
+  focusList: {
+    gap: 12,
   },
 
   // Footer

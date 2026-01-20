@@ -3,8 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { router } from 'expo-router';
 import { Animated, Easing } from 'react-native';
+import { supabase } from '@/lib/supabase';
 
-export type AppMode = 'financial' | 'personal';
+export type AppMode = 'financial' | 'personal' | 'both';
 
 const STORAGE_KEY = '@domusiq_app_mode';
 
@@ -21,9 +22,30 @@ export const [AppModeProvider, useAppMode] = createContextHook(() => {
 
   const loadMode = async () => {
     try {
-      const savedMode = await AsyncStorage.getItem(STORAGE_KEY);
-      if (savedMode === 'financial' || savedMode === 'personal') {
-        setModeState(savedMode);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('preferred_mode')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (profile?.preferred_mode) {
+          const preferredMode = profile.preferred_mode as AppMode;
+          setModeState(preferredMode === 'both' ? 'financial' : preferredMode);
+          await AsyncStorage.setItem(STORAGE_KEY, preferredMode === 'both' ? 'financial' : preferredMode);
+        } else {
+          const savedMode = await AsyncStorage.getItem(STORAGE_KEY);
+          if (savedMode === 'financial' || savedMode === 'personal') {
+            setModeState(savedMode);
+          }
+        }
+      } else {
+        const savedMode = await AsyncStorage.getItem(STORAGE_KEY);
+        if (savedMode === 'financial' || savedMode === 'personal') {
+          setModeState(savedMode);
+        }
       }
     } catch (error) {
       console.error('Error loading app mode:', error);
@@ -88,8 +110,8 @@ export const [AppModeProvider, useAppMode] = createContextHook(() => {
     });
   }, [mode, setMode, transitionProgress, transitionScale]);
 
-  const isFinancialMode = mode === 'financial';
-  const isPersonalMode = mode === 'personal';
+  const isFinancialMode = mode === 'financial' || mode === 'both';
+  const isPersonalMode = mode === 'personal' || mode === 'both';
 
   return useMemo(() => ({
     mode,
