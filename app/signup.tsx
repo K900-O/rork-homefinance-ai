@@ -209,7 +209,7 @@ export default function SignupScreen() {
               >
                 <View style={styles.logoContainer}>
                   <Image 
-                    source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
+                    source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
                     style={styles.logo}
                     resizeMode="contain"
                   />
