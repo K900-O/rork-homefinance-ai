@@ -108,7 +108,7 @@ export default function HomeScreen() {
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <Image 
-                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ptej5vs470eje74ucn753' }} 
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/p5szue4vv3t2cfak2304t' }} 
                 style={styles.logo}
                 resizeMode="contain"
               />

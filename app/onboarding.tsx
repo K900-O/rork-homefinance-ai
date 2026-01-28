@@ -421,7 +421,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -482,7 +482,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -519,7 +519,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -579,7 +579,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -640,7 +640,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -701,7 +701,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -762,7 +762,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />
@@ -818,7 +818,7 @@ export default function OnboardingScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.iconBadge}>
             <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/tuczontkm4ohdugp8m10b' }}
               style={styles.iconImage}
               resizeMode="contain"
             />

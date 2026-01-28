@@ -135,7 +135,7 @@ export default function LandingScreen() {
             <View style={styles.menuItemActiveContainer}>
               <View style={styles.activeIconContainer}>
                 <Image 
-                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+                  source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/p5szue4vv3t2cfak2304t' }}
                   style={styles.activeIcon}
                   resizeMode="contain"
                 />
@@ -187,7 +187,7 @@ export default function LandingScreen() {
           <View style={styles.logoContainer}>
             <Animated.Image 
               source={{ 
-                uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh',
+                uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/p5szue4vv3t2cfak2304t',
               }}
               style={[
                 styles.logoImage,
@@ -214,7 +214,7 @@ export default function LandingScreen() {
           <View style={styles.contentHeader}>
             <View style={styles.iconBadge}>
                <Image 
-                 source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fb2ysglec16vmb3t12bzh' }}
+                 source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/p5szue4vv3t2cfak2304t' }}
                  style={styles.iconBadgeImage}
                  resizeMode="contain"
                />
