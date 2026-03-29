@@ -214,7 +214,7 @@ export default function LandingScreen() {
           <View style={styles.contentHeader}>
             <View style={styles.iconBadge}>
                <Image 
-                 source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/p5szue4vv3t2cfak2304t' }}
+                 source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/c19htsxnr4jhi05wp0k5u' }}
                  style={styles.iconBadgeImage}
                  resizeMode="contain"
                />
